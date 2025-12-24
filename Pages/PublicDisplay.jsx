@@ -88,26 +88,9 @@ export default function PublicDisplay() {
     };
 
     return (
-        <div className="h-screen flex flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-teal-900 overflow-hidden relative">
-            
-            {/* כפתור גלילה אוטומטית */}
-            {rides.length > 0 && (
-                <div 
-                    onClick={() => setIsAutoScrollEnabled(!isAutoScrollEnabled)}
-                    className="fixed top-10 left-10 z-50 flex items-center gap-4 px-5 py-3 rounded-full bg-black/40 backdrop-blur-md border border-white/10 shadow-xl cursor-pointer hover:bg-black/60 transition-all select-none group"
-                >
-                    <span className="text-white/90 font-medium text-lg">גלילה אוטומטית</span>
-                    <div className={`w-14 h-8 rounded-full p-1 transition-colors duration-300 ease-in-out ${
-                        isAutoScrollEnabled ? 'bg-teal-500' : 'bg-slate-600 group-hover:bg-slate-500'
-                    }`}>
-                        <div className={`bg-white w-6 h-6 rounded-full shadow-md transform transition-transform duration-300 ease-in-out ${
-                            isAutoScrollEnabled ? '-translate-x-6' : 'translate-x-0'
-                        }`} />
-                    </div>
-                </div>
-            )}
+        <div className="h-full flex flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-teal-900 overflow-hidden relative">
 
-            <div className="pt-8 px-8 flex-shrink-0">
+            <div className=" px-8 flex-shrink-0">
                 <PublicDisplayHeader />
             </div>
 
@@ -123,8 +106,8 @@ export default function PublicDisplay() {
                             <NoRidesMessage />
                         ) : (
                             <div 
-                                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full"
-                                style={{ paddingBottom: '30px' }} 
+                                className="grid grid-cols-1 gap-8 w-full"
+                                //style={{ paddingBottom: '50px' }} 
                             >
                                 {rides.map((ride) => (
                                     <RideCard

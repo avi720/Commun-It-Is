@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect} from 'react';
 import { Menu } from 'lucide-react';
-import { Outlet } from 'react-router-dom'; // <--- הרכיב החדש
+import { Outlet} from 'react-router-dom';
 import Sidebar from './HomePageComp/Sidebar';
 
 export default function MainLayout({ onLogout }) {
@@ -11,23 +11,39 @@ export default function MainLayout({ onLogout }) {
     const storedUser = localStorage.getItem('tremp_userData');
     if (storedUser) {
       setUserData(JSON.parse(storedUser));
+      setUserData(parsedUser);
     }
-  }, []);
+    // 2. בדיקה מול השרת: האם המשתמש הזה באמת קיים?
+      fetch(`${API_URL}/users/check/${parsedUser.email}`)
+        .then(response => {
+            if (!response.ok) {
+                // אופס! השרת לא מכיר אותנו (כנראה ה-DB נמחק)
+                console.warn("User not found in DB - logging out");
+                onLogout(); // זורק את המשתמש החוצה
+            }
+        })
+        .catch(err => {
+            console.error("Connection error:", err);
+            // כאן אפשר להחליט אם לנתק או לתת להמשיך (למשל אם אין אינטרנט)
+        });
+  }, [onLogout]);
 
   return (
-    <div className="relative w-full h-full bg-[#0f172a] text-white overflow-hidden">
+    // השינוי הגדול: h-screen (גובה מסך בדיוק) ו-flex-col
+    <div className="flex flex-col h-screen w-full bg-[#0f172a] text-white overflow-hidden">
       
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 h-16 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 flex items-center justify-between px-4 z-30 shadow-sm">
+      {/* הורדנו את fixed ושמנו flex-none (גובה קבוע שלא משתנה) */}
+      <header className="flex-none h-16 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 flex items-center justify-between px-4 z-30 shadow-sm relative">
         <button onClick={() => setIsSidebarOpen(true)} className="p-2 hover:bg-slate-800 rounded-full transition-colors">
           <Menu className="w-6 h-6 text-white" />
         </button>
         <h1 className="text-xl font-bold bg-gradient-to-r from-teal-400 to-blue-500 bg-clip-text text-transparent">
-          קהילת עזריקם
+         {userData?.city ? `קהילת ${userData.city}` : 'קהילת טרמפיקציה'}
         </h1>
       </header>
 
-      {/* Sidebar - כבר לא צריך להעביר לו currentView */}
+      {/* Sidebar - נשאר כמו שהוא כי הוא Fixed מעל הכל */}
       <Sidebar 
         isOpen={isSidebarOpen} 
         onClose={() => setIsSidebarOpen(false)}
@@ -35,8 +51,9 @@ export default function MainLayout({ onLogout }) {
       />
 
       {/* אזור התוכן */}
-      <main className="pt-16 px-2 h-full overflow-y-auto pb-10">
-        {/* מעבירים את המשתמש דרך ה-Context של הראוטר */}
+      {/* flex-1: תפוס את כל המקום שנשאר אחרי ההדר */}
+      {/* overflow-y-auto: אם התוכן ארוך, תגלול רק כאן בפנים */}
+      <main className="flex-1 overflow-y-auto relative">
         <Outlet context={{ user: userData }} /> 
       </main>
 

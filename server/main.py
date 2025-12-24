@@ -29,6 +29,7 @@ app.add_middleware(
 class UserSchema(BaseModel):
     firstName: str
     lastName: str
+    city: str
     address: str
     age: int
     email: str      # חובה בשביל לוגין
@@ -36,6 +37,7 @@ class UserSchema(BaseModel):
 
 class RideSchema(BaseModel):
     driver_name: str
+    location: str
     destination: str
     departure_time: str # אנחנו מצפים לתאריך מלא בפורמט ISO
     seats: int
@@ -63,6 +65,7 @@ def init_db():
                 password TEXT,
                 firstName TEXT,
                 lastName TEXT,
+                city TEXT,
                 address TEXT,
                 age INTEGER
             )
@@ -73,6 +76,7 @@ def init_db():
             CREATE TABLE IF NOT EXISTS rides (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 driver_name TEXT,
+                location TEXT,
                 destination TEXT,
                 departure_time TEXT,
                 seats INTEGER,
@@ -92,9 +96,9 @@ async def create_user(user: UserSchema):
         with sqlite3.connect(DB_NAME) as conn:
             cursor = conn.cursor()
             cursor.execute('''
-                INSERT INTO users (email, password, firstName, lastName, address, age)
-                VALUES (?, ?, ?, ?, ?, ?)
-            ''', (user.email, user.password, user.firstName, user.lastName, user.address, user.age))
+                INSERT INTO users (email, password, firstName, lastName, city, address, age)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            ''', (user.email, user.password, user.firstName, user.lastName, user.city, user.address, user.age))
             conn.commit()
             
         print(f"New user registered: {user.firstName} {user.lastName}")
@@ -123,6 +127,19 @@ async def login(credentials: LoginSchema):
             return dict(user)
         else:
             raise HTTPException(status_code=401, detail="Invalid email or password")
+        
+@app.get("/api/users/check/{email}")
+def check_user_exists(email: str):
+    with sqlite3.connect(DB_NAME) as conn:
+        cursor = conn.cursor()
+        cursor.execute('SELECT id FROM users WHERE email = ?', (email,))
+        user = cursor.fetchone()
+        
+        if user:
+            return {"status": "exists"}
+        else:
+            # אם המשתמש לא נמצא ב-DB, נחזיר שגיאה 404
+            raise HTTPException(status_code=404, detail="User not found")
 
 @app.get("/api/rides")
 def get_rides():
@@ -156,9 +173,9 @@ def create_ride(ride: RideSchema):
     with sqlite3.connect(DB_NAME) as conn:
         cursor = conn.cursor()
         cursor.execute('''
-            INSERT INTO rides (driver_name, destination, departure_time, seats, created_date)
-            VALUES (?, ?, ?, ?, ?)
-        ''', (ride.driver_name, ride.destination, ride.departure_time, ride.seats, created_date))
+            INSERT INTO rides (driver_name, location, destination, departure_time, seats, created_date)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ''', (ride.driver_name, ride.location, ride.destination, ride.departure_time, ride.seats, created_date))
         conn.commit()
         ride_id = cursor.lastrowid # מקבלים את ה-ID החדש שנוצר
     
@@ -173,7 +190,7 @@ def get_all_users():
     with sqlite3.connect(DB_NAME) as conn:
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
-        cursor.execute('SELECT id, firstName, lastName, email, address, age FROM users')
+        cursor.execute('SELECT id, firstName, lastName, email, city, address, age FROM users')
         return [dict(row) for row in cursor.fetchall()]
 
 if __name__ == "__main__":

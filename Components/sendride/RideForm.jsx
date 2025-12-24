@@ -8,6 +8,8 @@ import TimeSelection from "./TimeSelection";
 export default function RideForm({
     driverName,
     setDriverName,
+    // location,
+    // setLocation,
     destination,
     setDestination,
     departureMinutes,
@@ -24,11 +26,19 @@ export default function RideForm({
             try {
                 const user = JSON.parse(savedUser);
                 const fullName = `${user.firstName} ${user.lastName}`;
-                
+                const fullAddress = user.city && user.address 
+                                    ? `${user.address}, ${user.city}` 
+                                    : (user.address || '');
                 // בדיקה אם השדה ריק לפני שדורסים אותו (כדי לא להפריע אם המשתמש כבר הקליד)
-                if (!driverName) {
-                    setDriverName(fullName);
-                }
+                if (!driverName) setDriverName(fullName);
+                if (!destination && fullAddress) setDestination(fullAddress);
+
+                // setFormData(prev => ({
+                //     ...prev,
+                //     driverName: fullName,
+                //     origin: fullAddress  // ממלאים את הכתובת המלאה
+                // }));
+
             } catch (e) {
                 console.error("Error parsing user data", e);
             }
