@@ -64,7 +64,7 @@ export default function MainLayout({ onLogout }) {
       {/* אזור התוכן */}
       {/* flex-1: תפוס את כל המקום שנשאר אחרי ההדר */}
       {/* overflow-y-auto: אם התוכן ארוך, תגלול רק כאן בפנים */}
-      <main className="flex-1 overflow-y-auto bg-slate-800 relative">
+      <main className="flex-1 overflow-y-auto bg-gradient-to-br from-slate-900 via-slate-800 to-teal-900 relative">
         <Outlet context={{ user: userData }} /> 
       </main>
 

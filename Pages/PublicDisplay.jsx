@@ -5,18 +5,18 @@ import { AnimatePresence } from "framer-motion";
 import PublicDisplayHeader from "../Components/publicdisplay/PublicDisplayHeader";
 import RideCard from "../Components/publicdisplay/RideCard";
 import NoRidesMessage from "../Components/publicdisplay/NoRidesMessage";
-import CurrentTimeDisplay from "../Components/publicdisplay/CurrentTimeDisplay";
 
 export default function PublicDisplay() {
     const [currentTime, setCurrentTime] = useState(new Date());
-    const [isAutoScrollEnabled, setIsAutoScrollEnabled] = useState(false);
     const containerRef = useRef(null);
 
+    // --- עדכון הזמן הנוכחי כל שנייה ---
     useEffect(() => {
         const timer = setInterval(() => setCurrentTime(new Date()), 1000);
         return () => clearInterval(timer);
     }, []);
 
+    // --- שליפת נסיעות עם סינון ותזמון מחדש ---
     const { data: rides = [] } = useQuery({
         queryKey: ['rides'],
         queryFn: async () => {
@@ -31,48 +31,7 @@ export default function PublicDisplay() {
         initialData: []
     });
 
-    // --- לוגיקת גלילה מתוקנת ---
-    useEffect(() => {
-        const container = containerRef.current;
-        if (!container || !isAutoScrollEnabled || rides.length === 0) return;
-
-        let scrollInterval;
-        let resetTimeout;
-        let restartTimeout; // 1. המשתנה החדש שעוקב אחרי ההפעלה מחדש
-
-        const startScrolling = () => {
-            if (container.scrollHeight <= container.clientHeight) return;
-
-            scrollInterval = setInterval(() => {
-                // בדיקה אם הגענו לתחתית
-                if (container.scrollTop + container.clientHeight >= container.scrollHeight - 5) {
-                    clearInterval(scrollInterval);
-                    
-                    resetTimeout = setTimeout(() => {
-                        container.scrollTo({ top: 0, behavior: 'smooth' });
-                        
-                        // 2. כאן התיקון: שמרנו את הטיימר הזה למשתנה
-                        restartTimeout = setTimeout(() => {
-                            startScrolling();
-                        }, 2000);
-
-                    }, 2000);
-                } else {
-                    container.scrollTop += 2; 
-                }
-            }, 40); 
-        };
-
-        startScrolling();
-
-        // 3. ניקוי יסודי: מוחקים את כל סוגי הטיימרים כשמכבים את הכפתור
-        return () => {
-            clearInterval(scrollInterval);
-            clearTimeout(resetTimeout);
-            clearTimeout(restartTimeout); // חיסול ה"זומבי"
-        };
-    }, [isAutoScrollEnabled, rides.length]);
-
+    // חישוב תצוגת זמן ונקודת צבע לכל נסיעה
     const getTimeDisplay = (departureTime) => {
         const diffMinutes = Math.floor((new Date(departureTime) - currentTime) / 1000 / 60);
         if (diffMinutes <= 0) return `יצא לפני: ${Math.abs(diffMinutes)} דק'`;
@@ -122,10 +81,6 @@ export default function PublicDisplay() {
                         )}
                     </AnimatePresence>
                 </div>
-            </div>
-
-            <div className="flex-shrink-0">
-                <CurrentTimeDisplay currentTime={currentTime} />
             </div>
         </div>
     );

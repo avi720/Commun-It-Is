@@ -133,8 +133,7 @@ export default function RideForm({
     };
 
     return (
-        <form onSubmit={onSubmit} className="space-y-6">
-            
+        <div onSubmit={onSubmit} className="space-y-6">
             {/* שדה מי אני */}
             <div className="space-y-2">
                 <Label htmlFor="driver" className="text-sm font-medium text-slate-300 flex items-center gap-2">
@@ -269,6 +268,6 @@ export default function RideForm({
                     </div>
                 )}
             </Button>
-        </form>
+        </div>
     );
 }

@@ -84,7 +84,6 @@ export default function SendRide() {
                 animate={{ opacity: 1, y: 0 }}
                 className="w-full max-w-md"
             >
-                <div className="bg-slate-800 rounded-2xl shadow-2xl overflow-hidden">
                     <div className="space-y-1 pb-2 pt-3 px-6">
                         <CardTitle className="text-4xl font-bold text-center bg-gradient-to-r from-teal-400 to-blue-500 bg-clip-text text-transparent">
                             טרמפיקציה
@@ -109,8 +108,6 @@ export default function SendRide() {
                             isSubmitting={createRideMutation.isPending}
                         />
                     </CardContent>
-                </div>
-
                 <SuccessNotification isVisible={showSuccess} />
             </motion.div>
         </div>

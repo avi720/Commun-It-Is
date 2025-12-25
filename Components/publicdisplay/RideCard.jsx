@@ -1,61 +1,84 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Car, MapPin, Clock } from "lucide-react";
+import { Car, MapPin, Clock, User } from "lucide-react";
+import { formatRideTime } from "@/lib/utils"; // <--- הייבוא החשוב
 
-export default function RideCard({ ride, currentTime, getTimeDisplay, getTimeColor }) {
-    const timeDisplay = getTimeDisplay(ride.departure_time);
+export default function RideCard({ ride }) {
+    
+    // חישוב צבע לפי הזמן (דחוף = אדום, רחוק = ירוק)
+    const getTimeColor = () => {
+        const now = new Date();
+        const departure = new Date(ride.departure_time);
+        const diffMinutes = (departure - now) / 1000 / 60;
 
-    if (!timeDisplay) return null;
+        if (diffMinutes < 0) return "from-red-900/50 to-red-800/50 border-red-500/30"; // עבר זמן
+        if (diffMinutes < 60) return "from-orange-900/50 to-amber-800/50 border-orange-500/30"; // קרוב (שעה)
+        return "from-slate-800 to-slate-800 border-slate-700"; // רגיל
+    };
 
     return (
         <motion.div
-            key={ride.id}
             layout
-            initial={{ opacity: 0, scale: 0.8, y: 50 }}
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.8, y: -50 }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            exit={{ opacity: 0, scale: 0.95, y: -20 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
             className="group"
         >
-            <div className="relative bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl overflow-hidden transform transition-all hover:scale-105 hover:shadow-3xl border-4 border-white/50">
-                {/* פס צבעוני עליון */}
-                <div className={`h-3 bg-gradient-to-r ${getTimeColor(ride.departure_time)}`} />
+            <div className={`relative bg-slate-900/80 backdrop-blur-md rounded-2xl shadow-xl overflow-hidden border transition-all hover:border-slate-500 ${getTimeColor()}`}>
+                
+                {/* פס צבעוני עדין בצד */}
+                <div className="absolute top-0 right-0 bottom-0 w-1.5 bg-gradient-to-b from-teal-500 to-blue-600" />
 
-                <div className="p-4">
-                    {/* שם הנהג */}
-                    <div className="flex items-center gap-4 mb-6">
-                        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center shadow-lg">
-                            <Car className="w-8 h-8 text-white" />
-                        </div>
-                        <div>
-                            <p className="text-sm text-slate-500 font-medium">נהג</p>
-                            <h3 className="text-3xl font-black text-slate-800">
-                                {ride.driver_name}
-                            </h3>
+                <div className="p-5 flex flex-col gap-4">
+                    
+                    {/* שורה עליונה: נהג וזמן */}
+                    <div className="flex justify-between items-start">
+                        <div className="flex items-center gap-3">
+                             <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center border border-slate-600 shadow-inner">
+                                <User className="w-5 h-5 text-teal-400" />
+                            </div>
+                            <div>
+                                <h3 className="text-xl font-bold text-white leading-tight">
+                                    {ride.driver_name}
+                                </h3>
+                                <div className="flex items-center gap-1.5 mt-1 text-teal-400 text-sm font-medium">
+                                    <Clock className="w-3.5 h-3.5" />
+                                    {/* שימוש בפונקציה החכמה שלנו */}
+                                    {formatRideTime(ride.departure_time)}
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    {/* יעד */}
-                    <div className="flex items-start gap-4 mb-6 bg-slate-50 rounded-2xl p-6">
-                        <MapPin className="w-8 h-8 text-teal-600 flex-shrink-0 mt-1" />
-                        <div>
-                            <p className="text-sm text-slate-500 font-medium mb-1">יעד</p>
-                            <p className="text-2xl font-bold text-slate-800">
-                                {ride.destination}
-                            </p>
+                    {/* מסלול: מאיפה לאן (Visual Timeline) */}
+                    <div className="relative pr-4">
+                        {/* קו מחבר */}
+                        <div className="absolute top-2 right-[5px] bottom-2 w-0.5 bg-slate-700 rounded-full" />
+                        
+                        {/* מוצא */}
+                        <div className="flex items-start gap-3 mb-3 relative">
+                            <div className="w-3 h-3 rounded-full bg-slate-900 border-2 border-teal-500 z-10 mt-1.5 shadow-[0_0_10px_rgba(20,184,166,0.5)]" />
+                            <div>
+                                <p className="text-xs text-slate-500 mb-0.5">יוצא מ:</p>
+                                <p className="text-slate-200 font-medium text-base leading-snug">
+                                    {ride.location || "לא צוין מיקום"}
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* יעד */}
+                        <div className="flex items-start gap-3 relative">
+                             <MapPin className="w-4 h-4 text-orange-500 z-10 mt-1" />
+                            <div>
+                                <p className="text-xs text-slate-500 mb-0.5">נוסע ל:</p>
+                                <p className="text-white font-bold text-lg leading-snug shadow-black drop-shadow-sm">
+                                    {ride.destination}
+                                </p>
+                            </div>
                         </div>
                     </div>
 
-                    {/* זמן יציאה */}
-                    <div className={`flex items-center gap-4 bg-gradient-to-r ${getTimeColor(ride.departure_time)} rounded-2xl p-6 text-white shadow-lg`}>
-                        <Clock className="w-8 h-8 flex-shrink-0" />
-                        <div>
-                            <p className="text-sm opacity-90 font-medium mb-1">זמן יציאה</p>
-                            <p className="text-3xl font-black">
-                                {timeDisplay}
-                            </p>
-                        </div>
-                    </div>
                 </div>
             </div>
         </motion.div>
