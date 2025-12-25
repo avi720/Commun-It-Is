@@ -74,8 +74,8 @@ export default function Sidebar({ isOpen, onClose, onLogout }) {
                   לוח טרמפים
                 </button>
                 <button 
-                  onClick={() => handleNavigation('/send')}
-                  className={`w-full flex items-center gap-3 p-2 text-sm rounded-lg transition-colors ${isActive('/send') ? 'text-teal-400 bg-slate-800/50' : 'text-slate-400 hover:text-white'}`}
+                  onClick={() => handleNavigation('/send-ride')}
+                  className={`w-full flex items-center gap-3 p-2 text-sm rounded-lg transition-colors ${isActive('/send-ride') ? 'text-teal-400 bg-slate-800/50' : 'text-slate-400 hover:text-white'}`}
                 >
                   <Send className="w-4 h-4" />
                   פרסם נסיעה

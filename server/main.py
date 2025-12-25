@@ -34,6 +34,7 @@ class UserSchema(BaseModel):
     age: int
     email: str      # חובה בשביל לוגין
     password: str   # חובה בשביל לוגין
+    phone: str
 
 class RideSchema(BaseModel):
     driver_name: str
@@ -67,7 +68,8 @@ def init_db():
                 lastName TEXT,
                 city TEXT,
                 address TEXT,
-                age INTEGER
+                age INTEGER,
+                phone TEXT
             )
         ''')
         
@@ -96,9 +98,9 @@ async def create_user(user: UserSchema):
         with sqlite3.connect(DB_NAME) as conn:
             cursor = conn.cursor()
             cursor.execute('''
-                INSERT INTO users (email, password, firstName, lastName, city, address, age)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-            ''', (user.email, user.password, user.firstName, user.lastName, user.city, user.address, user.age))
+                INSERT INTO users (email, password, firstName, lastName, city, address, age, phone)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (user.email, user.password, user.firstName, user.lastName, user.city, user.address, user.age, user.phone))
             conn.commit()
             
         print(f"New user registered: {user.firstName} {user.lastName}")
@@ -190,7 +192,7 @@ def get_all_users():
     with sqlite3.connect(DB_NAME) as conn:
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
-        cursor.execute('SELECT id, firstName, lastName, email, city, address, age FROM users')
+        cursor.execute('SELECT id, firstName, lastName, email, city, address, age, phone FROM users')
         return [dict(row) for row in cursor.fetchall()]
 
 if __name__ == "__main__":

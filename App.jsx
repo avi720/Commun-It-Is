@@ -1,41 +1,39 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AppProvider, useAppData } from './context/AppContext'; // <--- הייבוא החדש
+import { AppProvider, useAppData } from './context/AppContext';
 
-// Components
-import LoginPage from './Pages/LoginPage';
-import RegisterPage from './Pages/RegisterPage';
-import OnboardingPage from './Pages/OnboardingPage';
 import MainLayout from './Components/MainLayout';
-import HomePage from './Pages/HomePage';
 import PublicDisplay from './Pages/PublicDisplay';
 import SendRide from './Pages/SendRide';
-import SettingsPage from './Pages/SettingsPage'; // הדף החדש שיצרנו
+import LoginPage from './Pages/LoginPage';
+import SettingsPage from './Pages/SettingsPage';
+import HomePage from './Pages/HomePage';
+import OnboardingPage from './Pages/OnboardingPage';
+import RegisterPage from './Pages/RegisterPage'; // <-- הוספנו את הייבוא החסר
 
 const queryClient = new QueryClient();
 
-// רכיב פנימי שמנהל את הניתובים כדי שיוכל להשתמש ב-useAppData
 function AppRoutes() {
-  const { user, isLoading, isAuthenticated } = useAppData();
+  const { isLoading, isAuthenticated } = useAppData();
 
-  // 1. מסך טעינה (Splash Screen)
   if (isLoading) {
     return (
       <div className="h-screen w-full flex items-center justify-center bg-slate-900 text-teal-500">
-         {/* אפשר לשים פה לוגו או אנימציה */}
-         <div className="text-2xl font-bold animate-pulse">טוען קומיוניטיז...</div>
+         <div className="text-2xl font-bold animate-pulse">טוען טרמפיקציה...</div>
       </div>
     );
   }
 
-  // 2. ניהול הניתובים
   return (
     <Routes>
+      {/* אזור ציבורי - פתוח לכולם */}
       <Route path="/login" element={!isAuthenticated ? <LoginPage /> : <Navigate to="/" />} />
-      <Route path="/register" element={!isAuthenticated ? <RegisterPage /> : <Navigate to="/" />} />
       
-      {/* נתיבים מוגנים (דורשים התחברות) */}
+      {/* התיקון: הוספת הנתיב החסר להרשמה */}
+      <Route path="/register" element={!isAuthenticated ? <RegisterPage /> : <Navigate to="/" />} />
+
+      {/* אזור מוגן - רק למחוברים */}
       {isAuthenticated ? (
         <Route path="/" element={<MainLayout />}>
            <Route index element={<HomePage />} />
@@ -45,18 +43,17 @@ function AppRoutes() {
            <Route path="settings" element={<SettingsPage />} />
         </Route>
       ) : (
-        // אם לא מחובר, זורקים ללוגין
-        <Route path="*" element={<Navigate to={isAuthenticated ? "/" : "/login"} />} />
+        // כל נתיב אחר זורק ללוגין
+        <Route path="*" element={<Navigate to="/login" />} />
       )}
     </Routes>
   );
 }
 
-// האפליקציה הראשית
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AppProvider> {/* העטיפה החדשה */}
+      <AppProvider>
         <BrowserRouter>
           <AppRoutes />
         </BrowserRouter>
