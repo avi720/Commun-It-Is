@@ -1,31 +1,42 @@
 import React, { useState, useEffect} from 'react';
 import { Menu } from 'lucide-react';
 import { Outlet} from 'react-router-dom';
-import Sidebar from './HomePageComp/Sidebar';
+import Sidebar from './homePageComp/Sidebar';
 
 export default function MainLayout({ onLogout }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [userData, setUserData] = useState(null);
+  const API_URL = "http://localhost:8000/api";
 
   useEffect(() => {
     const storedUser = localStorage.getItem('tremp_userData');
+    
     if (storedUser) {
-      setUserData(JSON.parse(storedUser));
-      setUserData(parsedUser);
+      try {
+          const userFromFile = JSON.parse(storedUser);
+          // --- הגנה: בדיקה אם הנתונים תקינים ---
+          if (!userFromFile || !userFromFile.email) {
+              console.warn("נתוני משתמש לא תקינים (חסר אימייל), מבצע יציאה...");
+              onLogout(); // נתונים פגומים -> החוצה
+              return;
+          }
+          // ------------------------------------
+          setUserData(userFromFile);
+          // בדיקה מול השרת
+          fetch(`${API_URL}/users/check/${userFromFile.email}`)
+            .then(response => {
+                if (!response.ok) {
+                    console.warn("המשתמש לא נמצא בשרת, מתנתק...");
+                    onLogout(); 
+                }
+            })
+            .catch(err => console.error("שגיאת חיבור לשרת:", err));
+            
+      } catch (e) {
+          console.error("שגיאה בקריאת נתונים:", e);
+          onLogout();
+      }
     }
-    // 2. בדיקה מול השרת: האם המשתמש הזה באמת קיים?
-      fetch(`${API_URL}/users/check/${parsedUser.email}`)
-        .then(response => {
-            if (!response.ok) {
-                // אופס! השרת לא מכיר אותנו (כנראה ה-DB נמחק)
-                console.warn("User not found in DB - logging out");
-                onLogout(); // זורק את המשתמש החוצה
-            }
-        })
-        .catch(err => {
-            console.error("Connection error:", err);
-            // כאן אפשר להחליט אם לנתק או לתת להמשיך (למשל אם אין אינטרנט)
-        });
   }, [onLogout]);
 
   return (
@@ -53,7 +64,7 @@ export default function MainLayout({ onLogout }) {
       {/* אזור התוכן */}
       {/* flex-1: תפוס את כל המקום שנשאר אחרי ההדר */}
       {/* overflow-y-auto: אם התוכן ארוך, תגלול רק כאן בפנים */}
-      <main className="flex-1 overflow-y-auto relative">
+      <main className="flex-1 overflow-y-auto bg-slate-800 relative">
         <Outlet context={{ user: userData }} /> 
       </main>
 

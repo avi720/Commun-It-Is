@@ -1,92 +1,115 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { base44 } from "../Api/Client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/Components/ui/card";
-import { Car } from "lucide-react";
+import { CardContent, CardTitle, CardDescription } from "@/Components/ui/card";
 import { motion } from "framer-motion";
 import RideForm from "../Components/sendride/RideForm";
 import SuccessNotification from "../Components/sendride/SuccessNotification";
 
 export default function SendRide() {
+    // State למשתמש המחובר
+    const [user, setUser] = useState(null);
+    
+    // State לטופס
     const [driverName, setDriverName] = useState("");
+    const [location, setLocation] = useState("");
     const [destination, setDestination] = useState("");
-    const [departureMinutes, setDepartureMinutes] = useState(0);
+    const [departureTime, setDepartureTime] = useState(new Date());
     const [showSuccess, setShowSuccess] = useState(false);
 
     const queryClient = useQueryClient();
 
+    // טעינת פרטי משתמש בעלייה של הדף
+    useEffect(() => {
+        const savedUser = localStorage.getItem('tremp_userData');
+        if (savedUser) {
+            try {
+                const parsedUser = JSON.parse(savedUser);
+                setUser(parsedUser);
+                // מילוי ראשוני של שם הנהג
+                setDriverName(`${parsedUser.firstName} ${parsedUser.lastName}`);
+            } catch (e) {
+                console.error("Error parsing user data", e);
+            }
+        }
+    }, []);
+
     const createRideMutation = useMutation({
         mutationFn: async (rideData) => {
-            const departureTime = new Date();
-            departureTime.setMinutes(departureTime.getMinutes() + rideData.departure_minutes);
+            // const departureTime = new Date();
+            // departureTime.setMinutes(departureTime.getMinutes() + rideData.departure_minutes);
 
+            // שולחים לשרת את התאריך המדויק שנבחר
+            // (המשתמש בחר תאריך ושעה בטופס, והם נשמרים ב-departure_time)
             return await base44.entities.Ride.create({
-                ...rideData,
-                departure_time: departureTime.toISOString()
+                driver_name: rideData.driver_name,
+                location: rideData.location,       // שים לב: אנחנו שולחים location
+                destination: rideData.destination,
+                seats: 4, // ברירת מחדל
+                departure_time: rideData.departure_time.toISOString()
             });
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['rides'] });
             setShowSuccess(true);
-            setDriverName("");
+            // איפוס חלקי (משאירים את השם)
+            setLocation("");
             setDestination("");
-            setDepartureMinutes(0);
+            setDepartureTime(new Date()); // איפוס לשעה הנוכחית
 
-            setTimeout(() => {
-                setShowSuccess(false);
-            }, 3000);
+            setTimeout(() => setShowSuccess(false), 3000);
         }
     });
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        if (!driverName.trim() || !destination.trim()) {
+        if (!driverName.trim() || !location.trim() || !destination.trim()) {
+            alert("נא למלא את כל השדות");
             return;
         }
 
         createRideMutation.mutate({
             driver_name: driverName,
+            location: location,    
             destination: destination,
-            departure_minutes: departureMinutes
+            departure_time: departureTime
         });
     };
 
     return (
-        <div className="h-full flex items-center justify-center">
+        <div className="h-full flex items-start justify-center">
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="w-full max-w-2xl"
+                className="w-full max-w-md"
             >
-                <Card className="shadow-2xl border-none bg-white/95 backdrop-blur">
-                    <CardHeader className="space-y-1 pb-4">
-                        <div className="flex items-center justify-center">
-                            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center shadow-lg">
-                                <Car className="w-10 h-10 text-white" />
-                            </div>
-                        </div>
-                        <CardTitle className="text-4xl font-bold text-center text-slate-800">
+                <div className="bg-slate-800 rounded-2xl shadow-2xl overflow-hidden">
+                    <div className="space-y-1 pb-2 pt-3 px-6">
+                        <CardTitle className="text-4xl font-bold text-center bg-gradient-to-r from-teal-400 to-blue-500 bg-clip-text text-transparent">
                             טרמפיקציה
                         </CardTitle>
-                        <CardDescription className="text-center text-lg text-slate-600 translate-y-2">
+                        <CardDescription className="text-center text-slate-400">
                             שתף נסיעה עם הקהילה
                         </CardDescription>
-                    </CardHeader>
+                    </div>
 
-                    <CardContent>
+                    <CardContent className="p-6">
                         <RideForm
+                            user={user} // העברת המשתמש לטופס
                             driverName={driverName}
                             setDriverName={setDriverName}
+                            location={location}
+                            setLocation={setLocation}
                             destination={destination}
                             setDestination={setDestination}
-                            departureMinutes={departureMinutes}
-                            setDepartureMinutes={setDepartureMinutes}
+                            departureTime={departureTime}
+                            setDepartureTime={setDepartureTime}
                             onSubmit={handleSubmit}
                             isSubmitting={createRideMutation.isPending}
                         />
                     </CardContent>
-                </Card>
+                </div>
 
                 <SuccessNotification isVisible={showSuccess} />
             </motion.div>

@@ -12,11 +12,7 @@ export default function TimeSelection({ selectedTime, onSelectTime }) {
 
     return (
         <div className="space-y-3">
-            <Label className="text-lg font-semibold text-slate-700 flex items-center gap-2">
-                <Clock className="w-5 h-5 text-teal-600" />
-                מתי תגיע לנק' האיסוף?
-            </Label>
-            <div className="grid grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 gap-3">
                 {timeOptions.map((option) => (
                     <button
                         key={option.value}

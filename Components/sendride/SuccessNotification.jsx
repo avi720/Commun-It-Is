@@ -18,7 +18,6 @@ export default function SuccessNotification({ isVisible }) {
                             <CheckCircle2 className="w-8 h-8" />
                             <div>
                                 <p className="text-xl font-bold">ההודעה נשלחה בהצלחה!</p>
-                                <p className="text-green-100">הנוסעים רואים את ההודעה שלך</p>
                             </div>
                         </CardContent>
                     </Card>
