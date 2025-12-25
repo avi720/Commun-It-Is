@@ -1,10 +1,11 @@
-import { base44 } from "../Api/Client";
+import { base44 } from "../../Api/Client";
 import React, { useState } from 'react';
+import { User, MapPin, Calendar, CheckCircle, Home, Phone } from 'lucide-react';
+import CitySelect from '../../Components/common/CitySelect';
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
-import { User, MapPin, Calendar, CheckCircle, Home } from 'lucide-react';
 
 // מקבלים את initialAuth (אימייל וסיסמה) מהדף הקודם
-export default function OnboardingPage({ onComplete, initialAuth }) {
+export default function OnboardingPage({ initialAuth }) {
   
   const [formData, setFormData] = useState({
     firstName: '',
@@ -21,7 +22,8 @@ export default function OnboardingPage({ onComplete, initialAuth }) {
     const completeData = {
         ...formData,
         email: initialAuth.email,
-        password: initialAuth.password
+        password: initialAuth.password,
+        Phone: "0" // שדה טלפון ריק כפי שהוסר מהשרת  
     };
 
     try {
@@ -36,7 +38,7 @@ export default function OnboardingPage({ onComplete, initialAuth }) {
         localStorage.setItem('tremp_isLoggedIn', 'true');
 
         console.log("המשתמש נשמר בהצלחה!");
-        onComplete(); 
+        //onComplete(); 
 
     } catch (error) {
         console.error("שגיאה בשמירת המשתמש:", error);
@@ -62,6 +64,7 @@ export default function OnboardingPage({ onComplete, initialAuth }) {
                   <input 
                     type="text" 
                     className="w-full p-2 pr-9 rounded bg-slate-900 border border-slate-700 text-white text-sm focus:ring-1 focus:ring-teal-500"
+                    placeholder="לדוגמא: אביאור"
                     required
                     onChange={(e) => setFormData({...formData, firstName: e.target.value})}
                   />
@@ -72,6 +75,7 @@ export default function OnboardingPage({ onComplete, initialAuth }) {
                 <input 
                   type="text" 
                   className="w-full p-2 rounded bg-slate-900 border border-slate-700 text-white text-sm focus:ring-1 focus:ring-teal-500"
+                  placeholder="לדוגמא: פז"
                   required
                   onChange={(e) => setFormData({...formData, lastName: e.target.value})}
                 />
@@ -80,16 +84,14 @@ export default function OnboardingPage({ onComplete, initialAuth }) {
 
             <div className="space-y-1">
               <label className="text-xs text-slate-400 mr-1">יישוב</label>
-              <div className="relative">
-                <Home className="absolute right-3 top-2.5 h-4 w-4 text-slate-500" />
-                <input 
-                  type="text" 
-                  className="w-full p-2 pr-9 rounded bg-slate-900 border border-slate-700 text-white text-sm focus:ring-1 focus:ring-teal-500"
-                  placeholder="לדוגמה: מושב בני דרום"
-                  required
-                  onChange={(e) => setFormData({...formData, city: e.target.value})}
-                />
-              </div>
+              {/* החלפנו את ה-input הרגיל ב-CitySelect */}
+                 <div className="relative">
+                    <CitySelect 
+                        value={formData.city}
+                        onChange={(value) => setFormData({...formData, city: value})}
+                        placeholder="עיר מגורים"
+                    />
+                 </div>
             </div>
 
             <div className="space-y-1">

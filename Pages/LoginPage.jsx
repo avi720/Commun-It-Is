@@ -47,7 +47,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-md bg-slate-800 border-slate-700 text-white shadow-2xl">
         <CardHeader className="text-center space-y-1">
           <CardTitle className="text-2xl font-bold text-teal-400">
-            התחברות לטרמפיקציה
+            התחברות
           </CardTitle>
           <CardDescription className="text-slate-400">
             הזן את פרטיך כדי להתחיל
@@ -87,15 +87,15 @@ export default function LoginPage() {
               disabled={isLoading}
               className="w-full bg-teal-600 hover:bg-teal-700 text-white p-2 rounded-md font-medium transition-colors flex items-center justify-center gap-2"
             >
-              {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogIn className="w-4 h-4" />}
               התחבר
+              {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogIn className="w-4 h-4" />}
             </button>
           </form>
 
           <div className="text-center text-sm text-slate-400 mt-4 select-none">
             אין לך חשבון?{' '}
             <span 
-                onClick={() => handleNavigation('./register')} 
+                onClick={() => handleNavigation('/register')} 
                 className="text-teal-400 cursor-pointer hover:underline font-bold"
             >
                 הירשם עכשיו

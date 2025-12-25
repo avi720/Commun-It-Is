@@ -9,8 +9,9 @@ import SendRide from './Pages/SendRide';
 import LoginPage from './Pages/LoginPage';
 import SettingsPage from './Pages/SettingsPage';
 import HomePage from './Pages/HomePage';
-import OnboardingPage from './Pages/OnboardingPage';
-import RegisterPage from './Pages/RegisterPage'; // <-- הוספנו את הייבוא החסר
+// import OnboardingPage from './Pages/Register/OnboardingPage';
+// import RegisterPage from './Pages/Register/RegisterPage'; // <-- הוספנו את הייבוא החסר
+import SignIn from './Pages/SignIn';
 
 const queryClient = new QueryClient();
 
@@ -31,13 +32,13 @@ function AppRoutes() {
       <Route path="/login" element={!isAuthenticated ? <LoginPage /> : <Navigate to="/" />} />
       
       {/* התיקון: הוספת הנתיב החסר להרשמה */}
-      <Route path="/register" element={!isAuthenticated ? <RegisterPage /> : <Navigate to="/" />} />
+      <Route path="/register" element={!isAuthenticated ? <SignIn /> : <Navigate to="/" />} />
+      {/* <Route path="/onboarding" element={!isAuthenticated ? <OnboardingPage /> : <Navigate to="/" />} /> */}
 
       {/* אזור מוגן - רק למחוברים */}
       {isAuthenticated ? (
         <Route path="/" element={<MainLayout />}>
            <Route index element={<HomePage />} />
-           <Route path="onboarding" element={<OnboardingPage />} />
            <Route path="rides" element={<PublicDisplay />} />
            <Route path="send-ride" element={<SendRide />} />
            <Route path="settings" element={<SettingsPage />} />

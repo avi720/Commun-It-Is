@@ -51,7 +51,7 @@ export const base44 = {
                     ...userData,
                     age: parseInt(userData.age)
                 };
-
+                console.log("Creating user with payload:", payload);
                 // תיקון: שימוש ב-API_URL
                 const response = await fetch(`${API_URL}/users`, {
                     method: 'POST',

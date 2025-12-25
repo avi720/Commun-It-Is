@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/Components/ui/card";
 import { Mail, Lock, ArrowRight, ArrowLeft } from 'lucide-react';
 
-export default function RegisterPage({ onContinue, onBack }) {
+export default function RegisterPage({ onContinue }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
+
+  const navigate = useNavigate();
+  const handleNavigation = (path) => { navigate(path); };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -30,7 +34,7 @@ export default function RegisterPage({ onContinue, onBack }) {
     <div className="min-h-screen flex items-center justify-center bg-slate-900 p-4">
       <Card className="w-full max-w-md bg-slate-800 border-slate-700 text-white">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold text-teal-400">הרשמה לטרמפיקציה</CardTitle>
+          <CardTitle className="text-2xl font-bold text-teal-400">הרשמה</CardTitle>
           <CardDescription className="text-slate-400">
             שלב 1 מתוך 2: פרטי התחברות
           </CardDescription>
@@ -87,15 +91,15 @@ export default function RegisterPage({ onContinue, onBack }) {
               className="w-full bg-teal-600 hover:bg-teal-700 text-white p-2 rounded-md font-medium transition-colors flex items-center justify-center gap-2"
             >
               המשך לשלב הבא
-              <ArrowRight className="w-4 h-4" />
+              <ArrowLeft className="w-4 h-4" />
             </button>
 
             <button 
               type="button"
-              onClick={onBack}
+              onClick={() => handleNavigation('/login')}
               className="w-full text-slate-400 hover:text-white p-2 text-sm flex items-center justify-center gap-2"
             >
-              <ArrowLeft className="w-4 h-4" />
+              <ArrowRight className="w-4 h-4" />
               חזרה להתחברות
             </button>
 
