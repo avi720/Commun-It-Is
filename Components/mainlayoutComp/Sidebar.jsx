@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom'; // <--- הוקים לניווט
 import { Home, Car, Monitor, Send, Settings, X, ChevronDown, ChevronUp, LogOut } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Sidebar({ isOpen, onClose, onLogout }) {
   const [isTrempOpen, setIsTrempOpen] = useState(false);

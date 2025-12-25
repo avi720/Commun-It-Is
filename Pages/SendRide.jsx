@@ -3,8 +3,8 @@ import { base44 } from "../Api/Client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CardContent, CardTitle, CardDescription } from "@/Components/ui/card";
 import { motion } from "framer-motion";
-import RideForm from "../Components/sendride/RideForm";
-import SuccessNotification from "../Components/sendride/SuccessNotification";
+import RideForm from "../Components/pagesComp/sendride/RideForm";
+import SuccessNotification from "../Components/pagesComp/sendride/SuccessNotification";
 
 export default function SendRide() {
     // State למשתמש המחובר

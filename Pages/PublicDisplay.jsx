@@ -2,9 +2,9 @@ import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "../Api/Client"; 
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence } from "framer-motion";
-import PublicDisplayHeader from "../Components/publicdisplay/PublicDisplayHeader";
-import RideCard from "../Components/publicdisplay/RideCard";
-import NoRidesMessage from "../Components/publicdisplay/NoRidesMessage";
+import PublicDisplayHeader from "../Components/pagesComp/publicdisplay/PublicDisplayHeader";
+import RideCard from "../Components/pagesComp/publicdisplay/RideCard";
+import NoRidesMessage from "../Components/pagesComp/publicdisplay/NoRidesMessage";
 
 export default function PublicDisplay() {
     const [currentTime, setCurrentTime] = useState(new Date());

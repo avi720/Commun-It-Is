@@ -1,19 +1,17 @@
 import React from 'react';
-import { useOutletContext } from 'react-router-dom'; // <--- הוק חדש
+import { useAppData } from '../context/AppContext';
+import { useNavigate, useOutletContext } from 'react-router-dom'; // <--- הוק חדש
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Building, Users, Star } from 'lucide-react';
 
 export default function HomePage() {
-  // מושכים את המידע שהעברנו ב-Outlet
-  const { user } = useOutletContext();
+  const { user } = useAppData();
+  const navigate = useNavigate(); // הוק לניווט
   
-  // הגנה למקרה שהמידע עוד לא נטען
-  const userName = user ? user.firstName : "חבר";
-
   return (
     <div className="space-y-6 px-4 pb-24">
       <div className="text-center space-y-2 mt-4">
-        <h1 className="text-3xl font-bold text-teal-400">היי, {userName}! 👋</h1>
+        <h1 className="text-3xl font-bold text-teal-400">היי, {user?.firstName || "חבר"}! 👋</h1>
         <p className="text-slate-400">ברוכים הבאים לקהילה שלך</p>
       </div>
 
