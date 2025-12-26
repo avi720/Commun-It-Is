@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { base44 } from "../Api/Client"; 
+import { avior } from "../Api/Client"; 
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence } from "framer-motion";
 import PublicDisplayHeader from "../Components/pagesComp/publicdisplay/PublicDisplayHeader";
@@ -20,12 +20,14 @@ export default function PublicDisplay() {
     const { data: rides = [] } = useQuery({
         queryKey: ['rides'],
         queryFn: async () => {
-            const allRides = await base44.entities.Ride.list('-created_date');
-            const now = new Date();
-            return allRides.filter(ride => {
-                const departureTime = new Date(ride.departure_time);
-                return now < new Date(departureTime.getTime() + 10 * 60 * 1000);
-            }).sort((a, b) => new Date(a.departure_time) - new Date(b.departure_time));
+            const allRides = await avior.entities.Ride.list();
+            return allRides;
+            // const allRides = await avior.entities.Ride.list('-created_date');
+            // const now = new Date();
+            // return allRides.filter(ride => {
+            //     const departureTime = new Date(ride.departure_time);
+            //     return now < new Date(departureTime.getTime() + 10 * 60 * 1000);
+            // }).sort((a, b) => new Date(a.departure_time) - new Date(b.departure_time));
         },
         refetchInterval: 5000, 
         initialData: []

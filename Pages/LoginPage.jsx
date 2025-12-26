@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/Components/ui/card";
 import { Mail, Lock, LogIn, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { base44 } from "../Api/Client";
+import { avior } from "../Api/Client";
 import { useAppData } from '../context/AppContext';
 
 export default function LoginPage() {
@@ -25,7 +25,7 @@ export default function LoginPage() {
 
     try {
       // התחברות בלבד
-      const response = await base44.auth.login(formData.email, formData.password);
+      const response = await avior.auth.login(formData.email, formData.password);
 
       // שמירת המידע
       localStorage.setItem('tremp_userData', JSON.stringify(response));

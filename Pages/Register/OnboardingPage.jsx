@@ -1,12 +1,15 @@
-import { base44 } from "../../Api/Client";
+import { avior } from "../../Api/Client";
 import React, { useState } from 'react';
-import { User, MapPin, Calendar, CheckCircle, Home, Phone } from 'lucide-react';
+import { User, MapPin, Calendar, CheckCircle, Home, Phone, RefreshCcw } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useAppData } from '../../context/AppContext';
 import CitySelect from '../../Components/common/CitySelect';
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 
 // מקבלים את initialAuth (אימייל וסיסמה) מהדף הקודם
 export default function OnboardingPage({ initialAuth }) {
-  
+  const { refresh } = useAppData();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -23,22 +26,25 @@ export default function OnboardingPage({ initialAuth }) {
         ...formData,
         email: initialAuth.email,
         password: initialAuth.password,
-        Phone: "0" // שדה טלפון ריק כפי שהוסר מהשרת  
+        phone: "0" // שדה טלפון ריק כפי שהוסר מהשרת  
     };
 
     try {
         console.log("שולח נתונים מלאים לשרת...", completeData);
         
-        await base44.entities.User.create(completeData);
+        await avior.entities.User.create(completeData);
         
-        // שמירה לזיכרון כדי שנישאר מחוברים
-        localStorage.setItem('tremp_userData', JSON.stringify(completeData));
-        // סימון שהתהליך הושלם
-        localStorage.setItem('tremp_onboardingDone', 'true');
-        localStorage.setItem('tremp_isLoggedIn', 'true');
+        // התיקון: שימוש ב-entities.User במקום ב-auth
+        const loginResponse = await avior.entities.User.login(completeData.email, completeData.password);
+        localStorage.setItem('tremp_userData', JSON.stringify(loginResponse));
 
-        console.log("המשתמש נשמר בהצלחה!");
-        //onComplete(); 
+        // אין צורך לשמור את אלו ידנית אם יש לך AppContext חכם:
+        // localStorage.setItem('tremp_onboardingDone', 'true');
+        // localStorage.setItem('tremp_isLoggedIn', 'true');
+
+        console.log("המשתמש נוצר ונשמר בהצלחה!");
+        await refresh();
+        navigate('/'); // הפניה לדף הבית לאחר ההרשמה
 
     } catch (error) {
         console.error("שגיאה בשמירת המשתמש:", error);

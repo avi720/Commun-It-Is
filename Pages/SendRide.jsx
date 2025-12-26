@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { base44 } from "../Api/Client";
+import { avior } from "../Api/Client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CardContent, CardTitle, CardDescription } from "@/Components/ui/card";
 import { motion } from "framer-motion";
@@ -41,7 +41,7 @@ export default function SendRide() {
 
             // שולחים לשרת את התאריך המדויק שנבחר
             // (המשתמש בחר תאריך ושעה בטופס, והם נשמרים ב-departure_time)
-            return await base44.entities.Ride.create({
+            return await avior.entities.Ride.create({
                 driver_name: rideData.driver_name,
                 location: rideData.location,       // שים לב: אנחנו שולחים location
                 destination: rideData.destination,

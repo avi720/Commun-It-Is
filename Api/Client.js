@@ -3,7 +3,7 @@
 // הפניה לשרת הפייתון המקומי שלך
 const API_URL = "/api";
 
-export const base44 = {
+export const avior = {
     entities: {
         // --- ישות הנסיעות ---
         Ride: {
@@ -32,6 +32,7 @@ export const base44 = {
             list: async (sortOrder = '-created_date') => {
                 try {
                     const response = await fetch(`${API_URL}/rides`);
+                    console.log("Fetching rides from:", `${API_URL}/rides`);
                     if (!response.ok) {
                         throw new Error(`Server error: ${response.status}`);
                     }

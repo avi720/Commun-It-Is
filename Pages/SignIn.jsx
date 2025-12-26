@@ -3,20 +3,17 @@ import OnboardingPage from './Register/OnboardingPage';
 import RegisterPage from './Register/RegisterPage';
 
 export default function SignIn() {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [isFinished, setIsFinished] = useState(false);
+    const [authData, setAuthData] = useState({ email: '', password: '' });
+    const [step, setStep] = useState(1); // 1 = Register, 2 = Onboarding
+
+    const handleContinue = (data) => {
+        setAuthData(data); // שומר מייל וסיסמה
+        setStep(2);        // עובר לשלב הבא
+    };
+
     return (
-        isFinished
-        ? (<OnboardingPage initialAuth={{ email, password }} /> ) 
-        : (
-            <RegisterPage 
-                onContinue={({ email, password }) => {
-                    setEmail(email);
-                    setPassword(password);
-                    setIsFinished(true);
-                }} 
-            />  
-        )  
-    )
- }
+        step === 1 
+        ? <RegisterPage onContinue={handleContinue} />
+        : <OnboardingPage initialAuth={authData} />
+    );
+}
