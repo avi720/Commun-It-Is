@@ -30,7 +30,7 @@ export default function MainLayout() {
         </div>
       </header>
 
-      <main className="flex-1 overflow-hidden relative">
+      <main className="flex-1 overflow-hidden relative bg-gradient-to-br from-slate-900 via-slate-800 to-teal-900">
         <Outlet />
       </main>
 

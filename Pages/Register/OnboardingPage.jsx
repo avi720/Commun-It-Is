@@ -15,18 +15,22 @@ export default function OnboardingPage({ initialAuth }) {
     lastName: '',
     city: '',
     address: '',
-    age: ''
+    age: '',
+    phone: ''
   });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
+    if (formData.phone.length < 10 || formData.phone.length > 10) {
+      setError('מספר טלפון לא תקין');
+      return;
+    }
     // איחוד הנתונים: מה שמילאנו עכשיו + האימייל והסיסמה מהשלב הקודם
     const completeData = {
         ...formData,
         email: initialAuth.email,
-        password: initialAuth.password,
-        phone: "0" // שדה טלפון ריק כפי שהוסר מהשרת  
+        password: initialAuth.password, 
     };
 
     try {
@@ -110,6 +114,20 @@ export default function OnboardingPage({ initialAuth }) {
                   placeholder="לדוגמה: הרימון 12"
                   required
                   onChange={(e) => setFormData({...formData, address: e.target.value})}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-xs text-slate-400 mr-1">טלפון</label>
+              <div className="relative">
+                <Phone className="absolute right-3 top-2.5 h-4 w-4 text-slate-500" />
+                <input 
+                  type="tel" 
+                  className="w-full p-2 pr-9 rounded bg-slate-900 border border-slate-700 text-white text-sm focus:ring-1 focus:ring-teal-500"
+                  placeholder="לדוגמה: 0521234567"
+                  required
+                  onChange={(e) => setFormData({...formData, phone: e.target.value})}
                 />
               </div>
             </div>

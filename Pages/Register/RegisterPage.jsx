@@ -25,7 +25,6 @@ export default function RegisterPage({ onContinue }) {
       setError('הסיסמה חייבת להכיל לפחות 6 תווים');
       return;
     }
-
     // מעבירים את המידע לשלב הבא (ולא לשרת עדיין)
     onContinue({ email, password });
   };

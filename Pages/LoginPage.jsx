@@ -25,7 +25,7 @@ export default function LoginPage() {
 
     try {
       // התחברות בלבד
-      const response = await avior.auth.login(formData.email, formData.password);
+      const response = await avior.entities.User.login(formData.email, formData.password);
 
       // שמירת המידע
       localStorage.setItem('tremp_userData', JSON.stringify(response));

@@ -36,12 +36,13 @@ export default function SendRide() {
 
     const createRideMutation = useMutation({
         mutationFn: async (rideData) => {
-            // const departureTime = new Date();
-            // departureTime.setMinutes(departureTime.getMinutes() + rideData.departure_minutes);
-
+            if (!user || !user.id) {
+            throw new Error("User not identified");
+            }
             // שולחים לשרת את התאריך המדויק שנבחר
             // (המשתמש בחר תאריך ושעה בטופס, והם נשמרים ב-departure_time)
             return await avior.entities.Ride.create({
+                user_id: user.id,
                 driver_name: rideData.driver_name,
                 location: rideData.location,       // שים לב: אנחנו שולחים location
                 destination: rideData.destination,

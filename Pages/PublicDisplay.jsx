@@ -43,7 +43,7 @@ export default function PublicDisplay() {
     };
 
     return (
-        <div className="h-full flex flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-teal-900 overflow-hidden relative">
+        <div className="h-full flex flex-col overflow-hidden relative">
 
             <div className=" px-8 flex-shrink-0">
                 <PublicDisplayHeader />

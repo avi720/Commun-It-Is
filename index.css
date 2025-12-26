@@ -84,3 +84,22 @@
     scrollbar-width: none;
     /* Firefox */
 }
+
+/* תיקון מקיף להשלמה אוטומטית - כולל מצב פוקוס */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+    /* 1. קיבוע צבע הרקע לכהה (Slate-900) */
+    -webkit-box-shadow: 0 0 0 30px #0f172a inset !important;
+    
+    /* 2. הפקודה הקריטית: מכריחה את הטקסט להיות לבן גם בפוקוס */
+    -webkit-text-fill-color: white !important;
+    
+    /* 3. גיבוי לדפדפנים אחרים וסמן כתיבה לבן */
+    color: white !important;
+    caret-color: white !important;
+    
+    /* 4. מניעת החלפת הרקע ע"י אנימציה */
+    transition: background-color 5000s ease-in-out 0s;
+}

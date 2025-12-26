@@ -78,6 +78,22 @@ export const avior = {
                     throw new Error('Login failed');
                 }
                 return response.json();
+            },
+
+            update: async (userId, userData) => {
+                const response = await fetch(`${API_URL}/users/${userId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
+                });
+        
+                if (!response.ok) {
+                    // Try to parse the error message from the server response
+                    const errorData = await response.json().catch(() => ({ message: 'Failed to parse error response' }));
+                    console.error('Server responded with 422:', errorData); // Log the server's detailed error
+                    throw new Error(errorData.message || 'Failed to update user due to invalid data.');
+                }
+                return response.json();
             }
         } // <--- סגירת User
     } // <--- סגירת entities

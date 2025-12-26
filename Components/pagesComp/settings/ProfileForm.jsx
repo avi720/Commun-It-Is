@@ -3,6 +3,7 @@ import { User, MapPin, Phone, Save, Loader2 } from 'lucide-react';
 import { Input } from "@/Components/ui/input";
 import { Button } from "@/Components/ui/button";
 import { Label } from "@/Components/ui/label";
+import { avior } from '../../../Api/Client';
 
 export default function ProfileForm({ user, onSave }) {
     // State מקומי לטופס כדי לא לשנות את הגלובלי בכל הקלדה
@@ -11,7 +12,7 @@ export default function ProfileForm({ user, onSave }) {
         lastName: '',
         phone: '',
         city: '',
-        address: ''
+        address: '',
     });
     const [isSaving, setIsSaving] = useState(false);
 
@@ -31,10 +32,19 @@ export default function ProfileForm({ user, onSave }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSaving(true);
-        // דימוי של פעולה אסינכרונית (אם בעתיד יהיה שרת)
-        await new Promise(resolve => setTimeout(resolve, 500));
-        onSave(formData);
-        setIsSaving(false);
+        try {
+            // 1. שליחה לשרת (חובה להעביר את ה-user.id!)
+            await avior.entities.User.update(user.id, formData);
+            
+            // 2. עדכון מקומי (UI)
+            onSave(formData);
+            
+        } catch (error) {
+            console.error("Update failed:", error);
+            alert("שגיאה בעדכון הפרטים");
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     return (
