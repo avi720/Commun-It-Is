@@ -94,6 +94,18 @@ export const avior = {
                     throw new Error(errorData.message || 'Failed to update user due to invalid data.');
                 }
                 return response.json();
+                
+            },
+            
+            delete: async (userId) => {
+                const response = await fetch(`${API_URL}/users/${userId}`, {
+                    method: 'DELETE',
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to delete user');
+                }
+                return response.json();
             }
         } // <--- סגירת User
     } // <--- סגירת entities

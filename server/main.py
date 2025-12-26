@@ -94,7 +94,27 @@ async def update_user(user_id: str, user_data: UserUpdateSchema):
     except Exception as e:
         print(f"Error updating user: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-    
+
+
+@app.delete("/api/users/{user_id}")
+async def delete_user(user_id: str):
+    try:
+        # אופציונלי: אם לא הגדרת "CASCADE" ב-Supabase, נצטרך למחוק קודם את הנסיעות שלו
+        # supabase.table("rides").delete().eq("user_id", user_id).execute()
+        
+        # מחיקת המשתמש עצמו
+        response = supabase.table("users").delete().eq("id", user_id).execute()
+        
+        if len(response.data) > 0:
+            print(f"User {user_id} deleted successfully")
+            return {"status": "success", "message": "User deleted"}
+        else:
+             raise HTTPException(status_code=404, detail="User not found")
+             
+    except Exception as e:
+        print(f"Error deleting user: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.post("/api/login")
 async def login(credentials: LoginSchema):

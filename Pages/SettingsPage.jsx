@@ -7,7 +7,7 @@ import { CheckCircle, XCircle } from 'lucide-react';
 
 export default function SettingsPage() {
     // 2. שולפים הכל מהקונטקסט המרכזי
-    const { user, updateUser, logout } = useAppData(); 
+    const { user, updateUser } = useAppData(); 
     
     // סטייט מקומי להודעות (טוסטים) - זה שייך רק לדף הזה
     const [message, setMessage] = useState(null);
@@ -28,11 +28,24 @@ export default function SettingsPage() {
         }
     };
 
-    // פונקציית איפוס קשיח (נשארה מקומית כי היא קיצונית)
-    const handleHardReset = () => {
-        if (window.confirm("פעולה זו תמחק את כל הנתונים מהמכשיר ותאפס את האפליקציה. להמשיך?")) {
-            localStorage.clear();
-            window.location.href = '/login';
+    // פונקציית מחיקת חשבון (לשעבר איפוס קשיח מקומי)
+    const handleHardReset = async () => {
+        if (window.confirm("פעולה זו תמחק את החשבון שלך ואת כל המידע לצמיתות! האם אתה בטוח?")) {
+            try {
+                // 1. קריאה לשרת למחיקת המשתמש
+                if (user && user.id) {
+                    // וודא שאתה משתמש ב-avior או base44 לפי מה שיש לך בקובץ
+                    await avior.entities.User.delete(user.id);
+                }
+
+                // 2. ניקוי מקומי והתנתקות
+                localStorage.clear();
+                window.location.href = '/login';
+                
+            } catch (error) {
+                console.error("Error deleting account:", error);
+                alert("אירעה שגיאה במחיקת החשבון. אנא נסה שוב.");
+            }
         }
     };
 
@@ -70,10 +83,10 @@ export default function SettingsPage() {
                 {/* הטפסים עצמם נשארו ללא שינוי */}
                 <ProfileForm user={user} onSave={handleSave} />
                 
-                <DangerZone onLogout={logout} onReset={handleHardReset} />
+                <DangerZone onReset={handleHardReset} />
 
                 <div className="text-center text-slate-600 text-xs mt-10">
-                    Trempikatzia v1.0 • Developed by Hanan
+                    Commun-it-is v1.0 • Developed by Hanan
                 </div>
             </motion.div>
         </div>
