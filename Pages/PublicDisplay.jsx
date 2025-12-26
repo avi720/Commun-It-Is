@@ -22,12 +22,6 @@ export default function PublicDisplay() {
         queryFn: async () => {
             const allRides = await avior.entities.Ride.list();
             return allRides;
-            // const allRides = await avior.entities.Ride.list('-created_date');
-            // const now = new Date();
-            // return allRides.filter(ride => {
-            //     const departureTime = new Date(ride.departure_time);
-            //     return now < new Date(departureTime.getTime() + 10 * 60 * 1000);
-            // }).sort((a, b) => new Date(a.departure_time) - new Date(b.departure_time));
         },
         refetchInterval: 5000, 
         initialData: []
