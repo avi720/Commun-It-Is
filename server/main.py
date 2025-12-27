@@ -1,15 +1,24 @@
 import os
+import uuid
+
+from fastapi import UploadFile, File, Form
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from datetime import datetime, timedelta, timezone
 from typing import List, Optional
+from dotenv import load_dotenv
 from supabase import create_client, Client
 
 # --- הגדרות Supabase ---
 # וודא שהכנסת כאן את הפרטים האמיתיים שלך
-SUPABASE_URL = "https://crhhgcisokrjehnyviya.supabase.co"
-SUPABASE_KEY = "sb_publishable_kCCixn8jk0e9Z7gDmWMWbw__Q1jYH33"
+load_dotenv()
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+
+# בדיקה שהמפתחות קיימים
+if not SUPABASE_URL or not SUPABASE_KEY:
+    raise ValueError("Supabase keys are missing! Check your .env file.")
 
 # יצירת החיבור
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
@@ -58,6 +67,11 @@ class RideSchema(BaseModel):
 class LoginSchema(BaseModel):
     email: str
     password: str
+
+class PostSchema(BaseModel):
+    user_id: str  # או int, תלוי איך זה אצלך ב-DB
+    content: str
+    image_url: Optional[str] = None
 
 # --- נתיבים (Routes) ---
 
@@ -205,6 +219,57 @@ def create_ride(ride: RideSchema):
 def get_all_users():
     response = supabase.table("users").select("*").execute()
     return response.data
+
+@app.get("/api/posts")
+def get_posts():
+    try:
+        # שליפה חכמה: אנחנו מבקשים את הפוסטים וגם את המידע על המשתמש (שם וטלפון)
+        # הפקודה select("*, users(*)") עושה JOIN אוטומטי
+        response = supabase.table("posts").select("*, users(firstName, lastName, phone)").order("created_at", desc=True).execute()
+        return response.data
+    except Exception as e:
+        print(f"Error fetching posts: {e}")
+        return []
+
+@app.post("/api/posts")
+async def create_post(
+    user_id: str = Form(...),      # מקבלים כ-Form Data
+    content: str = Form(...),      # מקבלים כ-Form Data
+    image: UploadFile = File(None) # הקובץ עצמו (אופציונלי)
+):
+    try:
+        image_url = None
+
+        # אם נשלחה תמונה - נעלה אותה ל-Storage
+        if image:
+            # קריאת תוכן הקובץ
+            file_content = await image.read()
+            
+            # יצירת שם ייחודי (כדי לא לדרוס תמונות עם אותו שם)
+            file_ext = image.filename.split(".")[-1]
+            file_name = f"{uuid.uuid4()}.{file_ext}"
+            file_path = f"post_images/{file_name}"
+            
+            # העלאה לדלי "images" שיצרנו
+            # שים לב: זה דורש שיהיה דלי בשם 'images' ב-Supabase
+            res = supabase.storage.from_("images").upload(file_path, file_content, {"content-type": image.content_type})
+            
+            # קבלת ה-URL הציבורי
+            image_url = supabase.storage.from_("images").get_public_url(file_path)
+
+        # שמירת הפוסט בטבלה
+        post_data = {
+            "user_id": user_id,
+            "content": content,
+            "image_url": image_url
+        }
+        
+        response = supabase.table("posts").insert(post_data).execute()
+        return response.data[0]
+
+    except Exception as e:
+        print(f"Error creating post: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     import uvicorn

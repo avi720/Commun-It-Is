@@ -61,8 +61,7 @@ export default function PublicDisplay() {
                             <NoRidesMessage />
                         ) : (
                             <div 
-                                className="grid grid-cols-1 gap-8 w-full"
-                                //style={{ paddingBottom: '50px' }} 
+                                className="grid grid-cols-1 gap-6 w-full"
                             >
                                 {rides.map((ride) => (
                                     <RideCard

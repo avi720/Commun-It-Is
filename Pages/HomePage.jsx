@@ -1,47 +1,84 @@
-import React from 'react';
-import { useAppData } from '../context/AppContext';
-import { useNavigate, useOutletContext } from 'react-router-dom'; // <--- הוק חדש
+import React, { useEffect, useState } from 'react';
+import { Building, Users, Star, Plus, Loader2 } from 'lucide-react';
+import { Button } from "@/Components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
-import { Building, Users, Star } from 'lucide-react';
+import { useAppData } from '../context/AppContext';
+import { avior } from '../Api/Client';
+import FeedPosts from '../Components/pagesComp/homePageComp/FeedPosts';
+import CreatePostModal from '../Components/pagesComp/homePageComp/CreatePostModal';
+
+const FloatingActionButton = ({ onClick }) => (
+    <Button 
+        onClick={onClick}
+        className="fixed bottom-16 left-6 w-14 h-14 rounded-full bg-teal-500 hover:bg-teal-600 shadow-lg shadow-teal-500/30 flex items-center justify-center z-50 transition-transform hover:scale-105"
+    >
+        <Plus className="w-8 h-8 text-white" />
+    </Button>
+);
 
 export default function HomePage() {
   const { user } = useAppData();
-  const navigate = useNavigate(); // הוק לניווט
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    loadPosts();
+  }, []);
+
+  const loadPosts = async () => {
+    try {
+      const data = await avior.entities.Post.list();
+      setPosts(data);
+    } catch (error) {
+      console.error("Error loading posts:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
   
   return (
-    <div className="space-y-6 px-4 pb-24">
-      <div className="text-center space-y-2 mt-4">
+    <div className="min-h-screen space-y-6 relative">
+      <header className="text-center space-y-2 mt-4">
         <h1 className="text-3xl font-bold text-teal-400">היי, {user?.firstName || "חבר"}! 👋</h1>
-        <p className="text-slate-400">ברוכים הבאים לקהילה שלך</p>
-      </div>
+      </header>
 
-      {/* ... שאר הקוד נשאר אותו דבר ... */}
-      <div className="grid grid-cols-2 gap-4">
-        <Card className="bg-slate-800 border-slate-700">
-          <CardContent className="p-4 flex flex-col items-center gap-2 text-center">
-            <Building className="w-8 h-8 text-indigo-400" />
-            <span className="text-sm font-medium text-white">הבניין שלי</span>
-          </CardContent>
-        </Card>
-        <Card className="bg-slate-800 border-slate-700">
-          <CardContent className="p-4 flex flex-col items-center gap-2 text-center">
-            <Users className="w-8 h-8 text-pink-400" />
-            <span className="text-sm font-medium text-white">חברי הקהילה</span>
-          </CardContent>
-        </Card>
+      <div className="max-w-lg mx-auto space-y-4">
+        {loading ? (
+          <div className="flex justify-center pt-20">
+            <Loader2 className="w-8 h-8 text-teal-500 animate-spin" />
+          </div>
+        ) : posts.length === 0 ? (
+          <div className="text-center text-slate-500 pt-24">
+            <Card className="bg-slate-800/50 border-slate-700">
+              <CardHeader>
+                <CardTitle className="text-lg text-white flex items-center gap-2">
+                  <Star className="w-5 h-5 text-yellow-400" />
+                  חדשות הקהילה
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-slate-200 text-sm">
+                כאן יופיעו עדכונים על אירועים קרובים, הודעות ועד ועוד...
+              </CardContent>
+            </Card>
+            <div className="text-slate-200 font-bold mt-6">
+              אין פוסטים עדיין. היה הראשון לפרסם!
+            </div>
+          </div>
+        ) : (
+          posts.map((post) => (
+            <FeedPosts key={post.id} post={post} />
+          ))
+        )}
       </div>
+      {/* כפתור הוספה */}
+      <FloatingActionButton onClick={() => setIsModalOpen(true)} />
 
-      <Card className="bg-slate-800/50 border-slate-700">
-        <CardHeader>
-          <CardTitle className="text-lg text-white flex items-center gap-2">
-            <Star className="w-5 h-5 text-yellow-400" />
-            חדשות הקהילה
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="text-slate-400 text-sm">
-          כאן יופיעו עדכונים על אירועים קרובים, הודעות ועד ועוד...
-        </CardContent>
-      </Card>
+      <CreatePostModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        onPostCreated={loadPosts} 
+      />
     </div>
   );
 }

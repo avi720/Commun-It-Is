@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
-import { Car, MapPin, Send, Home, Navigation, Loader2, Clock} from "lucide-react";
+import { Car, MapPin, Send, Home, Navigation, Loader2, Clock, Users} from "lucide-react";
 import { formatRideTime } from "@/lib/utils";
 
 export default function RideForm({
@@ -13,6 +13,8 @@ export default function RideForm({
     setLocation,
     destination,
     setDestination,
+    seats,
+    setSeats,
     departureTime,
     setDepartureTime,
     onSubmit,
@@ -138,7 +140,7 @@ export default function RideForm({
             <div className="space-y-2">
                 <Label htmlFor="driver" className="text-sm font-medium text-slate-300 flex items-center gap-2">
                     <Car className="w-4 h-4 text-teal-400" />
-                    מי אני?
+                    מי נוהג?
                 </Label>
                 <Input
                     id="driver"
@@ -207,6 +209,22 @@ export default function RideForm({
                     value={destination}
                     onChange={(e) => setDestination(e.target.value)}
                     placeholder='לדוגמה: רכבת מרכז...'
+                    className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-500 focus:ring-teal-500"
+                    required
+                />
+            </div>
+
+            {/* שדה מספר מושבים */}
+            <div className="space-y-2">
+                <Label htmlFor="seats" className="text-sm font-medium text-slate-300 flex items-center gap-2">
+                    <Users className="w-4 h-4 text-teal-400" />
+                    מספר מושבים פנויים
+                </Label>
+                <Input
+                    id="seats"
+                    value={seats}
+                    onChange={(e) => setSeats(e.target.value)}
+                    placeholder='לדוגמה: 4'
                     className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-500 focus:ring-teal-500"
                     required
                 />

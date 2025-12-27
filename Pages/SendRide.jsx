@@ -14,6 +14,7 @@ export default function SendRide() {
     const [driverName, setDriverName] = useState("");
     const [location, setLocation] = useState("");
     const [destination, setDestination] = useState("");
+    const [seats, setSeats] = useState(4);
     const [departureTime, setDepartureTime] = useState(new Date());
     const [showSuccess, setShowSuccess] = useState(false);
 
@@ -46,7 +47,7 @@ export default function SendRide() {
                 driver_name: rideData.driver_name,
                 location: rideData.location,       // שים לב: אנחנו שולחים location
                 destination: rideData.destination,
-                seats: 4, // ברירת מחדל
+                seats: rideData.seats, // ברירת מחדל
                 departure_time: rideData.departure_time.toISOString()
             });
         },
@@ -65,7 +66,7 @@ export default function SendRide() {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        if (!driverName.trim() || !location.trim() || !destination.trim()) {
+        if (!driverName.trim() || !location.trim() || !destination.trim() || !seats) {
             alert("נא למלא את כל השדות");
             return;
         }
@@ -74,6 +75,7 @@ export default function SendRide() {
             driver_name: driverName,
             location: location,    
             destination: destination,
+            seats: seats,
             departure_time: departureTime
         });
     };
@@ -103,6 +105,8 @@ export default function SendRide() {
                             setLocation={setLocation}
                             destination={destination}
                             setDestination={setDestination}
+                            seats={seats}
+                            setSeats={setSeats}
                             departureTime={departureTime}
                             setDepartureTime={setDepartureTime}
                             onSubmit={handleSubmit}

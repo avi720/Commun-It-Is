@@ -107,6 +107,30 @@ export const avior = {
                 }
                 return response.json();
             }
-        } // <--- סגירת User
+        }, // <--- סגירת User
+
+        Post: {
+            list: async () => {
+                const response = await fetch(`${API_URL}/posts`);
+                if (!response.ok) throw new Error('Failed to fetch posts');
+                return response.json();
+            },
+            create: async (formData) => {
+                // שים לב: אנחנו מקבלים formData ישירות, ולא אובייקט רגיל
+                const response = await fetch(`${API_URL}/posts`, {
+                    method: 'POST',
+                    // חשוב: לא מוסיפים headers: { 'Content-Type': 'application/json' }
+                    // הדפדפן יגדיר אוטומטית multipart/form-data
+                    body: formData 
+                });
+                
+                if (!response.ok) {
+                    const errorText = await response.text(); // כדי לראות שגיאות מהשרת
+                    console.error("Server Error:", errorText);
+                    throw new Error('Failed to create post');
+                }
+                return response.json();
+            }
+        }
     } // <--- סגירת entities
 };
