@@ -1,36 +1,156 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Lock, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Mail, Lock, CheckCircle2, ArrowRight, ArrowLeft, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/Components/ui/card";
+import { avior } from '../../Api/Client';
+import { Button } from "@/Components/ui/button";
+import { useAppData } from '../../context/AppContext';
 
-export default function RegisterPage({ onContinue }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
-
+export default function RegisterPage() {
   const navigate = useNavigate();
-  const handleNavigation = (path) => { navigate(path); };
+  const { register, refresh } = useAppData();
+  // ניהול מצבים (State)
+  const [loading, setLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [error, setError] = useState(''); // היה חסר לך
+  const [emailSentTo, setEmailSentTo] = useState('');
+  
+  // ריכוז כל שדות הטופס לאובייקט אחד
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
 
-  const handleSubmit = (e) => {
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+    // ניקוי שגיאות כשהמשתמש מקליד
+    if (error) setError('');
+  };
+
+  const handleCheckVerification = async () => {
+    setLoading(true);
+    try {
+        // מנסים לרענן את הנתונים מהשרת
+        await refresh();
+        // אם האימות הצליח, ה-App.jsx יזהה את זה לבד ויעביר אותך דף (בגלל ה-AuthRoute)
+    } catch (error) {
+        console.error(error);
+    } finally {
+        setLoading(false);
+    }
+  };
+
+  const handleRegister = async (e) => {
     e.preventDefault();
-    setError('');
 
-    if (password !== confirmPassword) {
+    // בדיקות תקינות (Validations)
+    if (formData.password !== formData.confirmPassword) {
       setError('הסיסמאות אינן תואמות');
       return;
     }
 
-    if (password.length < 6) {
+    // 1. בדיקת תו מיוחד (בודק אם יש לפחות אחד מהתווים האלו)
+    const specialCharRegex = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
+    // 2. בדיקת מספר (בודק אם יש ספרה 0-9)
+    const numberRegex = /\d/;
+
+    if (formData.password.length < 6) {
       setError('הסיסמה חייבת להכיל לפחות 6 תווים');
       return;
     }
-    // מעבירים את המידע לשלב הבא (ולא לשרת עדיין)
-    onContinue({ email, password });
+
+    if (!specialCharRegex.test(formData.password)) {
+        setError('הסיסמה חייבת להכיל לפחות תו מיוחד אחד (!@#$...)');
+        return;
+    }
+
+    if (!numberRegex.test(formData.password)) {
+        setError('הסיסמה חייבת להכיל לפחות מספר אחד');
+        return;
+    }
+
+    setLoading(true);
+    try {
+      // 1. קריאה להרשמה (Auth בלבד)
+      await avior.auth.signUp(
+        formData.email, 
+        formData.password
+      );
+      
+      // 2. הצלחה - מעבר למסך אימות מייל
+      setEmailSentTo(formData.email);
+      setIsSuccess(true);
+
+    } catch (err) {
+      console.error("Registration error:", err);
+      // הצגת הודעה ידידותית למשתמש
+      if (err.message.includes("already registered")) {
+        setError("המייל הזה כבר רשום במערכת");
+      } else {
+        setError(err.message || "שגיאה בהרשמה");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
+  // --- תצוגה 1: מסך הצלחה (מייל נשלח) ---
+  if (isSuccess) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-900 p-4" dir="rtl">
+        <Card className="w-full max-w-md bg-slate-800 border-slate-700 animate-in fade-in zoom-in-95 duration-300">
+          <CardHeader className="text-center space-y-4">
+            <div className="mx-auto w-16 h-16 bg-teal-500/20 rounded-full flex items-center justify-center border border-teal-500/30">
+              <Mail className="w-8 h-8 text-teal-400" />
+            </div>
+            <CardTitle className="text-2xl text-white">אימות כתובת מייל</CardTitle>
+            <CardDescription className="text-slate-400 text-lg">
+              שלחנו מייל אימות לכתובת:
+              <br />
+              <span className="text-white font-medium">{emailSentTo}</span>
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="bg-slate-900/50 p-4 rounded-lg border border-slate-700 text-sm text-slate-300 space-y-3">
+              <p className="flex items-center gap-2">
+                <CheckCircle2 className="w-5 h-5 text-teal-500" />
+                <span>בדוק את תיבת הדואר הנכנס שלך</span>
+              </p>
+              <p className="flex items-center gap-2">
+                <CheckCircle2 className="w-5 h-5 text-teal-500" />
+                <span>לחץ על הקישור במייל להפעלת החשבון</span>
+              </p>
+              <p className="flex items-center gap-2">
+                <CheckCircle2 className="w-5 h-5 text-teal-500" />
+                <span>לאחר מכן, לחץ על הכפתור למטה</span>
+              </p>
+            </div>
+            {/* כפתור בדיקה חכם */}
+            <Button 
+              className="w-full bg-teal-600 hover:bg-teal-700 text-white gap-2 h-12 text-lg animate-pulse"
+              onClick={handleCheckVerification}
+              disabled={loading}
+            >
+              {loading ? "בודק..." : "אימתתי את המייל"}
+            </Button>
+
+            <Button 
+              variant="ghost"
+              className="w-full bg-slate-700 hover:bg-slate-600 text-white gap-2 h-12 text-lg"
+              onClick={() => navigate('/login')}
+            >
+              עבור לדף ההתחברות <ArrowRight className="w-5 h-5" />
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // --- תצוגה 2: טופס הרשמה ---
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-900 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-slate-900 p-4" dir="rtl">
       <Card className="w-full max-w-md bg-slate-800 border-slate-700 text-white">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-teal-400">הרשמה</CardTitle>
@@ -39,64 +159,79 @@ export default function RegisterPage({ onContinue }) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleRegister} className="space-y-4">
             
             <div className="space-y-2">
               <div className="relative">
-                <Mail className="absolute right-3 top-3 h-5 w-5 text-slate-400" />
+                <Mail className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
                 <input 
+                  name="email"
                   type="email" 
                   placeholder="אימייל"
-                  className="w-full p-2 pr-10 rounded-md bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  className="w-full p-2 pl-10 rounded-md bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500"
                   required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={formData.email}
+                  onChange={handleChange}
+                  dir="ltr"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
               <div className="relative">
-                <Lock className="absolute right-3 top-3 h-5 w-5 text-slate-400" />
+                <Lock className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
                 <input 
+                  name="password"
                   type="password" 
-                  placeholder="סיסמה"
-                  className="w-full p-2 pr-10 rounded-md bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  placeholder="סיסמה (לפחות 6 תווים)"
+                  className="w-full p-2 pl-10 rounded-md bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500"
                   required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={formData.password}
+                  onChange={handleChange}
+                  dir="ltr"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
               <div className="relative">
-                <Lock className="absolute right-3 top-3 h-5 w-5 text-slate-400" />
+                <Lock className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
                 <input 
+                  name="confirmPassword"
                   type="password" 
                   placeholder="אימות סיסמה"
-                  className="w-full p-2 pr-10 rounded-md bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  className="w-full p-2 pl-10 rounded-md bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500"
                   required
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  dir="ltr"
                 />
               </div>
             </div>
 
-            {error && <div className="text-red-400 text-sm text-center">{error}</div>}
+            {error && (
+              <div className="text-red-400 text-sm text-center bg-red-900/20 p-2 rounded border border-red-900/50">
+                {error}
+              </div>
+            )}
 
-            <button 
+            <Button 
               type="submit"
-              className="w-full bg-teal-600 hover:bg-teal-700 text-white p-2 rounded-md font-medium transition-colors flex items-center justify-center gap-2"
+              disabled={loading}
+              className="w-full bg-teal-600 hover:bg-teal-700 text-white h-11 text-lg font-medium transition-colors flex items-center justify-center gap-2"
             >
-              המשך לשלב הבא
-              <ArrowLeft className="w-4 h-4" />
-            </button>
+              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (
+                <>
+                  המשך לשלב הבא
+                  <ArrowLeft className="w-4 h-4" />
+                </>
+              )}
+            </Button>
 
             <button 
               type="button"
-              onClick={() => handleNavigation('/login')}
-              className="w-full text-slate-400 hover:text-white p-2 text-sm flex items-center justify-center gap-2"
+              onClick={() => navigate('/login')}
+              className="w-full text-slate-400 hover:text-white p-2 text-sm flex items-center justify-center gap-2 mt-2"
             >
               <ArrowRight className="w-4 h-4" />
               חזרה להתחברות

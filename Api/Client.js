@@ -1,9 +1,39 @@
 // Api/Client.js
+import { createClient } from '@supabase/supabase-js';
+
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY;
+
+// יצירת הקליינט וייצוא שלו - קריטי שזה יהיה כאן!
+export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // הפניה לשרת הפייתון המקומי שלך
 const API_URL = "/api";
 
 export const avior = {
+    // --- ישות האותנטיקציה ---
+    auth: {
+    // פונקציה חדשה: רק רושמת ל-Auth ושולחת מייל
+        signUp: async (email, password) => {
+            const { data, error } = await supabase.auth.signUp({
+                email,
+                password,
+                options: {
+                    emailRedirectTo: `${window.location.origin}/verification-success`
+                }
+                // options: {
+                //     // שמירת השם ב-Metadata כדי שיהיה זמין מיד
+                //     data: {
+                //         first_name: firstName,
+                //         last_name: lastName
+                //     }
+                // }
+            });
+            if (error) throw error;
+            return data;
+        }
+    },
+
     entities: {
         // --- ישות הנסיעות ---
         Ride: {
@@ -45,23 +75,18 @@ export const avior = {
 
         // --- ישות המשתמשים (עכשיו היא בחוץ, כמו שצריך) ---
         User: {
-            create: async (userData) => {
-                // המרת הגיל למספר
-                const payload = {
-                    ...userData,
-                    age: parseInt(userData.age)
-                };
-                console.log("Creating user with payload:", payload);
-                // תיקון: שימוש ב-API_URL
+            // פונקציה חדשה: שמירת הפרטים בטבלה (תקרא לה ב-Onboarding)
+            createProfile: async (profileData) => {
+                // כאן אנחנו שולחים לשרת (Python) שישמור בטבלה
                 const response = await fetch(`${API_URL}/users`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify(profileData)
                 });
                 
                 if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`Failed to create user: ${errorText}`);
+                    const err = await response.json();
+                    throw new Error(err.detail || 'Failed to create profile');
                 }
                 return response.json();
             },
@@ -120,7 +145,7 @@ export const avior = {
                     return []; // מחזיר רשימה ריקה במקרה של שגיאה כדי שהאתר לא יקרוס
                 }
             },
-            
+
             create: async (formData) => {
                 // שים לב: אנחנו מקבלים formData ישירות, ולא אובייקט רגיל
                 const response = await fetch(`${API_URL}/posts`, {

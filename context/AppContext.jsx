@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from '../Api/Client';
 // import { base44 } from '../Api/Client'; // לא בשימוש ישיר כאן כרגע
 
 const AppContext = createContext();
@@ -22,17 +23,35 @@ export function AppProvider({ children }) {
         }
 
         try {
-            const parsedUser = JSON.parse(storedUser);
+            // בדיקת סשן נוכחי מול Supabase
+            const { data: { session } } = await supabase.auth.getSession();
             
-            // בדיקה מול השרת שהמשתמש קיים
-            const response = await fetch(`${API_URL}/users/check/${parsedUser.email}`);
+            if (!session) {
+                handleLogout();
+                return;
+            }
+
+            // המשתמש מחובר! עכשיו נבדוק אם יש לו פרופיל בטבלה שלנו
+            const response = await fetch(`${API_URL}/users/check/${session.user.email}`);
             
             if (response.ok) {
-                setUser(parsedUser);
+                // מצב תקין: יש משתמש ויש פרופיל
+                const userData = await response.json();
+                setUser(userData);
                 setIsAuthenticated(true);
-            } else {
-                console.warn("User invalid on server, logging out...");
-                handleLogout();
+            } else if (response.status === 404) {
+                // --- מצב ביניים: מחובר אבל אין פרופיל ---
+                console.log("User authenticated but no profile found. Redirecting to onboarding.");
+                
+                // אנחנו מגדירים משתמש זמני כדי שהמערכת לא תזרוק אותו
+                setUser({ 
+                    id: session.user.id,
+                    email: session.user.email,
+                    // firstName: session.user.user_metadata.first_name,
+                    // lastName: session.user.user_metadata.last_name,
+                    isIncomplete: true // דגל שיעזור לנו ב-App.jsx
+                });
+                setIsAuthenticated(true);
             }
         } catch (error) {
             console.error("Data loading error:", error);

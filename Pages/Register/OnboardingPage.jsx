@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 
 // מקבלים את initialAuth (אימייל וסיסמה) מהדף הקודם
 export default function OnboardingPage({ initialAuth }) {
-  const { refresh } = useAppData();
+  const { user, refresh } = useAppData();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     firstName: '',
@@ -28,27 +28,23 @@ export default function OnboardingPage({ initialAuth }) {
     }
     // איחוד הנתונים: מה שמילאנו עכשיו + האימייל והסיסמה מהשלב הקודם
     const completeData = {
-        ...formData,
-        email: initialAuth.email,
-        password: initialAuth.password, 
+      id : user.id,
+      ...formData,
+      email: user.email,
+      password: user.password // חשוב: הסיסמה צריכה להגיע מהשלב הקודם 
     };
 
     try {
-        console.log("שולח נתונים מלאים לשרת...", completeData);
-        
-        await avior.entities.User.create(completeData);
-        
-        // התיקון: שימוש ב-entities.User במקום ב-auth
-        const loginResponse = await avior.entities.User.login(completeData.email, completeData.password);
-        localStorage.setItem('tremp_userData', JSON.stringify(loginResponse));
+      await avior.entities.User.createProfile(completeData);
+      console.log("שולח נתונים מלאים לשרת...", completeData);
+      
+      // לאחר יצירת הפרופיל, נבצע כניסה אוטומטית ונשמור את הנתונים ב-localStorage
+      const loginResponse = await avior.entities.User.login(completeData.email, completeData.password);
+      localStorage.setItem('tremp_userData', JSON.stringify(loginResponse));
 
-        // אין צורך לשמור את אלו ידנית אם יש לך AppContext חכם:
-        // localStorage.setItem('tremp_onboardingDone', 'true');
-        // localStorage.setItem('tremp_isLoggedIn', 'true');
-
-        console.log("המשתמש נוצר ונשמר בהצלחה!");
-        await refresh();
-        navigate('/'); // הפניה לדף הבית לאחר ההרשמה
+      console.log("המשתמש נוצר ונשמר בהצלחה!");
+      await refresh();
+      navigate('/'); // הפניה לדף הבית לאחר ההרשמה
 
     } catch (error) {
         console.error("שגיאה בשמירת המשתמש:", error);
