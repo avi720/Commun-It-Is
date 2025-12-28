@@ -1,16 +1,18 @@
 import { avior } from "../../Api/Client";
 import React, { useState } from 'react';
-import { User, MapPin, Calendar, CheckCircle, Home, Phone, RefreshCcw } from 'lucide-react';
+import { User, MapPin, Calendar, CheckCircle, Home, Lock, Phone, RefreshCcw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAppData } from '../../context/AppContext';
 import CitySelect from '../../Components/common/CitySelect';
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 
 // מקבלים את initialAuth (אימייל וסיסמה) מהדף הקודם
-export default function OnboardingPage({ initialAuth }) {
+export default function OnboardingPage() {
   const { user, refresh } = useAppData();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
+    password: '',
+    confirmPassword: '',
     firstName: '',
     lastName: '',
     city: '',
@@ -22,6 +24,32 @@ export default function OnboardingPage({ initialAuth }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+        // בדיקות תקינות (Validations)
+    if (formData.password !== formData.confirmPassword) {
+      setError('הסיסמאות אינן תואמות');
+      return;
+    }
+
+    // 1. בדיקת תו מיוחד (בודק אם יש לפחות אחד מהתווים האלו)
+    const specialCharRegex = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
+    // 2. בדיקת מספר (בודק אם יש ספרה 0-9)
+    const numberRegex = /\d/;
+
+    if (formData.password.length < 6) {
+      setError('הסיסמה חייבת להכיל לפחות 6 תווים');
+      return;
+    }
+
+    if (!specialCharRegex.test(formData.password)) {
+        setError('הסיסמה חייבת להכיל לפחות תו מיוחד אחד (!@#$...)');
+        return;
+    }
+
+    if (!numberRegex.test(formData.password)) {
+        setError('הסיסמה חייבת להכיל לפחות מספר אחד');
+        return;
+    }
+
     if (formData.phone.length < 10 || formData.phone.length > 10) {
       setError('מספר טלפון לא תקין');
       return;
@@ -30,8 +58,6 @@ export default function OnboardingPage({ initialAuth }) {
     const completeData = {
       id : user.id,
       ...formData,
-      email: user.email,
-      password: user.password // חשוב: הסיסמה צריכה להגיע מהשלב הקודם 
     };
 
     try {
@@ -61,7 +87,34 @@ export default function OnboardingPage({ initialAuth }) {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            
+            <div className="space-y-1">
+              <label className="text-xs text-slate-400 mr-1">סיסמה</label>
+              <div className="relative">
+                <Lock className="absolute right-3 top-2.5 h-4 w-4 text-slate-500" />
+                <input 
+                  type="password" 
+                  className="w-full p-2 pr-9 rounded bg-slate-900 border border-slate-700 text-white text-sm focus:ring-1 focus:ring-teal-500"
+                  placeholder="לדוגמא: abcd1!"
+                  required
+                  onChange={(e) => setFormData({...formData, password: e.target.value})}
+                  dir="ltr"
+                />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs text-slate-400 mr-1">סיסמה</label>
+              <div className="relative">
+                <Lock className="absolute right-3 top-2.5 h-4 w-4 text-slate-500" />
+                <input 
+                  type="password" 
+                  className="w-full p-2 pr-9 rounded bg-slate-900 border border-slate-700 text-white text-sm focus:ring-1 focus:ring-teal-500"
+                  placeholder="אימות סיסמה"
+                  required
+                  onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+                  dir="ltr"
+                />
+              </div>
+            </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
                 <label className="text-xs text-slate-400 mr-1">שם פרטי</label>

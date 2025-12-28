@@ -1,11 +1,8 @@
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { CheckCircle2, X } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
-import { Button } from "@/Components/ui/button";
 
 export default function VerificationSuccess() {
-    const navigate = useNavigate();
 
     return (
         <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4" dir="rtl">
@@ -20,16 +17,6 @@ export default function VerificationSuccess() {
                     <p className="text-slate-300 text-lg">
                         אתה יכול <span className="font-bold text-teal-400">לסגור את החלון הזה</span> ולחזור לאפליקציה כדי להמשיך.
                     </p>
-                    
-                    {/* <div className="pt-4 border-t border-slate-800">
-                        <p className="text-slate-500 text-sm mb-4">או אם אתה מעדיף להמשיך מכאן:</p>
-                        <Button 
-                            className="w-full bg-slate-800 hover:bg-slate-700 text-white"
-                            onClick={() => navigate('/')}
-                        >
-                            כנס לאפליקציה
-                        </Button>
-                    </div> */}
                 </CardContent>
             </Card>
         </div>

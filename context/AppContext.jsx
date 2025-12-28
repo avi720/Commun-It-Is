@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../Api/Client';
-// import { base44 } from '../Api/Client'; // לא בשימוש ישיר כאן כרגע
 
 const AppContext = createContext();
 
@@ -9,90 +8,80 @@ export function AppProvider({ children }) {
     const [isLoading, setIsLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-    // --- התיקון הקריטי ---
-    // שימוש בנתיב יחסי. ה-Vite Proxy (שמוגדר ב-vite.config.js) ינתב את זה לשרת הנכון אוטומטית.
     const API_URL = "/api"; 
 
-    const loadUserData = async () => {
-        setIsLoading(true);
-        const storedUser = localStorage.getItem('tremp_userData');
-
-        if (!storedUser) {
-            setIsLoading(false);
-            return;
-        }
-
+    // הוספנו פרמטר showLoader (ברירת מחדל: true)
+    const loadUserData = async (showLoader = true) => {
+        if (showLoader) setIsLoading(true);
+        
         try {
-            // בדיקת סשן נוכחי מול Supabase
             const { data: { session } } = await supabase.auth.getSession();
             
             if (!session) {
-                handleLogout();
+                // רק אם זה לא טעינה שקטה, מבצעים ניתוק מלא.
+                // בטעינה שקטה אולי נעדיף לא לזרוק את המשתמש מיד אם יש בעיית רשת רגעית,
+                // אבל כאן נשאיר את זה פשוט.
+                if (showLoader) handleLogout();
                 return;
             }
 
-            // המשתמש מחובר! עכשיו נבדוק אם יש לו פרופיל בטבלה שלנו
             const response = await fetch(`${API_URL}/users/check/${session.user.email}`);
-            
+            // אם קיבלנו נתונים, המשתמש קיים במערכת. אם לא, הוא צריך להשלים פרטים.
             if (response.ok) {
-                // מצב תקין: יש משתמש ויש פרופיל
                 const userData = await response.json();
                 setUser(userData);
                 setIsAuthenticated(true);
             } else if (response.status === 404) {
-                // --- מצב ביניים: מחובר אבל אין פרופיל ---
-                console.log("User authenticated but no profile found. Redirecting to onboarding.");
-                
-                // אנחנו מגדירים משתמש זמני כדי שהמערכת לא תזרוק אותו
                 setUser({ 
                     id: session.user.id,
                     email: session.user.email,
-                    // firstName: session.user.user_metadata.first_name,
-                    // lastName: session.user.user_metadata.last_name,
-                    isIncomplete: true // דגל שיעזור לנו ב-App.jsx
+                    isIncomplete: true 
                 });
                 setIsAuthenticated(true);
             }
         } catch (error) {
             console.error("Data loading error:", error);
-            // במקרה של שגיאת רשת (שרת למטה), נשאיר את המשתמש מחובר על בסיס הזיכרון
-            if (storedUser) {
-                 try {
-                    setUser(JSON.parse(storedUser));
-                    setIsAuthenticated(true);
-                 } catch (e) {
-                    handleLogout();
-                 }
-            }
+            // לא מנתקים מיד בשגיאת רשת כדי לא להעיף משתמש סתם
         } finally {
-            setIsLoading(false);
+            if (showLoader) setIsLoading(false);
         }
     };
 
     useEffect(() => {
-        loadUserData();
+        // בטעינה הראשונה של הדף - מציגים לואדר
+        loadUserData(true);
+        
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+            if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+                // --- התיקון כאן: בשינויים אוטומטיים, לא מראים לואדר ---
+                // אלא אם כן המשתמש עדיין לא מחובר בכלל (null)
+                loadUserData(false); 
+            } else if (event === 'SIGNED_OUT') {
+                handleLogout();
+            }
+        });
+
+        return () => subscription.unsubscribe();
     }, []);
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
+        await supabase.auth.signOut().catch(() => {});
         localStorage.removeItem('tremp_userData');
-        localStorage.removeItem('tremp_isLoggedIn'); // ניקוי יסודי
         setUser(null);
         setIsAuthenticated(false);
-        window.location.href = '/login';
     };
 
-    const updateUser = (newUserData) => {
-        setUser(newUserData);
-        localStorage.setItem('tremp_userData', JSON.stringify(newUserData));
-    };
+    // כשקוראים לרענון ידני (למשל מכפתור "אימתתי מייל"), כן נרצה לראות לואדר
+    const refresh = () => loadUserData(true);
 
     const value = {
         user,
         isLoading,
         isAuthenticated,
         logout: handleLogout,
-        updateUser,
-        refresh: loadUserData
+        refresh,
+        // פונקציה לרענון שקט אם תצטרך בעתיד
+        silentRefresh: () => loadUserData(false) 
     };
 
     return (

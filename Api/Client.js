@@ -14,24 +14,19 @@ export const avior = {
     // --- ישות האותנטיקציה ---
     auth: {
     // פונקציה חדשה: רק רושמת ל-Auth ושולחת מייל
-        signUp: async (email, password) => {
+        signUp: async (email) => {
             const { data, error } = await supabase.auth.signUp({
                 email,
-                password,
                 options: {
                     emailRedirectTo: `${window.location.origin}/verification-success`
                 }
-                // options: {
-                //     // שמירת השם ב-Metadata כדי שיהיה זמין מיד
-                //     data: {
-                //         first_name: firstName,
-                //         last_name: lastName
-                //     }
-                // }
             });
             if (error) throw error;
             return data;
-        }
+        },
+        signOut: async () => {
+            await supabase.auth.signOut();
+        },
     },
 
     entities: {

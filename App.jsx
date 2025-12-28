@@ -43,12 +43,11 @@ const AuthRoute = ({ children }) => {
 };
 
 function AppRoutes() {
-  const { user, isLoading, isAuthenticated } = useAppData();
-
+const { isAuthenticated, user, isLoading } = useAppData();
   if (isLoading) {
     return (
       <div className="h-screen w-full flex items-center justify-center bg-slate-900 text-teal-500">
-         <div className="text-2xl font-bold animate-pulse">טוען טרמפיקציה...</div>
+         <div className="text-2xl font-bold animate-pulse">טוען את הקהילה שלך...</div>
       </div>
     );
   }
@@ -56,13 +55,13 @@ function AppRoutes() {
   return (
     <Routes>
       {/* אזור ציבורי - פתוח לכולם */}
-      <Route path="/login" element={<AuthRoute><LoginPage /></AuthRoute>} />
+      <Route path="/login" element={!isAuthenticated ? <AuthRoute><LoginPage /></AuthRoute> : <Navigate to="/" />} />
       
       {/* כאן השינוי: RegisterPage עומד בפני עצמו */}
-      <Route path="/register" element={<AuthRoute><RegisterPage /></AuthRoute>} />
+      <Route path="/register" element={!isAuthenticated ? <AuthRoute><RegisterPage /></AuthRoute> : <Navigate to="/" />} />
       <Route path="/verification-success" element={<VerificationSuccess />} />
       {/* נתיב מיוחד להשלמת פרטים - נגיש רק למי שמחובר אבל חסר פרופיל */}
-      <Route path="/onboarding" element={<OnboardingPage />} />
+      <Route path="/onboarding" element={isAuthenticated ? <OnboardingPage /> : <Navigate to="/login" />} />
 
       {/* אזור מוגן - רק למחוברים */}
         <Route path="/" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
