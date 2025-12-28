@@ -29,13 +29,12 @@ export const avior = {
             },
             
             // קבלת רשימת נסיעות
-            list: async (sortOrder = '-created_date') => {
+            list: async (userCity) => {
                 try {
-                    const response = await fetch(`${API_URL}/rides`);
-                    console.log("Fetching rides from:", `${API_URL}/rides`);
-                    if (!response.ok) {
-                        throw new Error(`Server error: ${response.status}`);
-                    }
+                    const url = `${API_URL}/rides?city=${encodeURIComponent(userCity)}`;
+                    const response = await fetch(url);
+                    console.log("Fetching rides from:", url);
+                    if (!response.ok) throw new Error(`Server error: ${response.status}`);
                     return await response.json();
                 } catch (error) {
                     console.error("Error fetching rides:", error);
@@ -110,11 +109,18 @@ export const avior = {
         }, // <--- סגירת User
 
         Post: {
-            list: async () => {
-                const response = await fetch(`${API_URL}/posts`);
-                if (!response.ok) throw new Error('Failed to fetch posts');
-                return response.json();
+            list: async (userCity) => {
+                try {
+                    const url = `${API_URL}/posts?city=${encodeURIComponent(userCity)}`;
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error('Failed to fetch posts');
+                    return response.json();
+                } catch (error) {
+                    console.error("Error fetching posts:", error);
+                    return []; // מחזיר רשימה ריקה במקרה של שגיאה כדי שהאתר לא יקרוס
+                }
             },
+            
             create: async (formData) => {
                 // שים לב: אנחנו מקבלים formData ישירות, ולא אובייקט רגיל
                 const response = await fetch(`${API_URL}/posts`, {

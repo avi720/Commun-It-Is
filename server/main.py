@@ -160,23 +160,47 @@ def check_user_exists(email: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/rides")
-def get_rides():
+def get_rides(city: str = None):
     try:
-        # שליפת כל הנסיעות
-        response = supabase.table("rides").select("*").execute()
+        if not city:
+            return []
+
+        # שלב 1: משיגים את כל המזהים (IDs) של משתמשים שגרים בעיר הזו
+        # (אנחנו עושים את זה בשני שלבים כדי לא להסתבך עם Foreign Keys בטבלת הנסיעות הישנה)
+        user_res = supabase.table("users").select("id").eq("city", city).execute()
+        
+        # יוצרים רשימה של IDs
+        user_ids = [u['id'] for u in user_res.data]
+        
+        if not user_ids:
+            return []
+
+        # שלב 2: שולפים את הנסיעות שנוצרו על ידי המשתמשים האלה
+        response = supabase.table("rides").select("*").in_("user_id", user_ids).execute()
         all_rides = response.data
 
-        # סינון נסיעות ישנות
+        # --- מכאן ממשיך הסינון של הזמן שכבר כתבנו ---
         now_utc = datetime.now(timezone.utc)
         valid_rides = []
         
         for ride in all_rides:
             try:
-                ride_time = datetime.fromisoformat(ride["departure_time"].replace("Z", "+00:00"))
+                if not ride.get("departure_time"): continue
+
+                time_str = ride["departure_time"].replace("Z", "+00:00")
+                ride_time = datetime.fromisoformat(time_str)
+                
+                if ride_time.tzinfo is None:
+                    ride_time = ride_time.replace(tzinfo=timezone.utc)
+                
+                # תיקון תצוגה
+                ride["departure_time"] = ride_time.isoformat()
+
                 if now_utc < ride_time + timedelta(minutes=10):
                     valid_rides.append(ride)
-            except Exception:
-                valid_rides.append(ride)
+                    
+            except Exception as e:
+                print(f"Skipping ride: {e}")
 
         return sorted(valid_rides, key=lambda x: x['departure_time'])
     
@@ -221,11 +245,18 @@ def get_all_users():
     return response.data
 
 @app.get("/api/posts")
-def get_posts():
+def get_posts(city: str = None):
     try:
+        if not city:
+            return []
         # שליפה חכמה: אנחנו מבקשים את הפוסטים וגם את המידע על המשתמש (שם וטלפון)
         # הפקודה select("*, users(*)") עושה JOIN אוטומטי
-        response = supabase.table("posts").select("*, users(firstName, lastName, phone)").order("created_at", desc=True).execute()
+        response = supabase.table("posts")\
+            .select("*, users!inner(firstName, lastName, phone, city)")\
+            .eq("users.city", city)\
+            .order("created_at", desc=True)\
+            .execute()
+        
         return response.data
     except Exception as e:
         print(f"Error fetching posts: {e}")

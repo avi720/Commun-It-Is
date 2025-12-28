@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
-import { avior } from "../Api/Client"; 
+import { avior } from "../Api/Client";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence } from "framer-motion";
+import { useAppData } from '../context/AppContext';
 import PublicDisplayHeader from "../Components/pagesComp/publicdisplay/PublicDisplayHeader";
 import RideCard from "../Components/pagesComp/publicdisplay/RideCard";
 import NoRidesMessage from "../Components/pagesComp/publicdisplay/NoRidesMessage";
 
 export default function PublicDisplay() {
+    const { user } = useAppData();
     const [currentTime, setCurrentTime] = useState(new Date());
     const containerRef = useRef(null);
 
@@ -20,7 +22,7 @@ export default function PublicDisplay() {
     const { data: rides = [] } = useQuery({
         queryKey: ['rides'],
         queryFn: async () => {
-            const allRides = await avior.entities.Ride.list();
+            const allRides = await avior.entities.Ride.list(user.city);
             return allRides;
         },
         refetchInterval: 5000, 

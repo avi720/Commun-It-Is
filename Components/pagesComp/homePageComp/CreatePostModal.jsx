@@ -1,14 +1,12 @@
 import React, { useState, useRef } from 'react';
 import { X, Image as ImageIcon, Loader2, Send, Trash2 } from 'lucide-react';
 import { Button } from "@/Components/ui/button";
-import { Input } from "@/Components/ui/input";
 import { avior } from '../../../Api/Client';
 import { useAppData } from '../../../context/AppContext';
 
 export default function CreatePostModal({ isOpen, onClose, onPostCreated }) {
     const { user } = useAppData();
     const [content, setContent] = useState('');
-    const [imageUrl, setImageUrl] = useState('');
     const [selectedFile, setSelectedFile] = useState(null); // הקובץ עצמו
     const [previewUrl, setPreviewUrl] = useState(null);  // תצוגה מקדימה
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -53,7 +51,7 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }) {
             await avior.entities.Post.create(formData);
             // איפוס הטופס וסגירה
             setContent('');
-            setImageUrl('');
+            clearImage();
             onPostCreated(); // רענון הפיד בדף הבית
             onClose();
             

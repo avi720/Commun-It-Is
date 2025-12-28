@@ -21,9 +21,8 @@ export default function FeedPosts({ post }) {
         }
 
         // 2. הכנת ההודעה המוכנה מראש
-        // אנחנו שמים ציטוט קטן מהפוסט כדי שהמפרסם יבין על מה מדובר
-        const postSnippet = post.content.length > 30 ? post.content.substring(0, 30) + "..." : post.content;
-        const text = `היי ${post.users.firstName}, ראיתי את הפוסט שלך בקהילה: "${postSnippet}" אשמח לשמוע פרטים נוספים.`;
+        const postLink = `${window.location.origin}/#post-${post.id}`;
+        const text = `${postLink}\n\nהיי ${post.users.firstName},\n ראיתי את הפוסט שלך בקהילה, אשמח לשמוע פרטים נוספים.`;
 
         // 3. פתיחת ווצאפ
         const url = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
@@ -31,7 +30,7 @@ export default function FeedPosts({ post }) {
     };
 
     return (
-        <Card className="bg-slate-800 border-slate-700 overflow-hidden mb-4">
+        <Card id={`post-${post.id}`} className="bg-slate-800 border-slate-700 overflow-hidden mb-4 scroll-mt-24">
             {/* כותרת: פרטי המפרסם */}
             <div className="p-4 flex items-center gap-3 border-b border-slate-700/50">
                 <div className="w-10 h-10 rounded-full bg-teal-900/50 flex items-center justify-center border border-teal-700">

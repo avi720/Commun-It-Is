@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/Components/ui/card";
 import { Mail, Lock, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/Components/ui/card";
 
 export default function RegisterPage({ onContinue }) {
   const [email, setEmail] = useState('');
