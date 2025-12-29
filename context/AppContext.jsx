@@ -21,10 +21,13 @@ export function AppProvider({ children }) {
                 // רק אם זה לא טעינה שקטה, מבצעים ניתוק מלא.
                 // בטעינה שקטה אולי נעדיף לא לזרוק את המשתמש מיד אם יש בעיית רשת רגעית,
                 // אבל כאן נשאיר את זה פשוט.
-                if (showLoader) handleLogout();
+                setUser(null);
+                setIsAuthenticated(false);
+                if (showLoader) setIsLoading(false);
                 return;
             }
-
+            console.log("Session found:", session);
+            // מביאים את פרטי המשתמש מה-API שלנו
             const response = await fetch(`${API_URL}/users/check/${session.user.email}`);
             // אם קיבלנו נתונים, המשתמש קיים במערכת. אם לא, הוא צריך להשלים פרטים.
             if (response.ok) {
@@ -41,12 +44,14 @@ export function AppProvider({ children }) {
             }
         } catch (error) {
             console.error("Data loading error:", error);
+            setUser(null);
+            setIsAuthenticated(false);
             // לא מנתקים מיד בשגיאת רשת כדי לא להעיף משתמש סתם
         } finally {
             if (showLoader) setIsLoading(false);
         }
     };
-
+    
     useEffect(() => {
         // בטעינה הראשונה של הדף - מציגים לואדר
         loadUserData(true);
@@ -56,8 +61,13 @@ export function AppProvider({ children }) {
                 // --- התיקון כאן: בשינויים אוטומטיים, לא מראים לואדר ---
                 // אלא אם כן המשתמש עדיין לא מחובר בכלל (null)
                 loadUserData(false); 
+            
             } else if (event === 'SIGNED_OUT') {
-                handleLogout();
+                // כאן זה בסדר לקרוא לניקוי, כי זה בא מהאירוע עצמו
+                setUser(null);
+                setIsAuthenticated(false);
+                setIsLoading(false);
+                //handleLogout();
             }
         });
 
@@ -65,10 +75,12 @@ export function AppProvider({ children }) {
     }, []);
 
     const handleLogout = async () => {
-        await supabase.auth.signOut().catch(() => {});
+        try{
+            await supabase.auth.signOut()
+        } catch (error) {
+            console.error("Logout error:", error);
+        }
         localStorage.removeItem('tremp_userData');
-        setUser(null);
-        setIsAuthenticated(false);
     };
 
     // כשקוראים לרענון ידני (למשל מכפתור "אימתתי מייל"), כן נרצה לראות לואדר
@@ -79,9 +91,9 @@ export function AppProvider({ children }) {
         isLoading,
         isAuthenticated,
         logout: handleLogout,
-        refresh,
+        refresh
         // פונקציה לרענון שקט אם תצטרך בעתיד
-        silentRefresh: () => loadUserData(false) 
+        //silentRefresh: () => loadUserData(false) 
     };
 
     return (

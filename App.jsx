@@ -9,7 +9,6 @@ import SendRide from './Pages/SendRide';
 import LoginPage from './Pages/LoginPage';
 import SettingsPage from './Pages/SettingsPage';
 import HomePage from './Pages/HomePage';
-import SignIn from './Pages/SignIn';
 import RegisterPage from './Pages/Register/RegisterPage';
 import OnboardingPage from './Pages/Register/OnboardingPage';
 import VerificationSuccess from './Pages/Register/VerificationSuccess';
@@ -35,15 +34,20 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
-// רכיב שמוודא שמשתמש שכבר קיים לא ייכנס שוב להרשמה/התחברות
-const AuthRoute = ({ children }) => {
-    const { isAuthenticated } = useAppData();
-    if (isAuthenticated) return <Navigate to="/" replace />;
+// רכיב להשלמת פרטים: רק למחוברים שאין להם פרופיל
+const OnboardingRoute = ({ children }) => {
+    const { isAuthenticated, user, isLoading } = useAppData();
+    
+    if (isLoading) return null;
+    if (!isAuthenticated) return <Navigate to="/login" replace />;
+    // אם המשתמש כבר שלם, אין לו מה לחפש פה -> לך הביתה
+    if (isAuthenticated && !user?.isIncomplete) return <Navigate to="/" replace />;
+    
     return children;
 };
 
 function AppRoutes() {
-const { isAuthenticated, user, isLoading } = useAppData();
+const { isAuthenticated, isLoading } = useAppData();
   if (isLoading) {
     return (
       <div className="h-screen w-full flex items-center justify-center bg-slate-900 text-teal-500">
@@ -55,13 +59,13 @@ const { isAuthenticated, user, isLoading } = useAppData();
   return (
     <Routes>
       {/* אזור ציבורי - פתוח לכולם */}
-      <Route path="/login" element={!isAuthenticated ? <AuthRoute><LoginPage /></AuthRoute> : <Navigate to="/" />} />
+      <Route path="/login" element={!isAuthenticated ? <LoginPage /> : <Navigate to="/" />} />
       
       {/* כאן השינוי: RegisterPage עומד בפני עצמו */}
-      <Route path="/register" element={!isAuthenticated ? <AuthRoute><RegisterPage /></AuthRoute> : <Navigate to="/" />} />
+      <Route path="/register" element={!isAuthenticated ? <RegisterPage /> : <Navigate to="/" />} />
       <Route path="/verification-success" element={<VerificationSuccess />} />
       {/* נתיב מיוחד להשלמת פרטים - נגיש רק למי שמחובר אבל חסר פרופיל */}
-      <Route path="/onboarding" element={isAuthenticated ? <OnboardingPage /> : <Navigate to="/login" />} />
+      <Route path="/onboarding" element={<OnboardingRoute><OnboardingPage /></OnboardingRoute>} />
 
       {/* אזור מוגן - רק למחוברים */}
         <Route path="/" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>

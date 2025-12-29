@@ -24,8 +24,17 @@ export const avior = {
             if (error) throw error;
             return data;
         },
-        signOut: async () => {
-            await supabase.auth.signOut();
+        // לבדיקה למה ההתנתקות נמצא ב-AppContext.jsx
+        // signOut: async () => {
+        //     await supabase.auth.signOut();
+        //},
+        login: async (email, password) => {
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email,
+                password
+            });
+            if (error) throw error;
+            return data;
         },
     },
 

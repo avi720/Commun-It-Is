@@ -17,7 +17,9 @@ export default function RegisterPage() {
   
   // ריכוז כל שדות הטופס לאובייקט אחד
   const [formData, setFormData] = useState({
-    email: ''
+    email: '',
+    password: '',
+    confirmPassword: ''
   });
 
   // --- תוספת: שחזור מצב בטעינת הדף ---
@@ -58,11 +60,38 @@ export default function RegisterPage() {
   const handleRegister = async (e) => {
     e.preventDefault();
 
+    // בדיקות תקינות (Validations)
+    if (formData.password !== formData.confirmPassword) {
+      setError('הסיסמאות אינן תואמות');
+      return;
+    }
+
+    // 1. בדיקת תו מיוחד (בודק אם יש לפחות אחד מהתווים האלו)
+    const specialCharRegex = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
+    // 2. בדיקת מספר (בודק אם יש ספרה 0-9)
+    const numberRegex = /\d/;
+
+    if (formData.password.length < 6) {
+      setError('הסיסמה חייבת להכיל לפחות 6 תווים');
+      return;
+    }
+
+    if (!specialCharRegex.test(formData.password)) {
+        setError('הסיסמה חייבת להכיל לפחות תו מיוחד אחד (!@#$...)');
+        return;
+    }
+
+    if (!numberRegex.test(formData.password)) {
+        setError('הסיסמה חייבת להכיל לפחות מספר אחד');
+        return;
+    }
+
     setLoading(true);
     try {
       // 1. קריאה להרשמה (Auth בלבד)
       await avior.auth.signUp(
-        formData.email
+        formData.email,
+        formData.password
       );
       sessionStorage.setItem('pendingRegistrationEmail', formData.email); // שמירת המייל לזיכרון של הטאב הנוכחי
       // 2. הצלחה - מעבר למסך אימות מייל
@@ -161,6 +190,38 @@ export default function RegisterPage() {
                   className="w-full p-2 pl-10 rounded-md bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500"
                   required
                   value={formData.email}
+                  onChange={handleChange}
+                  dir="ltr"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="relative">
+                <Lock className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
+                <input 
+                  name="password"
+                  type="password" 
+                  placeholder="סיסמה (לפחות 6 תווים)"
+                  className="w-full p-2 pl-10 rounded-md bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  required
+                  value={formData.password}
+                  onChange={handleChange}
+                  dir="ltr"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="relative">
+                <Lock className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
+                <input 
+                  name="confirmPassword"
+                  type="password" 
+                  placeholder="אימות סיסמה"
+                  className="w-full p-2 pl-10 rounded-md bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  required
+                  value={formData.confirmPassword}
                   onChange={handleChange}
                   dir="ltr"
                 />

@@ -36,6 +36,12 @@ app.add_middleware(
 )
 
 # --- מודלים (Schemas) ---
+class LoginSchema(BaseModel):
+    email: str
+    password: str
+
+# class SignupSchema(BaseModel):
+#     email: str
 
 class UserSchema(BaseModel):
     firstName: str
@@ -64,30 +70,43 @@ class RideSchema(BaseModel):
     seats: int
     departure_minutes: Optional[int] = None 
 
-class LoginSchema(BaseModel):
-    email: str
-    password: str
-
 class PostSchema(BaseModel):
     user_id: str  # או int, תלוי איך זה אצלך ב-DB
     content: str
     image_url: Optional[str] = None
 
 # --- נתיבים (Routes) ---
-
-@app.post("/api/users")
-async def create_user(user: UserSchema):
+@app.post("/api/login")
+async def login(credentials: LoginSchema):
     try:
-        user_data = user.dict()
-        response = supabase.table("users").insert(user_data).execute()
-        return {"status": "success", "message": "User created successfully"}
+        response = supabase.table("users").select("*")\
+            .eq("email", credentials.email)\
+            .eq("password", credentials.password)\
+            .execute()
         
+        if len(response.data) > 0:
+            return response.data[0]
+        else:
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+            
     except Exception as e:
-        error_msg = str(e)
-        if "23505" in error_msg or "duplicate key" in error_msg:
-             raise HTTPException(status_code=400, detail="Email already exists")
-        print(f"Error creating user: {e}")
+        print(f"Login error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# @app.post("/api/users")
+# async def create_user(user: SignupSchema):
+#     try:
+#         user_data = user.dict()
+#         supabase.table("users").insert(user_data).execute()
+#         return {"status": "success", "message": "User created successfully"}
+        
+#     except Exception as e:
+#         error_msg = str(e)
+#         if "23505" in error_msg or "duplicate key" in error_msg:
+#              raise HTTPException(status_code=400, detail="Email already exists")
+#         print(f"Error creating user: {e}")
+#         raise HTTPException(status_code=500, detail=str(e))
     
 
 @app.put("/api/users/{user_id}")
@@ -127,24 +146,6 @@ async def delete_user(user_id: str):
              
     except Exception as e:
         print(f"Error deleting user: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.post("/api/login")
-async def login(credentials: LoginSchema):
-    try:
-        response = supabase.table("users").select("*")\
-            .eq("email", credentials.email)\
-            .eq("password", credentials.password)\
-            .execute()
-        
-        if len(response.data) > 0:
-            return response.data[0]
-        else:
-            raise HTTPException(status_code=401, detail="Invalid email or password")
-            
-    except Exception as e:
-        print(f"Login error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
         
 

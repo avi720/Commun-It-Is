@@ -10,9 +10,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 export default function OnboardingPage() {
   const { user, refresh } = useAppData();
   const navigate = useNavigate();
+  const [error, setError] = useState('');
   const [formData, setFormData] = useState({
-    password: '',
-    confirmPassword: '',
     firstName: '',
     lastName: '',
     city: '',
@@ -23,32 +22,6 @@ export default function OnboardingPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-        // בדיקות תקינות (Validations)
-    if (formData.password !== formData.confirmPassword) {
-      setError('הסיסמאות אינן תואמות');
-      return;
-    }
-
-    // 1. בדיקת תו מיוחד (בודק אם יש לפחות אחד מהתווים האלו)
-    const specialCharRegex = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
-    // 2. בדיקת מספר (בודק אם יש ספרה 0-9)
-    const numberRegex = /\d/;
-
-    if (formData.password.length < 6) {
-      setError('הסיסמה חייבת להכיל לפחות 6 תווים');
-      return;
-    }
-
-    if (!specialCharRegex.test(formData.password)) {
-        setError('הסיסמה חייבת להכיל לפחות תו מיוחד אחד (!@#$...)');
-        return;
-    }
-
-    if (!numberRegex.test(formData.password)) {
-        setError('הסיסמה חייבת להכיל לפחות מספר אחד');
-        return;
-    }
 
     if (formData.phone.length < 10 || formData.phone.length > 10) {
       setError('מספר טלפון לא תקין');
@@ -65,8 +38,8 @@ export default function OnboardingPage() {
       console.log("שולח נתונים מלאים לשרת...", completeData);
       
       // לאחר יצירת הפרופיל, נבצע כניסה אוטומטית ונשמור את הנתונים ב-localStorage
-      const loginResponse = await avior.entities.User.login(completeData.email, completeData.password);
-      localStorage.setItem('tremp_userData', JSON.stringify(loginResponse));
+      // const loginResponse = await avior.auth.login(completeData.email, completeData.password);
+      // localStorage.setItem('tremp_userData', JSON.stringify(loginResponse));
 
       console.log("המשתמש נוצר ונשמר בהצלחה!");
       await refresh();
@@ -195,6 +168,12 @@ export default function OnboardingPage() {
                 />
               </div>
             </div>
+
+            {error && (
+              <div className="text-red-400 text-sm text-center bg-red-900/20 p-2 rounded border border-red-900/50">
+                {error}
+              </div>
+            )}
 
             <button 
               type="submit"

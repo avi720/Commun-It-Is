@@ -4,6 +4,7 @@ import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { Car, MapPin, Send, Home, Navigation, Loader2, Clock, Users} from "lucide-react";
 import { formatRideTime } from "@/lib/utils";
+import Location from "./rideform/location";
 
 export default function RideForm({
     user, // מקבלים את המשתמש מהאבא
@@ -73,66 +74,7 @@ export default function RideForm({
     };
 
     // פונקציה למילוי כתובת הבית
-    const fillHomeAddress = (e) => {
-        e.preventDefault(); // מניעת רענון
-        if (user?.city && user?.address) {
-            setLocation(`${user.address}, ${user.city}`);
-        } else if (user?.address) {
-            setLocation(user.address);
-        }
-        setOriginMode('home');
-    };
-
-    // פונקציה למציאת מיקום נוכחי (GPS)
-    const handleCurrentLocation = (e) => {
-        e.preventDefault();
-        setOriginMode('gps');
-        setIsLoadingLocation(true);
-        setLocation("מאתר מיקום...");
-
-        if (!navigator.geolocation) {
-            alert("הדפדפן לא תומך במיקום");
-            setIsLoadingLocation(false);
-            return;
-        }
-
-        navigator.geolocation.getCurrentPosition(
-            async (position) => {
-                const { latitude, longitude } = position.coords;
-                try {
-                    // המרה לכתובת בעברית דרך OpenStreetMap
-                    const response = await fetch(
-                        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1&accept-language=he`,
-                        { headers: { 'User-Agent': 'TrempikatziaApp/1.0' } }
-                    );
-                    const data = await response.json();
-                    
-                    // ניסיון לקחת את שם הרחוב והעיר
-                    let address = data.address.road || data.address.pedestrian || '';
-                    if (data.address.house_number) address += ' ' + data.address.house_number;
-                    if (data.address.city || data.address.town || data.address.village) {
-                        address += ', ' + (data.address.city || data.address.town || data.address.village);
-                    }
-                    
-                    // אם לא הצלחנו להרכיב, ניקח את הכתובת המלאה שחזרה
-                    if (address.length < 5) address = data.display_name.split(',')[0];
-
-                    setLocation(address);
-                } catch (error) {
-                    console.error("Error fetching address:", error);
-                    setLocation(`${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
-                } finally {
-                    setIsLoadingLocation(false);
-                }
-            },
-            (error) => {
-                console.error(error);
-                alert("לא הצלחנו למצוא את המיקום");
-                setIsLoadingLocation(false);
-                setLocation("");
-            }
-        );
-    };
+    
 
     return (
         <form onSubmit={onSubmit} className="space-y-6">
@@ -154,6 +96,7 @@ export default function RideForm({
 
             {/* שדה מאיפה (עם טאבים) */}
             <div className="space-y-3">
+                <Location user={user} location={location} setLocation={setLocation} />
                 <Label htmlFor="location" className="text-sm font-medium text-slate-300 flex items-center gap-2">
                     <MapPin className="w-4 h-4 text-teal-400" />
                     מאיפה אני נוסע?
