@@ -44,13 +44,12 @@ class LoginSchema(BaseModel):
 #     email: str
 
 class UserSchema(BaseModel):
+    email: str
     firstName: str
     lastName: str
     city: str
     address: str
     age: int
-    email: str
-    password: str
     phone: str
 
 class UserUpdateSchema(BaseModel):
@@ -94,19 +93,19 @@ async def login(credentials: LoginSchema):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# @app.post("/api/users")
-# async def create_user(user: SignupSchema):
-#     try:
-#         user_data = user.dict()
-#         supabase.table("users").insert(user_data).execute()
-#         return {"status": "success", "message": "User created successfully"}
+@app.post("/api/create_user")
+async def create_user(user: UserSchema):
+    try:
+        user_data = user.dict()
+        supabase.table("users").insert(user_data).execute()
+        return {"status": "success", "message": "User created successfully"}
         
-#     except Exception as e:
-#         error_msg = str(e)
-#         if "23505" in error_msg or "duplicate key" in error_msg:
-#              raise HTTPException(status_code=400, detail="Email already exists")
-#         print(f"Error creating user: {e}")
-#         raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        error_msg = str(e)
+        if "23505" in error_msg or "duplicate key" in error_msg:
+             raise HTTPException(status_code=400, detail="Email already exists")
+        print(f"Error creating user: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
     
 
 @app.put("/api/users/{user_id}")
@@ -152,9 +151,9 @@ async def delete_user(user_id: str):
 @app.get("/api/users/check/{email}")
 def check_user_exists(email: str):
     try:
-        response = supabase.table("users").select("id").eq("email", email).execute()
+        response = supabase.table("users").select("*").eq("email", email).execute()
         if len(response.data) > 0:
-            return {"status": "exists"}
+            return response.data[0]
         else:
             raise HTTPException(status_code=404, detail="User not found")
     except Exception as e:

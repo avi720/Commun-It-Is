@@ -40,7 +40,7 @@ export function AppProvider({ children }) {
                     email: session.user.email,
                     isIncomplete: true 
                 });
-                setIsAuthenticated(true);
+                setIsAuthenticated(false);
             }
         } catch (error) {
             console.error("Data loading error:", error);

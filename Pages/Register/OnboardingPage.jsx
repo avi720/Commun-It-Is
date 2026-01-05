@@ -29,7 +29,6 @@ export default function OnboardingPage() {
     }
     // איחוד הנתונים: מה שמילאנו עכשיו + האימייל והסיסמה מהשלב הקודם
     const completeData = {
-      id : user.id,
       ...formData,
     };
 
@@ -38,12 +37,12 @@ export default function OnboardingPage() {
       console.log("שולח נתונים מלאים לשרת...", completeData);
       
       // לאחר יצירת הפרופיל, נבצע כניסה אוטומטית ונשמור את הנתונים ב-localStorage
-      // const loginResponse = await avior.auth.login(completeData.email, completeData.password);
-      // localStorage.setItem('tremp_userData', JSON.stringify(loginResponse));
+       //const loginResponse = await avior.auth.login(completeData.email, completeData.password);
+       //localStorage.setItem('tremp_userData', JSON.stringify(loginResponse));
 
       console.log("המשתמש נוצר ונשמר בהצלחה!");
       await refresh();
-      navigate('/'); // הפניה לדף הבית לאחר ההרשמה
+      navigate('/login'); // הפניה לדף הבית לאחר ההרשמה
 
     } catch (error) {
         console.error("שגיאה בשמירת המשתמש:", error);

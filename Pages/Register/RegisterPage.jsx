@@ -41,8 +41,19 @@ export default function RegisterPage() {
   const handleCheckVerification = async () => {
     setLoading(true);
     try {
+      const response = await avior.auth.getCurrentUser();
+      if (response && response.emailVerified) {
+          // אימות הצליח - מעבר לדף השלמת הפרופיל
+          sessionStorage.removeItem('pendingRegistrationEmail');
+          navigate('/onboarding');
+          return;
+      } else {
+          alert("המייל עדיין לא אומת. אנא בדוק את תיבת הדואר שלך ונסה שוב.");
+          setLoading(false);
+          return;
+      } 
         // מנסים לרענן את הנתונים מהשרת
-        await refresh();
+      //await refresh();
         // אם האימות הצליח, ה-App.jsx יזהה את זה לבד ויעביר אותך דף (בגלל ה-AuthRoute)
     } catch (error) {
         console.error(error);

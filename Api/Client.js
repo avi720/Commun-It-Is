@@ -14,9 +14,10 @@ export const avior = {
     // --- ישות האותנטיקציה ---
     auth: {
     // פונקציה חדשה: רק רושמת ל-Auth ושולחת מייל
-        signUp: async (email) => {
+        signUp: async (email, password) => {
             const { data, error } = await supabase.auth.signUp({
                 email,
+                password,
                 options: {
                     emailRedirectTo: `${window.location.origin}/verification-success`
                 }
@@ -82,7 +83,7 @@ export const avior = {
             // פונקציה חדשה: שמירת הפרטים בטבלה (תקרא לה ב-Onboarding)
             createProfile: async (profileData) => {
                 // כאן אנחנו שולחים לשרת (Python) שישמור בטבלה
-                const response = await fetch(`${API_URL}/users`, {
+                const response = await fetch(`${API_URL}/create_user`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(profileData)
