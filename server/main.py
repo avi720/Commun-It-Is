@@ -91,21 +91,6 @@ async def login(credentials: LoginSchema):
     except Exception as e:
         print(f"Login error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.post("/api/create_user")
-async def create_user(user: UserSchema):
-    try:
-        user_data = user.dict()
-        supabase.table("users").insert(user_data).execute()
-        return {"status": "success", "message": "User created successfully"}
-        
-    except Exception as e:
-        error_msg = str(e)
-        if "23505" in error_msg or "duplicate key" in error_msg:
-             raise HTTPException(status_code=400, detail="Email already exists")
-        print(f"Error creating user: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
     
 
 @app.put("/api/users/{user_id}")

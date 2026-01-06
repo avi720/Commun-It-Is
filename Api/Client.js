@@ -37,6 +37,11 @@ export const avior = {
             if (error) throw error;
             return data;
         },
+        getCurrentUser: async (email) => {
+            const { data, error } = await supabase.auth.getUser({email});
+            if (error) throw error;
+            return data;
+        }
     },
 
     entities: {
@@ -83,17 +88,20 @@ export const avior = {
             // פונקציה חדשה: שמירת הפרטים בטבלה (תקרא לה ב-Onboarding)
             createProfile: async (profileData) => {
                 // כאן אנחנו שולחים לשרת (Python) שישמור בטבלה
-                const response = await fetch(`${API_URL}/create_user`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(profileData)
-                });
-                
-                if (!response.ok) {
-                    const err = await response.json();
-                    throw new Error(err.detail || 'Failed to create profile');
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) {
+                    console.error("User not logged in");
+                    return;
                 }
-                return response.json();
+                const { error } = await supabase.from('users').update({profileData}).eq('id', user.id);
+                if (error) {
+                    console.error('Error updating profile:', error.message);
+                    alert('שגיאה בשמירת הפרטים');
+                } else {
+                    console.log('Profile updated successfully!');
+                    // כאן אתה יכול להפנות את המשתמש לדף הבית
+                    // window.location.href = '/dashboard';
+                }
             },
             
             login: async (email, password) => {

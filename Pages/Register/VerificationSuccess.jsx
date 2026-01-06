@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { CheckCircle2, X } from 'lucide-react';
+import React from 'react';
+import { CheckCircle2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 
 export default function VerificationSuccess() {

@@ -41,8 +41,8 @@ export default function RegisterPage() {
   const handleCheckVerification = async () => {
     setLoading(true);
     try {
-      const response = await avior.auth.getCurrentUser();
-      if (response && response.emailVerified) {
+      const response = await avior.auth.getCurrentUser(formData.email);
+      if (response) {
           // אימות הצליח - מעבר לדף השלמת הפרופיל
           sessionStorage.removeItem('pendingRegistrationEmail');
           navigate('/onboarding');
