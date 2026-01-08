@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 
 // מקבלים את initialAuth (אימייל וסיסמה) מהדף הקודם
 export default function OnboardingPage() {
-  const { user, refresh } = useAppData();
+  const { refresh } = useAppData();
   const navigate = useNavigate();
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({

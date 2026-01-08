@@ -5,13 +5,17 @@ import { CardContent, CardTitle, CardDescription } from "@/Components/ui/card";
 import { motion } from "framer-motion";
 import RideForm from "../Components/pagesComp/sendride/RideForm";
 import SuccessNotification from "../Components/pagesComp/sendride/SuccessNotification";
+import { useAppData } from "../context/AppContext";
 
 export default function SendRide() {
     // State למשתמש המחובר
-    const [user, setUser] = useState(null);
-    
+    //const [user, setUser] = useState(null);
+    const { user } = useAppData();
     // State לטופס
     const [driverName, setDriverName] = useState("");
+    useEffect(() => {
+        setDriverName(`${user.firstName} ${user.lastName}`);
+    }, [user]);
     const [location, setLocation] = useState("");
     const [destination, setDestination] = useState("");
     const [seats, setSeats] = useState(4);
@@ -21,19 +25,19 @@ export default function SendRide() {
     const queryClient = useQueryClient();
 
     // טעינת פרטי משתמש בעלייה של הדף
-    useEffect(() => {
-        const savedUser = localStorage.getItem('tremp_userData');
-        if (savedUser) {
-            try {
-                const parsedUser = JSON.parse(savedUser);
-                setUser(parsedUser);
-                // מילוי ראשוני של שם הנהג
-                setDriverName(`${parsedUser.firstName} ${parsedUser.lastName}`);
-            } catch (e) {
-                console.error("Error parsing user data", e);
-            }
-        }
-    }, []);
+    // useEffect(() => {
+    //     const savedUser = localStorage.getItem('tremp_userData');
+    //     if (savedUser) {
+    //         try {
+    //             const parsedUser = JSON.parse(savedUser);
+    //             setUser(parsedUser);
+    //             // מילוי ראשוני של שם הנהג
+    //             setDriverName(`${parsedUser.firstName} ${parsedUser.lastName}`);
+    //         } catch (e) {
+    //             console.error("Error parsing user data", e);
+    //         }
+    //     }
+    // }, []);
 
     const createRideMutation = useMutation({
         mutationFn: async (rideData) => {

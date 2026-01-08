@@ -93,7 +93,7 @@ export const avior = {
                     console.error("User not logged in");
                     return;
                 }
-                const { error } = await supabase.from('users').update(profileData).eq('email', user.email);
+                const { error } = await supabase.from('users').update(profileData).eq('id', user.id);
                 if (error) {
                     console.error('Error updating profile:', error.message);
                     alert('שגיאה בשמירת הפרטים');

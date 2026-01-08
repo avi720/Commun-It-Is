@@ -21,9 +21,6 @@ export default function RideForm({
     onSubmit,
     isSubmitting
 }) {
-    // מצבים פנימיים לניהול ה-UI של המיקום
-    const [originMode, setOriginMode] = useState('manual'); 
-    const [isLoadingLocation, setIsLoadingLocation] = useState(false);
     // ניהול נפרד של השדות בטופס (מחרוזות)
     const [dateStr, setDateStr] = useState(""); 
     const [timeStr, setTimeStr] = useState("");
@@ -73,9 +70,6 @@ export default function RideForm({
         updateParentTime(dateStr, val);
     };
 
-    // פונקציה למילוי כתובת הבית
-    
-
     return (
         <form onSubmit={onSubmit} className="space-y-6">
             {/* שדה מי אני */}
@@ -97,48 +91,6 @@ export default function RideForm({
             {/* שדה מאיפה (עם טאבים) */}
             <div className="space-y-3">
                 <Location user={user} location={location} setLocation={setLocation} />
-                <Label htmlFor="location" className="text-sm font-medium text-slate-300 flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-teal-400" />
-                    מאיפה אני נוסע?
-                </Label>
-
-                {/* כפתורי בחירה מהירה */}
-                <div className="grid grid-cols-2 gap-2 p-1 bg-slate-900 rounded-lg border border-slate-800">
-                    <button
-                        onClick={fillHomeAddress}
-                        className={`flex items-center justify-center gap-2 p-2 rounded-md text-sm transition-all ${
-                            originMode === 'home' 
-                            ? 'bg-slate-700 text-white shadow-sm' 
-                            : 'text-slate-400 hover:text-slate-200'
-                        }`}
-                    >
-                        <Home className="w-4 h-4" />
-                        מהבית
-                    </button>
-                    <button
-                        onClick={handleCurrentLocation}
-                        className={`flex items-center justify-center gap-2 p-2 rounded-md text-sm transition-all ${
-                            originMode === 'gps' 
-                            ? 'bg-teal-600 text-white shadow-sm' 
-                            : 'text-slate-400 hover:text-slate-200'
-                        }`}
-                    >
-                        {isLoadingLocation ? <Loader2 className="w-4 h-4 animate-spin" /> : <Navigation className="w-4 h-4" />}
-                        מיקום נוכחי
-                    </button>
-                </div>
-
-                <Input
-                    id="location"
-                    value={location}
-                    onChange={(e) => {
-                        setLocation(e.target.value);
-                        setOriginMode('manual');
-                    }}
-                    placeholder='או הקלד כתובת...'
-                    className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-500 focus:ring-teal-500"
-                    required
-                />
             </div>
 
             {/* שדה לאן */}
