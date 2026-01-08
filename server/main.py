@@ -36,12 +36,6 @@ app.add_middleware(
 )
 
 # --- מודלים (Schemas) ---
-class LoginSchema(BaseModel):
-    email: str
-    password: str
-
-# class SignupSchema(BaseModel):
-#     email: str
 
 class UserSchema(BaseModel):
     email: str
@@ -74,24 +68,8 @@ class PostSchema(BaseModel):
     content: str
     image_url: Optional[str] = None
 
+
 # --- נתיבים (Routes) ---
-@app.post("/api/login")
-async def login(credentials: LoginSchema):
-    try:
-        response = supabase.table("users").select("*")\
-            .eq("email", credentials.email)\
-            .eq("password", credentials.password)\
-            .execute()
-        
-        if len(response.data) > 0:
-            return response.data[0]
-        else:
-            raise HTTPException(status_code=401, detail="Invalid email or password")
-            
-    except Exception as e:
-        print(f"Login error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-    
 
 @app.put("/api/users/{user_id}")
 async def update_user(user_id: str, user_data: UserUpdateSchema):
@@ -132,17 +110,6 @@ async def delete_user(user_id: str):
         print(f"Error deleting user: {e}")
         raise HTTPException(status_code=500, detail=str(e))
         
-
-@app.get("/api/users/check/{email}")
-def check_user_exists(email: str):
-    try:
-        response = supabase.table("users").select("*").eq("email", email).execute()
-        if len(response.data) > 0:
-            return response.data[0]
-        else:
-            raise HTTPException(status_code=404, detail="User not found")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/rides")
 def get_rides(city: str = None):

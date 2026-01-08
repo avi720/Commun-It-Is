@@ -40,13 +40,15 @@ export default function OnboardingPage() {
        //const loginResponse = await avior.auth.login(completeData.email, completeData.password);
        //localStorage.setItem('tremp_userData', JSON.stringify(loginResponse));
 
-      console.log("המשתמש נוצר ונשמר בהצלחה!");
       await refresh();
-      navigate('/login'); // הפניה לדף הבית לאחר ההרשמה
 
     } catch (error) {
         console.error("שגיאה בשמירת המשתמש:", error);
         alert("הייתה בעיה בשמירת הפרטים. נסה שוב.");
+    }
+    finally {
+      console.log("המשתמש נוצר ונשמר בהצלחה!");
+      navigate('/'); // הפניה לדף הבית לאחר ההרשמה
     }
   };
 
@@ -59,34 +61,6 @@ export default function OnboardingPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-1">
-              <label className="text-xs text-slate-400 mr-1">סיסמה</label>
-              <div className="relative">
-                <Lock className="absolute right-3 top-2.5 h-4 w-4 text-slate-500" />
-                <input 
-                  type="password" 
-                  className="w-full p-2 pr-9 rounded bg-slate-900 border border-slate-700 text-white text-sm focus:ring-1 focus:ring-teal-500"
-                  placeholder="לדוגמא: abcd1!"
-                  required
-                  onChange={(e) => setFormData({...formData, password: e.target.value})}
-                  dir="ltr"
-                />
-              </div>
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs text-slate-400 mr-1">סיסמה</label>
-              <div className="relative">
-                <Lock className="absolute right-3 top-2.5 h-4 w-4 text-slate-500" />
-                <input 
-                  type="password" 
-                  className="w-full p-2 pr-9 rounded bg-slate-900 border border-slate-700 text-white text-sm focus:ring-1 focus:ring-teal-500"
-                  placeholder="אימות סיסמה"
-                  required
-                  onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
-                  dir="ltr"
-                />
-              </div>
-            </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
                 <label className="text-xs text-slate-400 mr-1">שם פרטי</label>

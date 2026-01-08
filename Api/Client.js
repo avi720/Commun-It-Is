@@ -36,12 +36,12 @@ export const avior = {
             });
             if (error) throw error;
             return data;
-        },
-        getCurrentUser: async (email) => {
-            const { data, error } = await supabase.auth.getUser({email});
-            if (error) throw error;
-            return data;
         }
+        // getCurrentUser: async (email) => {
+        //     const { data, error } = await supabase.auth.getUser({email});
+        //     if (error) throw error;
+        //     return data;
+        // }
     },
 
     entities: {
@@ -93,7 +93,7 @@ export const avior = {
                     console.error("User not logged in");
                     return;
                 }
-                const { error } = await supabase.from('users').update({profileData}).eq('id', user.id);
+                const { error } = await supabase.from('users').update(profileData).eq('email', user.email);
                 if (error) {
                     console.error('Error updating profile:', error.message);
                     alert('שגיאה בשמירת הפרטים');
@@ -104,18 +104,18 @@ export const avior = {
                 }
             },
             
-            login: async (email, password) => {
-                const response = await fetch(`${API_URL}/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
-                });
+            // login: async (email, password) => {
+            //     const response = await fetch(`${API_URL}/login`, {
+            //         method: 'POST',
+            //         headers: { 'Content-Type': 'application/json' },
+            //         body: JSON.stringify({ email, password })
+            //     });
                 
-                if (!response.ok) {
-                    throw new Error('Login failed');
-                }
-                return response.json();
-            },
+            //     if (!response.ok) {
+            //         throw new Error('Login failed');
+            //     }
+            //     return response.json();
+            // },
 
             update: async (userId, userData) => {
                 const response = await fetch(`${API_URL}/users/${userId}`, {

@@ -27,26 +27,44 @@ export function AppProvider({ children }) {
                 return;
             }
             console.log("Session found:", session);
-            // מביאים את פרטי המשתמש מה-API שלנו
-            const response = await fetch(`${API_URL}/users/check/${session.user.email}`);
-            // אם קיבלנו נתונים, המשתמש קיים במערכת. אם לא, הוא צריך להשלים פרטים.
-            if (response.ok) {
-                const userData = await response.json();
-                setUser(userData);
+            const { data: profile, error } = await supabase
+                .from('users')
+                .select('*')
+                .eq('id', session.user.id)
+                .single();
+
+            if (error && error.code !== 'PGRST116') { 
+                // PGRST116 = לא נמצאו תוצאות (JSON object requested, multiple (or no) rows returned)
+                console.error("Error fetching profile:", error);
+                throw error;
+            }
+            // 3. בדיקה אם הפרופיל קיים ומלא
+            if (profile) {
+                // בדיקה אם חסרים פרטים קריטיים (למשל שם פרטי)
+                if (!profile.firstName || !profile.lastName || !profile.city || !profile.phone || !profile.address || !profile.age) {
+                    setUser({ ...profile, isIncomplete: true });
+                    // המשתמש מחובר, אך חסרים פרטים -> ינותב ל-Onboarding
+                } else {
+                    setUser(profile);
+                }
                 setIsAuthenticated(true);
-            } else if (response.status === 404) {
+            } else {
+                // מקרה קצה: יש משתמש ב-Auth אבל לא ב-Public (אמור להיות מטופל ע"י הטריגר, אבל ליתר ביטחון)
+                console.warn("User exists in Auth but not in public.users");
                 setUser({ 
-                    id: session.user.id,
-                    email: session.user.email,
+                    id: session.user.id, 
+                    email: session.user.email, 
                     isIncomplete: true 
                 });
-                setIsAuthenticated(false);
+                setIsAuthenticated(true);
             }
+
         } catch (error) {
             console.error("Data loading error:", error);
+            // במקרה של שגיאה קריטית, נשאיר את המשתמש מחובר אך ללא נתונים כדי לא לזרוק אותו סתם
+            // או שנחליט לנתק אותו אם זה קריטי
             setUser(null);
             setIsAuthenticated(false);
-            // לא מנתקים מיד בשגיאת רשת כדי לא להעיף משתמש סתם
         } finally {
             if (showLoader) setIsLoading(false);
         }

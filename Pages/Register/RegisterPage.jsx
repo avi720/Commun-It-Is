@@ -41,26 +41,25 @@ export default function RegisterPage() {
   const handleCheckVerification = async () => {
     setLoading(true);
     try {
-      const response = await avior.auth.getCurrentUser(formData.email);
-      if (response) {
-          // אימות הצליח - מעבר לדף השלמת הפרופיל
-          sessionStorage.removeItem('pendingRegistrationEmail');
-          navigate('/onboarding');
-          return;
-      } else {
-          alert("המייל עדיין לא אומת. אנא בדוק את תיבת הדואר שלך ונסה שוב.");
-          setLoading(false);
-          return;
-      } 
-        // מנסים לרענן את הנתונים מהשרת
-      //await refresh();
-        // אם האימות הצליח, ה-App.jsx יזהה את זה לבד ויעביר אותך דף (בגלל ה-AuthRoute)
+      const loginResponse = await avior.auth.login(formData.email, formData.password);
+      if (loginResponse.user) {
+        // התחברות הצליחה! המייל מאומת.
+        // שומרים את המידע לשימוש באפליקציה
+        localStorage.setItem('tremp_userData', JSON.stringify(loginResponse.user));
+        // מנקים את המייל הזמני מהזיכרון של הטאב
+        sessionStorage.removeItem('pendingRegistrationEmail');
+        // רענון הקונטקסט כדי שהאפליקציה תדע שאנחנו מחוברים
+        await refresh(); 
+        // ה-Router ב-App.jsx כבר יעביר אותנו ל-Onboarding כי חסרים פרטים
+        navigate('/onboarding');
+      }
     } catch (error) {
-        console.error(error);
-    } finally {
-        setLoading(false);
-    }
-  };
+          console.error("Login failed:", error);
+          alert("האימות טרם הושלם או שגיאה בהתחברות. אנא נסה שוב.");
+      } finally {
+          setLoading(false);
+      }
+    };
 
   const handleReset = () => {
       sessionStorage.removeItem('pendingRegistrationEmail');
