@@ -6,15 +6,15 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from datetime import datetime, timedelta, timezone
-from typing import List, Optional
+from typing import Optional
 from dotenv import load_dotenv
-from supabase import create_client, Client
+from supabase import create_client, Client;
 
 # --- הגדרות Supabase ---
 # וודא שהכנסת כאן את הפרטים האמיתיים שלך
 load_dotenv()
 SUPABASE_URL = os.getenv("VITE_SUPABASE_URL")
-SUPABASE_KEY = os.getenv("VITE_SUPABASE_KEY")
+SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_KEY")
 
 # בדיקה שהמפתחות קיימים
 if not SUPABASE_URL or not SUPABASE_KEY:
@@ -46,14 +46,6 @@ class UserSchema(BaseModel):
     age: int
     phone: str
 
-class UserUpdateSchema(BaseModel):
-    firstName: str
-    lastName: str
-    city: str
-    address: str
-    phone: str
-    # שים לב: אנחנו לא כוללים כאן אימייל, סיסמה או גיל כי הם לא בטופס העדכון
-
 class RideSchema(BaseModel):
     user_id: str       # <--- השדה החדש: מזהה המשתמש (חובה!)
     driver_name: str
@@ -68,29 +60,7 @@ class PostSchema(BaseModel):
     content: str
     image_url: Optional[str] = None
 
-
 # --- נתיבים (Routes) ---
-
-@app.put("/api/users/{user_id}")
-async def update_user(user_id: str, user_data: UserUpdateSchema):
-    try:
-        # המרת הנתונים למילון
-        update_payload = user_data.dict()
-        
-        # עדכון ב-Supabase לפי ID
-        response = supabase.table("users").update(update_payload).eq("id", user_id).execute()
-        
-        if len(response.data) > 0:
-            print(f"User {user_id} updated successfully")
-            return response.data[0] # מחזיר את המשתמש המעודכן
-        else:
-             raise HTTPException(status_code=404, detail="User not found or update failed")
-             
-    except Exception as e:
-        print(f"Error updating user: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
 @app.delete("/api/users/{user_id}")
 async def delete_user(user_id: str):
     try:

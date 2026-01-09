@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">commun-it-is</string>
+    <string name="title_activity_main">commun-it-is</string>
+    <string name="package_name">com.CommunItIs.myapp</string>
+    <string name="custom_url_scheme">com.CommunItIs.myapp</string>
+</resources>

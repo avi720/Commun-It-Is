@@ -5,10 +5,12 @@ import { AnimatePresence } from "framer-motion";
 import { useAppData } from '../context/AppContext';
 import PublicDisplayHeader from "../Components/pagesComp/publicdisplay/PublicDisplayHeader";
 import RideCard from "../Components/pagesComp/publicdisplay/RideCard";
+import RideDetailsModal from "../Components/pagesComp/publicdisplay/RideDetailsModal";
 import NoRidesMessage from "../Components/pagesComp/publicdisplay/NoRidesMessage";
 
 export default function PublicDisplay() {
     const { user } = useAppData();
+    const [selectedRide, setSelectedRide] = useState(null);
     const [currentTime, setCurrentTime] = useState(new Date());
     const containerRef = useRef(null);
 
@@ -66,15 +68,30 @@ export default function PublicDisplay() {
                                 className="grid grid-cols-1 gap-6 w-full"
                             >
                                 {rides.map((ride) => (
-                                    <RideCard
+                                    <div
                                         key={ride.id}
-                                        ride={ride}
-                                        currentTime={currentTime}
-                                        getTimeDisplay={getTimeDisplay}
-                                        getTimeColor={getTimeColor}
-                                    />
+                                        onClick={() => setSelectedRide(ride)} // עדכון ה-State בעת לחיצה
+                                        className="cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98]" // הוספת אנימציית לחיצה קטנה ב-CSS
+                                    >
+                                        <RideCard
+                                            key={ride.id}
+                                            ride={ride}
+                                            currentTime={currentTime}
+                                            getTimeDisplay={getTimeDisplay}
+                                            getTimeColor={getTimeColor}
+                                        />
+                                    </div>
                                 ))}
                             </div>
+                        )}
+                    </AnimatePresence>
+
+                    <AnimatePresence>
+                        {selectedRide && (
+                            <RideDetailsModal 
+                                ride={selectedRide} 
+                                onClose={() => setSelectedRide(null)} 
+                            />
                         )}
                     </AnimatePresence>
                 </div>
