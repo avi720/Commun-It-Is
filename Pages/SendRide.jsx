@@ -24,25 +24,10 @@ export default function SendRide() {
 
     const queryClient = useQueryClient();
 
-    // טעינת פרטי משתמש בעלייה של הדף
-    // useEffect(() => {
-    //     const savedUser = localStorage.getItem('tremp_userData');
-    //     if (savedUser) {
-    //         try {
-    //             const parsedUser = JSON.parse(savedUser);
-    //             setUser(parsedUser);
-    //             // מילוי ראשוני של שם הנהג
-    //             setDriverName(`${parsedUser.firstName} ${parsedUser.lastName}`);
-    //         } catch (e) {
-    //             console.error("Error parsing user data", e);
-    //         }
-    //     }
-    // }, []);
-
     const createRideMutation = useMutation({
         mutationFn: async (rideData) => {
             if (!user || !user.id) {
-            throw new Error("User not identified");
+                throw new Error("User not identified");
             }
             // שולחים לשרת את התאריך המדויק שנבחר
             // (המשתמש בחר תאריך ושעה בטופס, והם נשמרים ב-departure_time)
@@ -77,7 +62,7 @@ export default function SendRide() {
 
         createRideMutation.mutate({
             driver_name: driverName,
-            location: location,    
+            location: location,
             destination: destination,
             seats: seats,
             departure_time: departureTime
@@ -91,32 +76,32 @@ export default function SendRide() {
                 animate={{ opacity: 1, y: 0 }}
                 className="w-full max-w-md"
             >
-                    <div className="space-y-1 pb-2 pt-3 px-6">
-                        <CardTitle className="text-4xl font-bold text-center bg-gradient-to-r from-teal-400 to-blue-500 bg-clip-text text-transparent">
-                            טרמפיקציה
-                        </CardTitle>
-                        <CardDescription className="text-center text-slate-400">
-                            שתף נסיעה עם הקהילה
-                        </CardDescription>
-                    </div>
+                <div className="space-y-1 pb-2 pt-3 px-6">
+                    <CardTitle className="text-4xl font-bold text-center bg-gradient-to-r from-teal-400 to-blue-500 bg-clip-text text-transparent">
+                        טרמפיקציה
+                    </CardTitle>
+                    <CardDescription className="text-center text-slate-400">
+                        שתף נסיעה עם הקהילה
+                    </CardDescription>
+                </div>
 
-                    <CardContent className="p-6">
-                        <RideForm
-                            user={user} // העברת המשתמש לטופס
-                            driverName={driverName}
-                            setDriverName={setDriverName}
-                            location={location}
-                            setLocation={setLocation}
-                            destination={destination}
-                            setDestination={setDestination}
-                            seats={seats}
-                            setSeats={setSeats}
-                            departureTime={departureTime}
-                            setDepartureTime={setDepartureTime}
-                            onSubmit={handleSubmit}
-                            isSubmitting={createRideMutation.isPending}
-                        />
-                    </CardContent>
+                <CardContent className="p-6">
+                    <RideForm
+                        user={user} // העברת המשתמש לטופס
+                        driverName={driverName}
+                        setDriverName={setDriverName}
+                        location={location}
+                        setLocation={setLocation}
+                        destination={destination}
+                        setDestination={setDestination}
+                        seats={seats}
+                        setSeats={setSeats}
+                        departureTime={departureTime}
+                        setDepartureTime={setDepartureTime}
+                        onSubmit={handleSubmit}
+                        isSubmitting={createRideMutation.isPending}
+                    />
+                </CardContent>
                 <SuccessNotification isVisible={showSuccess} />
             </motion.div>
         </div>
