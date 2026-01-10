@@ -76,7 +76,7 @@ export default function SendRide() {
                 animate={{ opacity: 1, y: 0 }}
                 className="w-full max-w-md"
             >
-                <div className="space-y-1 pb-2 pt-3 px-6">
+                <div className="space-y-1 pt-2 px-6">
                     <CardTitle className="text-4xl font-bold text-center bg-gradient-to-r from-teal-400 to-blue-500 bg-clip-text text-transparent">
                         טרמפיקציה
                     </CardTitle>
@@ -85,7 +85,7 @@ export default function SendRide() {
                     </CardDescription>
                 </div>
 
-                <CardContent className="p-6">
+                <CardContent className="pt-2 px-6">
                     <RideForm
                         user={user} // העברת המשתמש לטופס
                         driverName={driverName}

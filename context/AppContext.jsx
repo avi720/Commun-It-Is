@@ -5,19 +5,20 @@ const AppContext = createContext();
 
 export function AppProvider({ children }) {
     const [user, setUser] = useState(null);
+    const [session, setSession] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-    const API_URL = "/api"; 
+    const API_URL = "/api";
 
     // הוספנו פרמטר showLoader (ברירת מחדל: true)
     const loadUserData = async (showLoader = true) => {
         if (showLoader) setIsLoading(true);
-        
+
         try {
-            const { data: { session } } = await supabase.auth.getSession();
-            
-            if (!session) {
+            const { data: { session: currentSession } } = await supabase.auth.getSession();
+            setSession(currentSession);
+            if (!currentSession) {
                 // רק אם זה לא טעינה שקטה, מבצעים ניתוק מלא.
                 // בטעינה שקטה אולי נעדיף לא לזרוק את המשתמש מיד אם יש בעיית רשת רגעית,
                 // אבל כאן נשאיר את זה פשוט.
@@ -26,14 +27,14 @@ export function AppProvider({ children }) {
                 if (showLoader) setIsLoading(false);
                 return;
             }
-            console.log("Session found:", session);
+            console.log("Session found:", currentSession);
             const { data: profile, error } = await supabase
                 .from('users')
                 .select('*')
-                .eq('id', session.user.id)
+                .eq('id', currentSession.user.id)
                 .single();
 
-            if (error && error.code !== 'PGRST116') { 
+            if (error && error.code !== 'PGRST116') {
                 // PGRST116 = לא נמצאו תוצאות (JSON object requested, multiple (or no) rows returned)
                 console.error("Error fetching profile:", error);
                 throw error;
@@ -51,10 +52,10 @@ export function AppProvider({ children }) {
             } else {
                 // מקרה קצה: יש משתמש ב-Auth אבל לא ב-Public (אמור להיות מטופל ע"י הטריגר, אבל ליתר ביטחון)
                 console.warn("User exists in Auth but not in public.users");
-                setUser({ 
-                    id: session.user.id, 
-                    email: session.user.email, 
-                    isIncomplete: true 
+                setUser({
+                    id: currentSession.user.id,
+                    email: currentSession.user.email,
+                    isIncomplete: true
                 });
                 setIsAuthenticated(true);
             }
@@ -69,20 +70,23 @@ export function AppProvider({ children }) {
             if (showLoader) setIsLoading(false);
         }
     };
-    
+
     useEffect(() => {
         // בטעינה הראשונה של הדף - מציגים לואדר
         loadUserData(true);
-        
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, newSession) => {
+            // 3. עדכון ה-session בזמן אמת כשיש שינוי (התחברות/התנתקות)
+            setSession(newSession);
             if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
                 // --- התיקון כאן: בשינויים אוטומטיים, לא מראים לואדר ---
                 // אלא אם כן המשתמש עדיין לא מחובר בכלל (null)
-                loadUserData(false); 
-            
+                loadUserData(false);
+
             } else if (event === 'SIGNED_OUT') {
                 // כאן זה בסדר לקרוא לניקוי, כי זה בא מהאירוע עצמו
                 setUser(null);
+                setSession(null);
                 setIsAuthenticated(false);
                 setIsLoading(false);
                 //handleLogout();
@@ -93,7 +97,7 @@ export function AppProvider({ children }) {
     }, []);
 
     const handleLogout = async () => {
-        try{
+        try {
             await supabase.auth.signOut()
         } catch (error) {
             console.error("Logout error:", error);
@@ -106,6 +110,7 @@ export function AppProvider({ children }) {
 
     const value = {
         user,
+        session,
         isLoading,
         isAuthenticated,
         logout: handleLogout,

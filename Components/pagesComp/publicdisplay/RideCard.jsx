@@ -25,7 +25,7 @@ export default function RideCard({ ride }) {
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
             className="group">
 
-            <div className={`relative bg-slate-900/80 backdrop-blur-md rounded-2xl shadow-xl overflow-hidden border transition-all hover:border-slate-500 ${getTimeColor()}`}>
+            <div className={`w-full px-2 relative bg-slate-900/80 backdrop-blur-md rounded-2xl shadow-xl overflow-hidden border transition-all hover:border-slate-500 ${getTimeColor()}`}>
 
                 {/* פס צבעוני עדין בצד */}
                 <div className="absolute top-0 right-0 bottom-0 w-1.5 bg-gradient-to-b from-teal-500 to-blue-600" />

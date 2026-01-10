@@ -8,12 +8,12 @@ import FeedPosts from '../Components/pagesComp/homePageComp/FeedPosts';
 import CreatePostModal from '../Components/pagesComp/homePageComp/CreatePostModal';
 
 const FloatingActionButton = ({ onClick }) => (
-    <Button 
-        onClick={onClick}
-        className="fixed bottom-16 left-6 w-14 h-14 rounded-full bg-teal-500 hover:bg-teal-600 shadow-lg shadow-teal-500/30 flex items-center justify-center z-50 transition-transform hover:scale-105"
-    >
-        <Plus className="w-8 h-8 text-white" />
-    </Button>
+  <Button
+    onClick={onClick}
+    className="fixed bottom-16 left-6 w-14 h-14 rounded-full bg-teal-500 hover:bg-teal-600 shadow-lg shadow-teal-500/30 flex items-center justify-center z-50 transition-transform hover:scale-105"
+  >
+    <Plus className="w-8 h-8 text-white" />
+  </Button>
 );
 
 export default function HomePage() {
@@ -23,10 +23,10 @@ export default function HomePage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-      // טוענים פוסטים רק אם יש משתמש ויש לו עיר
-      if (user && user.city) {
-          loadPosts();
-      }
+    // טוענים פוסטים רק אם יש משתמש ויש לו עיר
+    if (user && user.city) {
+      loadPosts();
+    }
   }, [user]);
 
   const loadPosts = async () => {
@@ -39,12 +39,9 @@ export default function HomePage() {
       setLoading(false);
     }
   };
-  
+
   return (
     <div className="min-h-screen space-y-6 relative">
-      <header className="text-center space-y-2 mt-4">
-        <h1 className="text-3xl font-bold text-teal-400">היי, {user?.firstName || "חבר"}! 👋</h1>
-      </header>
 
       <div className="max-w-lg mx-auto space-y-4">
         {loading ? (
@@ -77,10 +74,10 @@ export default function HomePage() {
       {/* כפתור הוספה */}
       <FloatingActionButton onClick={() => setIsModalOpen(true)} />
 
-      <CreatePostModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-        onPostCreated={loadPosts} 
+      <CreatePostModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onPostCreated={loadPosts}
       />
     </div>
   );

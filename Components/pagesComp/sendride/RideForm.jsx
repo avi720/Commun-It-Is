@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
-import { Car, MapPin, Send, Home, Navigation, Loader2, Clock, Users} from "lucide-react";
+import { Car, MapPin, Send, Home, Navigation, Loader2, Clock, Users } from "lucide-react";
 import { formatRideTime } from "@/lib/utils";
 import Location from "./rideform/location";
 
@@ -22,7 +22,7 @@ export default function RideForm({
     isSubmitting
 }) {
     // ניהול נפרד של השדות בטופס (מחרוזות)
-    const [dateStr, setDateStr] = useState(""); 
+    const [dateStr, setDateStr] = useState("");
     const [timeStr, setTimeStr] = useState("");
     const [minDate, setMinDate] = useState("");
     const [maxDate, setMaxDate] = useState("");
@@ -30,11 +30,11 @@ export default function RideForm({
     // אתחול ראשוני
     useEffect(() => {
         const target = departureTime || new Date();
-        
+
         // התאמה לאזור זמן מקומי (ישראל) כדי שהתאריך ב-input יהיה נכון
         const offset = target.getTimezoneOffset() * 60000;
         const localISOTime = (new Date(target - offset)).toISOString().slice(0, -1);
-        
+
         setDateStr(localISOTime.split('T')[0]);
         setTimeStr(localISOTime.split('T')[1].slice(0, 5));
 
@@ -42,7 +42,7 @@ export default function RideForm({
         const now = new Date();
         const nowLocal = (new Date(now - offset)).toISOString().slice(0, -1);
         setMinDate(nowLocal.split('T')[0]);
-        
+
         const nextWeek = new Date(now);
         nextWeek.setDate(now.getDate() + 7);
         const nextWeekLocal = (new Date(nextWeek - offset)).toISOString().slice(0, -1);
@@ -71,9 +71,9 @@ export default function RideForm({
     };
 
     return (
-        <form onSubmit={onSubmit} className="space-y-6">
+        <form onSubmit={onSubmit} className="space-y-5">
             {/* שדה מי אני */}
-            <div className="space-y-2">
+            <div className="space-y-1">
                 <Label htmlFor="driver" className="text-sm font-medium text-slate-300 flex items-center gap-2">
                     <Car className="w-4 h-4 text-teal-400" />
                     מי נוהג?
@@ -89,12 +89,12 @@ export default function RideForm({
             </div>
 
             {/* שדה מאיפה (עם טאבים) */}
-            <div className="space-y-3">
+            <div className="space-y-1">
                 <Location user={user} location={location} setLocation={setLocation} />
             </div>
 
             {/* שדה לאן */}
-            <div className="space-y-2">
+            <div className="space-y-1">
                 <Label htmlFor="destination" className="text-sm font-medium text-slate-300 flex items-center gap-2">
                     <MapPin className="w-4 h-4 text-teal-400" />
                     לאן אני נוסע? (יעד)
@@ -110,7 +110,7 @@ export default function RideForm({
             </div>
 
             {/* שדה מספר מושבים */}
-            <div className="space-y-2">
+            <div className="space-y-1">
                 <Label htmlFor="seats" className="text-sm font-medium text-slate-300 flex items-center gap-2">
                     <Users className="w-4 h-4 text-teal-400" />
                     מספר מושבים פנויים
@@ -126,15 +126,15 @@ export default function RideForm({
             </div>
 
             {/* מתי יוצאים (החלק המעודכן) */}
-            <div className="space-y-2">
-                 <Label className="text-sm font-medium text-slate-300 flex items-center gap-2">
+            <div className="space-y-1">
+                <Label className="text-sm font-medium text-slate-300 flex items-center gap-2">
                     <Clock className="w-4 h-4 text-teal-400" />
                     מתי יוצאים?
-                 </Label>
-                 
-                 <div className="flex gap-2">
-                     {/* שדה תאריך */}
-                     <div className="relative flex-1">
+                </Label>
+
+                <div className="flex gap-2">
+                    {/* שדה תאריך */}
+                    <div className="relative flex-1">
                         <input
                             type="date"
                             value={dateStr}
@@ -144,10 +144,10 @@ export default function RideForm({
                             className="w-full p-3 bg-slate-900 border border-slate-700 rounded-md text-white focus:ring-teal-500 text-center"
                             required
                         />
-                     </div>
+                    </div>
 
-                     {/* שדה שעה */}
-                     <div className="relative flex-1">
+                    {/* שדה שעה */}
+                    <div className="relative flex-1">
                         <input
                             type="time"
                             value={timeStr}
@@ -155,20 +155,20 @@ export default function RideForm({
                             className="w-full p-3 bg-slate-900 border border-slate-700 rounded-md text-white focus:ring-teal-500 text-center text-lg tracking-wide"
                             required
                         />
-                     </div>
-                 </div>
-                 
-                 {/* תצוגת טקסט חכמה */}
-                 <div className="text-sm text-teal-400 text-center font-bold mt-2 bg-teal-950/30 p-2 rounded-lg border border-teal-900/50">
+                    </div>
+                </div>
+
+                {/* תצוגת טקסט חכמה */}
+                <div className="text-sm text-teal-400 text-center font-bold mt-2 bg-teal-950/30 p-2 rounded-lg border border-teal-900/50">
                     {departureTime ? formatRideTime(departureTime) : '...'}
-                 </div>
+                </div>
             </div>
 
             {/* כפתור שליחה */}
             <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-6 text-lg font-bold bg-gradient-to-r from-orange-500 to-pink-600 hover:from-orange-600 hover:to-pink-700 shadow-lg text-white border-0"
+                className="w-full py-5 text-lg font-bold bg-gradient-to-r from-orange-500 to-pink-600 hover:from-orange-600 hover:to-pink-700 shadow-lg text-white border-0"
             >
                 {isSubmitting ? (
                     <div className="flex items-center gap-2">

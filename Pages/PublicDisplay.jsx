@@ -27,7 +27,7 @@ export default function PublicDisplay() {
             const allRides = await avior.entities.Ride.list(user.city);
             return allRides;
         },
-        refetchInterval: 5000, 
+        refetchInterval: 5000,
         initialData: []
     });
 
@@ -54,17 +54,16 @@ export default function PublicDisplay() {
             </div>
 
             <div className="flex-1 overflow-hidden relative min-h-0">
-                <div 
-                    ref={containerRef} 
-                    className={`h-full overflow-y-auto scroll-smooth px-8 ${
-                        rides.length === 0 ? "flex items-center justify-center" : ""
-                    }`}
+                <div
+                    ref={containerRef}
+                    className={`h-full overflow-y-auto scroll-smooth px-4 ${rides.length === 0 ? "flex items-center justify-center" : ""
+                        }`}
                 >
                     <AnimatePresence mode="popLayout">
                         {rides.length === 0 ? (
                             <NoRidesMessage />
                         ) : (
-                            <div 
+                            <div
                                 className="grid grid-cols-1 gap-6 w-full"
                             >
                                 {rides.map((ride) => (
@@ -88,9 +87,9 @@ export default function PublicDisplay() {
 
                     <AnimatePresence>
                         {selectedRide && (
-                            <RideDetailsModal 
-                                ride={selectedRide} 
-                                onClose={() => setSelectedRide(null)} 
+                            <RideDetailsModal
+                                ride={selectedRide}
+                                onClose={() => setSelectedRide(null)}
                             />
                         )}
                     </AnimatePresence>

@@ -12,6 +12,8 @@ import HomePage from './Pages/HomePage';
 import RegisterPage from './Pages/Register/RegisterPage';
 import OnboardingPage from './Pages/Register/OnboardingPage';
 import VerificationSuccess from './Pages/Register/VerificationSuccess';
+import CommitteeDashboard from './Pages/CommitteeDashboard';
+import CommitteeRoute from './Components/auth/CommitteeRoute';
 
 const queryClient = new QueryClient();
 
@@ -36,22 +38,22 @@ const ProtectedRoute = ({ children }) => {
 
 // רכיב להשלמת פרטים: רק למחוברים שאין להם פרופיל
 const OnboardingRoute = ({ children }) => {
-    const { isAuthenticated, user, isLoading } = useAppData();
-    
-    if (isLoading) return null;
-    if (!isAuthenticated) return <Navigate to="/login" replace />;
-    // אם המשתמש כבר שלם, אין לו מה לחפש פה -> לך הביתה
-    if (isAuthenticated && !user?.isIncomplete) return <Navigate to="/" replace />;
-    
-    return children;
+  const { isAuthenticated, user, isLoading } = useAppData();
+
+  if (isLoading) return null;
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  // אם המשתמש כבר שלם, אין לו מה לחפש פה -> לך הביתה
+  if (isAuthenticated && !user?.isIncomplete) return <Navigate to="/" replace />;
+
+  return children;
 };
 
 function AppRoutes() {
-const { isAuthenticated, isLoading } = useAppData();
+  const { isAuthenticated, isLoading } = useAppData();
   if (isLoading) {
     return (
       <div className="h-screen w-full flex items-center justify-center bg-slate-900 text-teal-500">
-         <div className="text-2xl font-bold animate-pulse">טוען את הקהילה שלך...</div>
+        <div className="text-2xl font-bold animate-pulse">טוען את הקהילה שלך...</div>
       </div>
     );
   }
@@ -60,7 +62,7 @@ const { isAuthenticated, isLoading } = useAppData();
     <Routes>
       {/* אזור ציבורי - פתוח לכולם */}
       <Route path="/login" element={!isAuthenticated ? <LoginPage /> : <Navigate to="/" />} />
-      
+
       {/* כאן השינוי: RegisterPage עומד בפני עצמו */}
       <Route path="/register" element={!isAuthenticated ? <RegisterPage /> : <Navigate to="/" />} />
       <Route path="/verification-success" element={<VerificationSuccess />} />
@@ -68,14 +70,15 @@ const { isAuthenticated, isLoading } = useAppData();
       <Route path="/onboarding" element={<OnboardingRoute><OnboardingPage /></OnboardingRoute>} />
 
       {/* אזור מוגן - רק למחוברים */}
-        <Route path="/" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
-           <Route index element={<HomePage />} />
-           <Route path="rides" element={<PublicDisplay />} />
-           <Route path="send-ride" element={<SendRide />} />
-           <Route path="settings" element={<SettingsPage />} />
-        </Route>
+      <Route path="/" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
+        <Route index element={<HomePage />} />
+        <Route path="committee-dashboard" element={<CommitteeRoute><CommitteeDashboard /></CommitteeRoute>} />
+        <Route path="rides" element={<PublicDisplay />} />
+        <Route path="send-ride" element={<SendRide />} />
+        <Route path="settings" element={<SettingsPage />} />
+      </Route>
         // כל נתיב אחר זורק ללוגין
-        <Route path="*" element={<Navigate to="/login" />} />
+      <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
   );
 }
