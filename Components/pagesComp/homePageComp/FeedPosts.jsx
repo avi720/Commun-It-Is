@@ -1,10 +1,10 @@
 import React from 'react';
-import { MessageCircle, User, Share2 } from 'lucide-react';
+import { MessageCircle, User, Share2, Shield } from 'lucide-react';
 import { Card } from "@/Components/ui/card";
 import { Button } from "@/Components/ui/button";
 
 export default function FeedPosts({ post }) {
-
+    const is_committee = post.is_committee;
     // פונקציה לניקוי מספר הטלפון והכנת הקישור
     const handleWhatsAppClick = () => {
         if (!post.users || !post.users.phone) {
@@ -30,15 +30,25 @@ export default function FeedPosts({ post }) {
     };
 
     return (
-        <Card id={`post-${post.id}`} className="rounded-none bg-slate-800 border-none overflow-hidden mb-4 scroll-mt-24">
+        <Card id={`post-${post.id}`} className={`rounded-2xl shadow-sm mb-4 overflow-hidden border
+                ${is_committee
+                ? 'bg-gradient-to-br from-slate-900 to-slate-800 border-amber-500/50 shadow-amber-900/20'
+                : 'bg-slate-800 border-slate-700'}
+                >`}>
             {/* כותרת: פרטי המפרסם */}
             <div className="p-4 flex items-center gap-3 border-b border-slate-700/50">
-                <div className="w-10 h-10 rounded-full bg-teal-900/50 flex items-center justify-center border border-teal-700">
-                    <User className="w-5 h-5 text-teal-400" />
-                </div>
+                {/* אייקון משתמש */}
+                {is_committee ? (
+                    <div className="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center border border-amber-700 shadow-lg shadow-amber-500/20">
+                        <Shield className="w-6 h-6 text-white" />
+                    </div>
+                ) : (
+                    <img src={post.users?.avatar_url} alt="User Avatar" className="w-10 h-10 rounded-full object-cover border border-slate-600" />
+                )}
+
                 <div>
-                    <h3 className="font-bold text-slate-100">
-                        {post.users?.firstName} {post.users?.lastName}
+                    <h3 className={`font-bold text-sm ${is_committee ? 'text-amber-400' : 'text-white'}`}>
+                        {is_committee ? 'ועד הקהילה' : `${post.users?.firstName} ${post.users?.lastName}`}
                     </h3>
                     <p className="text-xs text-slate-400">
                         {new Date(post.created_at).toLocaleDateString('he-IL')}

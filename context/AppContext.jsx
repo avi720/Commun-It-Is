@@ -8,6 +8,12 @@ export function AppProvider({ children }) {
     const [session, setSession] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    // 1. הוסף את ה-State החדש
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    // 2. פונקציית עזר לפתיחה/סגירה
+    const toggleSidebar = () => setIsSidebarOpen(prev => !prev);
+    // פונקציה לסגירה מפורשת (למשל כשלוחצים על לינק במובייל)
+    const closeSidebar = () => setIsSidebarOpen(false);
 
     const API_URL = "/api";
 
@@ -114,7 +120,10 @@ export function AppProvider({ children }) {
         isLoading,
         isAuthenticated,
         logout: handleLogout,
-        refresh
+        refresh,
+        isSidebarOpen,
+        toggleSidebar,
+        closeSidebar
         // פונקציה לרענון שקט אם תצטרך בעתיד
         //silentRefresh: () => loadUserData(false) 
     };

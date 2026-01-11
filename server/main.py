@@ -188,6 +188,8 @@ def get_posts(city: str = None):
 async def create_post(
     user_id: str = Form(...),      # מקבלים כ-Form Data
     content: str = Form(...),      # מקבלים כ-Form Data
+    is_committee: bool = Form(False), # מקבלים האם הפוסט רשמי
+    community_id: str = Form(None), # מזהה קהילה
     image: UploadFile = File(None) # הקובץ עצמו (אופציונלי)
 ):
     try:
@@ -214,7 +216,9 @@ async def create_post(
         post_data = {
             "user_id": user_id,
             "content": content,
-            "image_url": image_url
+            "image_url": image_url,
+            "community_id": community_id, 
+            "is_committee": is_committee
         }
         
         response = supabase.table("posts").insert(post_data).execute()

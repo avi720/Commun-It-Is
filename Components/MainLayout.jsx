@@ -2,13 +2,13 @@ import React from 'react';
 import { Menu } from 'lucide-react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import Sidebar from './mainlayoutComp/Sidebar';
+import HomePage from '@/Pages/HomePage';
 import { useAppData } from '../context/AppContext';
 
 export default function MainLayout() {
-  const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
   const navigate = useNavigate();
 
-  const { user, logout } = useAppData();
+  const { user, logout, toggleSidebar } = useAppData();
 
   return (
     // 1. המעטפת הראשית: תופסת את כל הגובה, ומונעת גלילה של כל העמוד (רק התוכן יגלול)
@@ -24,7 +24,7 @@ export default function MainLayout() {
         <div className="h-14 w-full flex items-center justify-between px-4">
 
           <button
-            onClick={() => setIsSidebarOpen(true)}
+            onClick={toggleSidebar}
             className="p-2 -ml-2 hover:bg-slate-800 rounded-full transition-colors active:scale-95 touch-manipulation"
           >
             <Menu className="w-6 h-6 text-white" />
@@ -55,8 +55,6 @@ export default function MainLayout() {
       </main>
 
       <Sidebar
-        isOpen={isSidebarOpen}
-        onClose={() => setIsSidebarOpen(false)}
         onLogout={logout}
         user={user}
       />

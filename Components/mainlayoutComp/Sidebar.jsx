@@ -4,12 +4,12 @@ import { Home, Car, Monitor, Send, Settings, X, ChevronDown, ChevronUp, LogOut, 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppData } from '../../context/AppContext';
 
-export default function Sidebar({ isOpen, onClose, onLogout }) {
+export default function Sidebar({ onLogout }) {
   const [isTrempOpen, setIsTrempOpen] = useState(false);
 
   const navigate = useNavigate(); // פונקציה למעבר דפים
   const location = useLocation(); // איפה אני נמצא עכשיו?
-  const { user } = useAppData();
+  const { user, isSidebarOpen, closeSidebar } = useAppData();
   // פונקציית עזר לניווט
   const handleNavigation = (path) => {
     navigate(path);
@@ -25,18 +25,18 @@ export default function Sidebar({ isOpen, onClose, onLogout }) {
 
   return (
     <>
-      {isOpen && (
+      {isSidebarOpen && (
         <div
           className="fixed inset-0 bg-black/60 z-40 backdrop-blur-sm transition-opacity"
-          onClick={onClose}
+          onClick={closeSidebar}
         />
       )}
 
-      <div className={`fixed top-0 right-0 h-full w-64 bg-slate-900 border-l border-slate-800 z-50 transform transition-transform duration-300 ease-in-out shadow-2xl ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+      <div className={`fixed top-0 right-0 h-full w-64 bg-slate-900 border-l border-slate-800 z-50 transform transition-transform duration-300 ease-in-out shadow-2xl ${isSidebarOpen ? 'translate-x-0' : 'translate-x-full'}`}>
 
         <div className="p-4 flex justify-between items-center border-b border-slate-800">
           <h2 className="text-xl font-bold text-white">תפריט</h2>
-          <button onClick={onClose} className="text-slate-400 hover:text-white">
+          <button onClick={closeSidebar} className="text-slate-400 hover:text-white">
             <X className="w-6 h-6" />
           </button>
         </div>

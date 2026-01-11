@@ -6,21 +6,30 @@ import { useAppData } from '../context/AppContext';
 import { avior } from '../Api/Client';
 import FeedPosts from '../Components/pagesComp/homePageComp/FeedPosts';
 import CreatePostModal from '../Components/pagesComp/homePageComp/CreatePostModal';
-
-const FloatingActionButton = ({ onClick }) => (
-  <Button
-    onClick={onClick}
-    className="fixed bottom-16 left-6 w-14 h-14 rounded-full bg-teal-500 hover:bg-teal-600 shadow-lg shadow-teal-500/30 flex items-center justify-center z-50 transition-transform hover:scale-105"
-  >
-    <Plus className="w-8 h-8 text-white" />
-  </Button>
-);
+import MainLayout from '@/Components/MainLayout';
 
 export default function HomePage() {
   const { user } = useAppData();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const FloatingActionButton = ({ onClick }) => {
+    const { isSidebarOpen } = useAppData();
+    return (!isSidebarOpen ? (
+      <Button
+        onClick={onClick}
+        className="fixed bottom-16 left-6 w-14 h-14 rounded-full bg-teal-500 hover:bg-teal-600 shadow-lg shadow-teal-500/30 flex items-center justify-center z-50 transition-transform hover:scale-105"
+      >
+        <Plus className="w-8 h-8 text-white" />
+      </Button>)
+      : (
+        <div className="fixed bottom-16 left-6 w-14 h-14 rounded-full bg-teal-500/60 hover:bg-teal-600 shadow-lg shadow-teal-500/30 flex items-center justify-center z-50 transition-transform hover:scale-105">
+          <Plus className="w-4 h-4 text-gray-400" />
+        </div>
+      )
+    );
+  };
 
   useEffect(() => {
     // טוענים פוסטים רק אם יש משתמש ויש לו עיר
