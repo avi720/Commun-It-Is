@@ -3,23 +3,26 @@ import react from '@vitejs/plugin-react'
 import path from "path"
 import { fileURLToPath } from 'url';
 
-// תיקון כדי ש-__dirname יעבוד בסביבת מודולים
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      // השינוי כאן: הפנייה לתיקייה הנוכחית (".") במקום ל-"./src"
       "@": path.resolve(__dirname, "."),
     },
   },
   server: {
+    // 1. מאפשרים כניסה מ-ngrok
+    allowedHosts: true,
+    hmr: {
+      clientPort: 443,
+    },
+    // 2. הגדרת הפרוקסי (הקסם קורה כאן)
     proxy: {
       '/api': {
-        target: 'http://192.168.1.162:8000',
+        target: 'http://127.0.0.1:8000', // הכתובת המקומית של השרת שלך
         changeOrigin: true,
         secure: false,
       }

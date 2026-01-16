@@ -9,11 +9,11 @@ import { formatDate } from 'date-fns';
 export default function RideDetailsModal({ ride, onClose }) {
     if (!ride) return null;
 
-    const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+    const GOOGLEmaps_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
     // יצירת קישור למפה - דורש API KEY או שימוש בקישור חיפוש פשוט
     // זו גרסה פשוטה של Embed ללא צורך ב-API KEY מורכב לשימוש בסיסי (iframe)
     // הערה: לשימוש מקצועי מומלץ Google Maps Embed API Key
-    const mapSrc = `https://www.google.com/maps/embed/v1/directions?key=${GOOGLE_API_KEY}&origin=${ride.location}&destination=${ride.destination}&mode=driving`;
+    const mapSrc = `https://www.google.com/maps/embed/v1/directions?key=${GOOGLEmaps_API_KEY}&origin=${ride.location}&destination=${ride.destination}&mode=driving`;
     // אופציה חינמית ללא API KEY (פחות יפה אבל עובדת):
     // const mapSrc = `https://maps.google.com/maps?q=${ride.location} to ${ride.destination}&t=&z=13&ie=UTF8&iwloc=&output=embed`;
 

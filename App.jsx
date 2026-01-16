@@ -14,6 +14,7 @@ import OnboardingPage from './Pages/Register/OnboardingPage';
 import VerificationSuccess from './Pages/Register/VerificationSuccess';
 import CommitteeDashboard from './Pages/CommitteeDashboard';
 import CommitteeRoute from './Components/auth/CommitteeRoute';
+import PhoneBook from './Pages/PhoneBook';
 
 const queryClient = new QueryClient();
 
@@ -76,6 +77,7 @@ function AppRoutes() {
         <Route path="rides" element={<PublicDisplay />} />
         <Route path="send-ride" element={<SendRide />} />
         <Route path="settings" element={<SettingsPage />} />
+        <Route path="phonebook" element={<PhoneBook />} />
       </Route>
         // כל נתיב אחר זורק ללוגין
       <Route path="*" element={<Navigate to="/login" />} />

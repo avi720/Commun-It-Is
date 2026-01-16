@@ -4,16 +4,15 @@ import { createClient } from '@supabase/supabase-js';
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY;
 
-// יצירת הקליינט וייצוא שלו - קריטי שזה יהיה כאן!
+// יצירת הקליינט וייצוא שלו
 export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// הפניה לשרת הפייתון המקומי שלך
-const API_URL = "/api";
+// הפניה לשרת הפייתון המקומי שלך (דרך ngrok)
+const API_URL = "aaa/api";
 
 export const avior = {
     // --- ישות האותנטיקציה ---
     auth: {
-    // פונקציה חדשה: רק רושמת ל-Auth ושולחת מייל
         signUp: async (email, password) => {
             const { data, error } = await supabase.auth.signUp({
                 email,
@@ -25,10 +24,6 @@ export const avior = {
             if (error) throw error;
             return data;
         },
-        // לבדיקה למה ההתנתקות נמצא ב-AppContext.jsx
-        // signOut: async () => {
-        //     await supabase.auth.signOut();
-        //},
         login: async (email, password) => {
             const { data, error } = await supabase.auth.signInWithPassword({
                 email,
@@ -37,11 +32,6 @@ export const avior = {
             if (error) throw error;
             return data;
         }
-        // getCurrentUser: async (email) => {
-        //     const { data, error } = await supabase.auth.getUser({email});
-        //     if (error) throw error;
-        //     return data;
-        // }
     },
 
     entities: {
@@ -54,6 +44,7 @@ export const avior = {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
+                            'ngrok-skip-browser-warning': 'true', // <--- קיים ותקין
                         },
                         body: JSON.stringify(rideData),
                     });
@@ -67,27 +58,31 @@ export const avior = {
                     throw error;
                 }
             },
-            
+
             // קבלת רשימת נסיעות
             list: async (userCity) => {
                 try {
                     const url = `${API_URL}/rides?city=${encodeURIComponent(userCity)}`;
-                    const response = await fetch(url);
+                    // הוספתי כאן את ה-Headers לקריאת GET
+                    const response = await fetch(url, {
+                        headers: {
+                            'ngrok-skip-browser-warning': 'true'
+                        }
+                    });
+
                     console.log("Fetching rides from:", url);
                     if (!response.ok) throw new Error(`Server error: ${response.status}`);
                     return await response.json();
                 } catch (error) {
                     console.error("Error fetching rides:", error);
-                    return []; // מחזיר רשימה ריקה במקרה של שגיאה כדי שהאתר לא יקרוס
+                    return [];
                 }
             }
-        }, // <--- סגירת Ride
+        },
 
-        // --- ישות המשתמשים (עכשיו היא בחוץ, כמו שצריך) ---
+        // --- ישות המשתמשים ---
         User: {
-            // פונקציה חדשה: שמירת הפרטים בטבלה (תקרא לה ב-Onboarding)
             createProfile: async (profileData) => {
-                // כאן אנחנו שולחים לשרת (Python) שישמור בטבלה
                 const { data: { user } } = await supabase.auth.getUser();
                 if (!user) {
                     console.error("User not logged in");
@@ -99,82 +94,79 @@ export const avior = {
                     alert('שגיאה בשמירת הפרטים');
                 } else {
                     console.log('Profile updated successfully!');
-                    // כאן אתה יכול להפנות את המשתמש לדף הבית
-                    // window.location.href = '/dashboard';
                 }
             },
-            
-            // login: async (email, password) => {
-            //     const response = await fetch(`${API_URL}/login`, {
-            //         method: 'POST',
-            //         headers: { 'Content-Type': 'application/json' },
-            //         body: JSON.stringify({ email, password })
-            //     });
-                
-            //     if (!response.ok) {
-            //         throw new Error('Login failed');
-            //     }
-            //     return response.json();
-            // },
 
             update: async (userId, userData) => {
                 const response = await fetch(`${API_URL}/users/${userId}`, {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'ngrok-skip-browser-warning': 'true' // <--- הוספתי כאן
+                    },
                     body: JSON.stringify(userData)
                 });
-        
+
                 if (!response.ok) {
-                    // Try to parse the error message from the server response
                     const errorData = await response.json().catch(() => ({ message: 'Failed to parse error response' }));
-                    console.error('Server responded with 422:', errorData); // Log the server's detailed error
+                    console.error('Server responded with 422:', errorData);
                     throw new Error(errorData.message || 'Failed to update user due to invalid data.');
                 }
                 return response.json();
-                
             },
-            
+
             delete: async (userId) => {
                 const response = await fetch(`${API_URL}/users/${userId}`, {
                     method: 'DELETE',
+                    headers: {
+                        'ngrok-skip-browser-warning': 'true' // <--- הוספתי כאן
+                    }
                 });
-                
+
                 if (!response.ok) {
                     throw new Error('Failed to delete user');
                 }
                 return response.json();
             }
-        }, // <--- סגירת User
+        },
 
+        // --- פוסטים ---
         Post: {
             list: async (userCity) => {
                 try {
                     const url = `${API_URL}/posts?city=${encodeURIComponent(userCity)}`;
-                    const response = await fetch(url);
+                    // הוספתי כאן headers לקריאת GET
+                    const response = await fetch(url, {
+                        headers: {
+                            'ngrok-skip-browser-warning': 'true'
+                        }
+                    });
+
                     if (!response.ok) throw new Error('Failed to fetch posts');
                     return response.json();
                 } catch (error) {
                     console.error("Error fetching posts:", error);
-                    return []; // מחזיר רשימה ריקה במקרה של שגיאה כדי שהאתר לא יקרוס
+                    return [];
                 }
             },
 
             create: async (formData) => {
-                // שים לב: אנחנו מקבלים formData ישירות, ולא אובייקט רגיל
                 const response = await fetch(`${API_URL}/posts`, {
                     method: 'POST',
-                    // חשוב: לא מוסיפים headers: { 'Content-Type': 'application/json' }
-                    // הדפדפן יגדיר אוטומטית multipart/form-data
-                    body: formData 
+                    // שים לב: הוספתי את ה-Header של ngrok, אבל לא את ה-Content-Type!
+                    headers: {
+                        'ngrok-skip-browser-warning': 'true'
+                    },
+                    body: formData
                 });
-                
+
                 if (!response.ok) {
-                    const errorText = await response.text(); // כדי לראות שגיאות מהשרת
+                    const errorText = await response.text();
                     console.error("Server Error:", errorText);
                     throw new Error('Failed to create post');
                 }
                 return response.json();
             }
         }
-    } // <--- סגירת entities
+    }
 };

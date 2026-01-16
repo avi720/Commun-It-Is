@@ -30,20 +30,20 @@ export default function FeedPosts({ post }) {
     };
 
     return (
-        <Card id={`post-${post.id}`} className={`rounded-2xl shadow-sm mb-4 overflow-hidden border
+        <Card id={`post-${post.id}`} className={`rounded-none mb-4 overflow-hidden border
                 ${is_committee
-                ? 'bg-gradient-to-br from-slate-900 to-slate-800 border-amber-500/50 shadow-amber-900/20'
-                : 'bg-slate-800 border-slate-700'}
+                ? 'bg-gradient-to-br from-slate-900 to-slate-800 border-none'
+                : 'bg-slate-800 border-none'}
                 >`}>
             {/* כותרת: פרטי המפרסם */}
-            <div className="p-4 flex items-center gap-3 border-b border-slate-700/50">
+            <div className="p-4 flex items-center gap-3 border-none">
                 {/* אייקון משתמש */}
                 {is_committee ? (
-                    <div className="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center border border-amber-700 shadow-lg shadow-amber-500/20">
+                    <div className="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center border-none shadow-lg shadow-amber-500/20">
                         <Shield className="w-6 h-6 text-white" />
                     </div>
                 ) : (
-                    <img src={post.users?.avatar_url} alt="User Avatar" className="w-10 h-10 rounded-full object-cover border border-slate-600" />
+                    <img src={post.users?.avatar_url} alt="User Avatar" className="w-10 h-10 rounded-full object-cover border-none" />
                 )}
 
                 <div>
@@ -77,7 +77,7 @@ export default function FeedPosts({ post }) {
             </div>
 
             {/* כפתורי פעולה */}
-            <div className="p-3 bg-slate-900/50 border-t border-slate-700 flex justify-between items-center">
+            <div className="p-3 bg-slate-900/50 border-none flex justify-between items-center">
                 <Button
                     variant="ghost"
                     className="text-green-400 hover:text-green-300 hover:bg-green-900/20 flex-1 gap-2"

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom'; // <--- הוקים לניווט
-import { Home, Car, Monitor, Send, Settings, X, ChevronDown, ChevronUp, LogOut, Shield } from 'lucide-react';
+import { Home, Car, Monitor, Send, Settings, X, ChevronDown, ChevronUp, LogOut, Shield, BookUser } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppData } from '../../context/AppContext';
 
@@ -85,6 +85,16 @@ export default function Sidebar({ onLogout }) {
             )}
           </div>
 
+          <button
+            onClick={() => {
+              navigate('/phonebook');
+              onClose();
+            }}
+            className="w-full flex items-center space-x-3 space-x-reverse p-3 rounded-xl hover:bg-slate-800 transition-colors text-slate-300"
+          >
+            <BookUser className="w-5 h-5" />
+            <span className="font-medium">ספר טלפונים</span>
+          </button>
         </div>
 
         <div className="absolute bottom-0 w-full pb-4 px-2 pt-2 border-t border-slate-800 bg-slate-900">
