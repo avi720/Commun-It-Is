@@ -14,7 +14,7 @@ from supabase import create_client, Client;
 # וודא שהכנסת כאן את הפרטים האמיתיים שלך
 load_dotenv()
 SUPABASE_URL = os.getenv("VITE_SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_KEY")
+SUPABASE_KEY = os.getenv("VITE_SUPABASE_SERVICE_KEY")
 
 # בדיקה שהמפתחות קיימים
 if not SUPABASE_URL or not SUPABASE_KEY:
