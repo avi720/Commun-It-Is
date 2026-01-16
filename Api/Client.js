@@ -7,8 +7,7 @@ const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY;
 // יצירת הקליינט וייצוא שלו
 export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// הפניה לשרת הפייתון המקומי שלך (דרך ngrok)
-const API_URL = "aaa/api";
+const API_URL = "https://commun-it-is.onrender.com/api";
 
 export const avior = {
     // --- ישות האותנטיקציה ---
@@ -44,7 +43,6 @@ export const avior = {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'ngrok-skip-browser-warning': 'true', // <--- קיים ותקין
                         },
                         body: JSON.stringify(rideData),
                     });
@@ -64,11 +62,7 @@ export const avior = {
                 try {
                     const url = `${API_URL}/rides?city=${encodeURIComponent(userCity)}`;
                     // הוספתי כאן את ה-Headers לקריאת GET
-                    const response = await fetch(url, {
-                        headers: {
-                            'ngrok-skip-browser-warning': 'true'
-                        }
-                    });
+                    const response = await fetch(url);
 
                     console.log("Fetching rides from:", url);
                     if (!response.ok) throw new Error(`Server error: ${response.status}`);
@@ -102,7 +96,6 @@ export const avior = {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
-                        'ngrok-skip-browser-warning': 'true' // <--- הוספתי כאן
                     },
                     body: JSON.stringify(userData)
                 });
@@ -117,10 +110,7 @@ export const avior = {
 
             delete: async (userId) => {
                 const response = await fetch(`${API_URL}/users/${userId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'ngrok-skip-browser-warning': 'true' // <--- הוספתי כאן
-                    }
+                    method: 'DELETE'
                 });
 
                 if (!response.ok) {
@@ -136,11 +126,7 @@ export const avior = {
                 try {
                     const url = `${API_URL}/posts?city=${encodeURIComponent(userCity)}`;
                     // הוספתי כאן headers לקריאת GET
-                    const response = await fetch(url, {
-                        headers: {
-                            'ngrok-skip-browser-warning': 'true'
-                        }
-                    });
+                    const response = await fetch(url);
 
                     if (!response.ok) throw new Error('Failed to fetch posts');
                     return response.json();
@@ -153,10 +139,6 @@ export const avior = {
             create: async (formData) => {
                 const response = await fetch(`${API_URL}/posts`, {
                     method: 'POST',
-                    // שים לב: הוספתי את ה-Header של ngrok, אבל לא את ה-Content-Type!
-                    headers: {
-                        'ngrok-skip-browser-warning': 'true'
-                    },
                     body: formData
                 });
 

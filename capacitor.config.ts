@@ -1,19 +1,14 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
-// --- כאן אתה מגדיר את הכתובות שלך ---
-const render_URL = "aaa"; // הכתובת המשתנה
-
-// --- המפסק: שנה ל-true כשאתה יוצא מהבית ---
-const USE_CLOUDFLARE = false;
-
 const config: CapacitorConfig = {
   appId: 'com.CommunItIs.myapp',
   appName: 'commun-it-is',
   webDir: 'dist',
   server: {
-    // כאן הקסם קורה: הוא בוחר לבד לפי המפסק למעלה
-    url: render_URL,
-    cleartext: true
+    // כאן שמים את הכתובת של ה-Frontend שיצרנו הרגע ב-Render
+    url: "https://commun-it-is-frontend.onrender.com",
+    cleartext: true,
+    androidScheme: 'https'
   }
 };
 

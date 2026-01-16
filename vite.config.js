@@ -22,7 +22,7 @@ export default defineConfig({
     // 2. הגדרת הפרוקסי (הקסם קורה כאן)
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:8000', // הכתובת המקומית של השרת שלך
+        target: 'https://commun-it-is.onrender.com', // הכתובת המקומית של השרת שלך
         changeOrigin: true,
         secure: false,
       }
