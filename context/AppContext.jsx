@@ -8,7 +8,6 @@ export function AppProvider({ children }) {
     const [session, setSession] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    //const [isVerifiedResident, setIsVerifiedResident] = useState(false);
     // 1. הוסף את ה-State החדש
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     // 2. פונקציית עזר לפתיחה/סגירה
@@ -54,7 +53,6 @@ export function AppProvider({ children }) {
                     setUser({ ...profile, isVerifiedResident: false });
                 }
                 else {
-                    ;
                     setUser(profile);
                 }
                 setIsAuthenticated(true);

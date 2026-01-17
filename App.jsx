@@ -73,7 +73,7 @@ function AppRoutes() {
       <Route path="/verification-success" element={<VerificationSuccess />} />
       {/* נתיב מיוחד להשלמת פרטים - נגיש רק למי שמחובר אבל חסר פרופיל */}
       <Route path="/onboarding" element={<OnboardingRoute><OnboardingPage /></OnboardingRoute>} />
-      <Route path="/verification-waiting" element={user.isVerifiedResident ? <div className="min-h-screen bg-slate-950 flex items-center justify-center text-teal-500">הפרטים שלך נשלחו לבדיקה. תודה על הסבלנות!</div> : <Navigate to="/" />} />
+      <Route path="/verification-waiting" element={user.isVerifiedResident ? <Navigate to="/" /> : <div className="min-h-screen bg-slate-950 flex items-center justify-center text-teal-500">הפרטים שלך נשלחו לבדיקה. תודה על הסבלנות!</div>} />
 
       {/* אזור מוגן - רק למחוברים */}
       <Route path="/" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
