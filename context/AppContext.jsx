@@ -8,14 +8,13 @@ export function AppProvider({ children }) {
     const [session, setSession] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    //const [isVerifiedResident, setIsVerifiedResident] = useState(false);
     // 1. הוסף את ה-State החדש
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     // 2. פונקציית עזר לפתיחה/סגירה
     const toggleSidebar = () => setIsSidebarOpen(prev => !prev);
     // פונקציה לסגירה מפורשת (למשל כשלוחצים על לינק במובייל)
     const closeSidebar = () => setIsSidebarOpen(false);
-
-    const API_URL = "/api";
 
     // הוספנו פרמטר showLoader (ברירת מחדל: true)
     const loadUserData = async (showLoader = true) => {
@@ -51,7 +50,11 @@ export function AppProvider({ children }) {
                 if (!profile.firstName || !profile.lastName || !profile.city || !profile.phone || !profile.address || !profile.age) {
                     setUser({ ...profile, isIncomplete: true });
                     // המשתמש מחובר, אך חסרים פרטים -> ינותב ל-Onboarding
-                } else {
+                } else if (profile.is_validated_as_resident === false) {
+                    setUser({ ...profile, isVerifiedResident: false });
+                }
+                else {
+                    ;
                     setUser(profile);
                 }
                 setIsAuthenticated(true);
