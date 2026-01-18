@@ -13,7 +13,7 @@ export default function Sidebar({ onLogout }) {
   // פונקציית עזר לניווט
   const handleNavigation = (path) => {
     navigate(path);
-    onClose();
+    closeSidebar;
   };
 
   // בדיקה אם הנתיב הנוכחי פעיל (לצורך צביעת הכפתור)
@@ -86,10 +86,7 @@ export default function Sidebar({ onLogout }) {
           </div>
 
           <button
-            onClick={() => {
-              navigate('/phonebook');
-              onClose();
-            }}
+            onClick={() => navigate('/phonebook')}
             className="w-full flex items-center space-x-3 space-x-reverse p-3 rounded-xl hover:bg-slate-800 transition-colors text-slate-300"
           >
             <BookUser className="w-5 h-5" />
@@ -101,10 +98,7 @@ export default function Sidebar({ onLogout }) {
           {/* כפתור שמופיע רק לחברי ועד */}
           {user?.community_role === 'committee' && (
             <button
-              onClick={() => {
-                navigate('/committee-dashboard');
-                onClose();
-              }}
+              onClick={() => navigate('/committee-dashboard')}
               className="w-full flex items-center space-x-3 space-x-reverse p-3 rounded-xl hover:bg-slate-800 transition-colors text-amber-400"
             >
               <Shield className="w-5 h-5" />
