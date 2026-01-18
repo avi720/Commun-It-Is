@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom'; // <--- הוקים לניווט
-import { Home, Car, Monitor, Send, Settings, X, ChevronDown, ChevronUp, LogOut, Shield, BookUser } from 'lucide-react';
+import { Home, Car, Monitor, Send, Settings, X, ChevronDown, ChevronUp, LogOut, Shield, BookUser, Bell } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppData } from '../../context/AppContext';
 
@@ -83,14 +83,23 @@ export default function Sidebar({ onLogout }) {
                 </button>
               </div>
             )}
+
+
+            <button
+              onClick={() => navigate('/phonebook')}
+              className={({ isActive }) => `w-full flex items-center space-x-3 space-x-reverse p-3 rounded-xl hover:bg-slate-800 transition-colors ${isActive('/phonebook') ? 'text-teal-400 bg-slate-800/50' : 'text-slate-400 hover:text-white'}`}
+            >
+              <BookUser className="w-5 h-5" />
+              <span className="font-medium">ספר טלפונים</span>
+            </button>
           </div>
 
           <button
-            onClick={() => navigate('/phonebook')}
-            className="w-full flex items-center space-x-3 space-x-reverse p-3 rounded-xl hover:bg-slate-800 transition-colors text-slate-300"
+            onClick={() => navigate('/notifications')}
+            className={({ isActive }) => `flex items-center gap-3 p-3 rounded-xl transition-all ${isActive('/notifications') ? 'text-teal-400 bg-slate-800/50' : 'text-slate-400 hover:text-white'}`}
           >
-            <BookUser className="w-5 h-5" />
-            <span className="font-medium">ספר טלפונים</span>
+            <Bell className="w-5 h-5" />
+            <span className="font-medium">הודעות חשובות</span>
           </button>
         </div>
 

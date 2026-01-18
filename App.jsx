@@ -18,6 +18,7 @@ import VerificationSuccess from './Pages/Register/VerificationSuccess';
 import CommitteeDashboard from './Pages/CommitteeDashboard';
 import CommitteeRoute from './Components/auth/CommitteeRoute';
 import PhoneBook from './Pages/PhoneBook';
+import NotificationsHistory from './Pages/NotificationsHistory';
 
 const queryClient = new QueryClient();
 
@@ -86,6 +87,7 @@ function AppRoutes() {
         <Route path="send-ride" element={<SendRide />} />
         <Route path="settings" element={<SettingsPage />} />
         <Route path="phonebook" element={<PhoneBook />} />
+        <Route path="notifications" element={<NotificationsHistory />} />
       </Route>
         // כל נתיב אחר זורק ללוגין
       <Route path="*" element={<Navigate to="/login" />} />
