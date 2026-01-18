@@ -35,7 +35,7 @@ const ProtectedRoute = ({ children }) => {
   }
 
   if (user?.isVerifiedResident === false) {
-    return <Navigate to="/verification-waiting" replace />;
+    return <Navigate to="/resident-verification" replace />;
   }
 
   return children;
@@ -54,7 +54,7 @@ const OnboardingRoute = ({ children }) => {
 };
 
 function AppRoutes() {
-  const { isAuthenticated, isLoading } = useAppData();
+  const { isAuthenticated, isLoading, user } = useAppData();
   if (isLoading) {
     return (
       <div className="h-screen w-full flex items-center justify-center bg-slate-900 text-teal-500">
@@ -73,7 +73,7 @@ function AppRoutes() {
       <Route path="/verification-success" element={<VerificationSuccess />} />
       {/* נתיב מיוחד להשלמת פרטים - נגיש רק למי שמחובר אבל חסר פרופיל */}
       <Route path="/onboarding" element={<OnboardingRoute><OnboardingPage /></OnboardingRoute>} />
-      <Route path="/verification-waiting" element={user.isVerifiedResident ? <Navigate to="/" /> : <div className="min-h-screen bg-slate-950 flex items-center justify-center text-teal-500">הפרטים שלך נשלחו לבדיקה. תודה על הסבלנות!</div>} />
+      <Route path="/resident-verification" element={user.isVerifiedResident ? <Navigate to="/" /> : <div className="min-h-screen bg-slate-950 flex items-center justify-center text-teal-500">הפרטים שלך נשלחו לבדיקה. תודה על הסבלנות!</div>} />
 
       {/* אזור מוגן - רק למחוברים */}
       <Route path="/" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>

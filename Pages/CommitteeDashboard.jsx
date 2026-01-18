@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Store, Settings, Check, X, Shield } from 'lucide-react';
+import { Users, Store, Settings, Check, X, Shield, Filter } from 'lucide-react';
 import { supabase } from '../Api/Client';
 import { useAppData } from '../context/AppContext';
-
 
 export default function CommitteeDashboard() {
     const [activeTab, setActiveTab] = useState('businesses');
     const [loading, setLoading] = useState(true);
     const { user } = useAppData();
+    
     // Data States
     const [pendingBusinesses, setPendingBusinesses] = useState([]);
     const [residents, setResidents] = useState([]);
     const [communitySettings, setCommunitySettings] = useState(null);
+
+    // Filter State: 'all' | 'verified' | 'unverified'
+    const [residentFilter, setResidentFilter] = useState('all');
 
     useEffect(() => {
         if (user?.community_id) {
@@ -27,15 +30,16 @@ export default function CommitteeDashboard() {
                 .from('businesses')
                 .select('*')
                 .eq('community_id', user.community_id)
-                .eq('is_verified_by_committee', false); // רק אלו שלא אושרו
+                .eq('is_verified_by_committee', false);
 
             setPendingBusinesses(busData || []);
 
             // 2. Fetch Residents
             const { data: resData } = await supabase
-                .from('users') // שים לב: אנחנו שולפים מ-public.users
+                .from('users')
                 .select('*')
-                .eq('community_id', user.community_id);
+                .eq('community_id', user.community_id)
+                .order('created_at', { ascending: false }); // החדשים ביותר ראשונים
 
             setResidents(resData || []);
 
@@ -63,11 +67,43 @@ export default function CommitteeDashboard() {
             .eq('id', businessId);
 
         if (!error) {
-            // הסר את העסק מהרשימה המקומית
             setPendingBusinesses(prev => prev.filter(b => b.id !== businessId));
-            alert("העסק אושר בהצלחה! כעת הוא יופיע עם וי כחול בחיפוש.");
+            alert("העסק אושר בהצלחה!");
         }
     };
+
+    // פעולה: שינוי סטטוס תושב (Toggle)
+    const toggleResidentStatus = async (residentId, currentStatus) => {
+        const newStatus = !currentStatus;
+        
+        // עדכון אופטימי (מיידי) בממשק
+        setResidents(prev => prev.map(r => 
+            r.id === residentId ? { ...r, is_verified_as_resident: newStatus } : r
+        ));
+
+        // שליחה לשרת
+        const { error } = await supabase
+            .from('users')
+            .update({ is_verified_as_resident: newStatus })
+            .eq('id', residentId);
+
+        if (error) {
+            console.error("Error updating resident status:", error);
+            // אם נכשל, נחזיר את המצב לקדמותו
+            setResidents(prev => prev.map(r => 
+                r.id === residentId ? { ...r, is_verified_as_resident: currentStatus } : r
+            ));
+            alert("אירעה שגיאה בעדכון הסטטוס");
+        }
+    };
+
+    // סינון הרשימה לפי הבחירה
+    const filteredResidents = residents.filter(resident => {
+        if (residentFilter === 'all') return true;
+        if (residentFilter === 'verified') return resident.is_verified_as_resident;
+        if (residentFilter === 'unverified') return !resident.is_verified_as_resident;
+        return true;
+    });
 
     if (!user || user.community_role !== 'committee') {
         return <div className="p-8 text-center text-red-400">אין לך הרשאה לצפות בדף זה.</div>;
@@ -85,7 +121,7 @@ export default function CommitteeDashboard() {
             </div>
 
             {/* טאבים למעבר */}
-            <div className="flex p-2 gap-2 overflow-x-auto">
+            <div className="flex p-2 gap-2 overflow-x-auto border-b border-slate-800">
                 <TabButton
                     active={activeTab === 'businesses'}
                     onClick={() => setActiveTab('businesses')}
@@ -96,7 +132,7 @@ export default function CommitteeDashboard() {
                     active={activeTab === 'residents'}
                     onClick={() => setActiveTab('residents')}
                     icon={<Users className="w-4 h-4" />}
-                    label="תושבים"
+                    label="ניהול תושבים"
                 />
                 <TabButton
                     active={activeTab === 'settings'}
@@ -107,7 +143,7 @@ export default function CommitteeDashboard() {
             </div>
 
             {/* תוכן ראשי */}
-            <div className="flex-1 overflow-y-auto pt-4">
+            <div className="flex-1 overflow-y-auto pt-4 px-2">
                 {loading ? (
                     <div className="text-center p-10 text-slate-400">טוען נתונים...</div>
                 ) : (
@@ -115,14 +151,14 @@ export default function CommitteeDashboard() {
                         {/* --- טאב עסקים --- */}
                         {activeTab === 'businesses' && (
                             <div className="space-y-4">
-                                <h2 className="text-lg font-semibold text-slate-300">עסקים שממתינים לאישור</h2>
+                                <h2 className="text-lg font-semibold text-slate-300 px-2">עסקים שממתינים לאישור</h2>
                                 {pendingBusinesses.length === 0 ? (
-                                    <div className="p-6 bg-slate-800 rounded-xl text-center text-slate-400">
+                                    <div className="p-6 bg-slate-800 rounded-xl text-center text-slate-400 mx-2">
                                         אין עסקים חדשים לאישור כרגע 🎉
                                     </div>
                                 ) : (
                                     pendingBusinesses.map(business => (
-                                        <div key={business.id} className="bg-slate-800 p-4 rounded-xl border border-slate-700 flex justify-between items-center">
+                                        <div key={business.id} className="bg-slate-800 p-4 rounded-xl border border-slate-700 flex justify-between items-center mx-2">
                                             <div>
                                                 <h3 className="font-bold text-lg">{business.name}</h3>
                                                 <p className="text-sm text-slate-400">{business.category} • {business.phone}</p>
@@ -140,63 +176,91 @@ export default function CommitteeDashboard() {
                             </div>
                         )}
 
-                        {/* --- טאב תושבים (תצוגת טבלה) --- */}
+                        {/* --- טאב תושבים (הטבלה המאוחדת) --- */}
                         {activeTab === 'residents' && (
                             <div className="space-y-4">
-                                <h2 className="pr-4 text-lg font-semibold text-slate-300">
-                                    תושבי הקהילה ({residents.length})
-                                </h2>
+                                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center px-2 gap-4">
+                                    <h2 className="text-lg font-semibold text-slate-300">
+                                        תושבי הקהילה ({filteredResidents.length})
+                                    </h2>
+                                    
+                                    {/* כפתורי סינון */}
+                                    <div className="flex bg-slate-800 p-1 rounded-lg border border-slate-700">
+                                        <FilterButton 
+                                            active={residentFilter === 'all'} 
+                                            onClick={() => setResidentFilter('all')} 
+                                            label="הכל" 
+                                        />
+                                        <FilterButton 
+                                            active={residentFilter === 'unverified'} 
+                                            onClick={() => setResidentFilter('unverified')} 
+                                            label="ממתינים לאישור" 
+                                            alert={residents.some(r => !r.is_verified_as_resident)}
+                                        />
+                                        <FilterButton 
+                                            active={residentFilter === 'verified'} 
+                                            onClick={() => setResidentFilter('verified')} 
+                                            label="מאושרים" 
+                                        />
+                                    </div>
+                                </div>
 
-
-                                {/* המיכל הזה הוא גם המסגרת המעוצבת וגם האחראי על הגלילה */}
-                                <div className="w-max overflow-x-auto bg-slate-800 rounded-xl border border-slate-700 shadow-sm">
-
-                                    {/* min-w-max מכריח את הטבלה להיות ברוחב התוכן שלה, מה שמפעיל את הגלילה */}
+                                <div className="w-full overflow-x-auto bg-slate-800 rounded-xl border border-slate-700 shadow-sm mx-auto max-w-[98%]">
                                     <table className="min-w-max w-full text-sm text-right text-slate-300">
                                         <thead className="text-xs text-slate-400 uppercase bg-slate-900/50 border-b border-slate-700">
                                             <tr>
-                                                <th className="px-6 py-4 whitespace-nowrap font-semibold">שם מלא</th>
-                                                <th className="px-6 py-4 whitespace-nowrap font-semibold">יישוב</th>
-                                                <th className="px-6 py-4 whitespace-nowrap font-semibold">כתובת</th>
-                                                <th className="px-6 py-4 whitespace-nowrap font-semibold">טלפון</th>
-                                                <th className="px-6 py-4 whitespace-nowrap font-semibold">אימייל</th>
-                                                <th className="px-6 py-4 whitespace-nowrap font-semibold">גיל</th>
-                                                <th className="px-6 py-4 whitespace-nowrap font-semibold">תפקיד</th>
+                                                <th className="px-4 py-3 font-semibold">סטטוס (לחץ לשינוי)</th>
+                                                <th className="px-4 py-3 font-semibold">שם מלא</th>
+                                                <th className="px-4 py-3 font-semibold">פרטים</th>
+                                                <th className="px-4 py-3 font-semibold">יצירת קשר</th>
+                                                <th className="px-4 py-3 font-semibold">תפקיד</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-slate-700">
-                                            {residents.map((resident, index) => (
-                                                <tr
-                                                    key={resident.id || index}
-                                                    className="hover:bg-slate-700/50 transition-colors"
-                                                >
-                                                    <td className="px-6 py-4 font-medium text-white whitespace-nowrap">
+                                            {filteredResidents.map((resident) => (
+                                                <tr key={resident.id} className="hover:bg-slate-700/50 transition-colors">
+                                                    
+                                                    {/* עמודת סטטוס לחיצה */}
+                                                    <td className="px-4 py-3 whitespace-nowrap">
+                                                        <button 
+                                                            onClick={() => toggleResidentStatus(resident.id, resident.is_verified_as_resident)}
+                                                            className={`
+                                                                flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium border transition-all active:scale-95
+                                                                ${resident.is_verified_as_resident 
+                                                                    ? 'bg-green-500/10 text-green-400 border-green-500/20 hover:bg-green-500/20' 
+                                                                    : 'bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20'}
+                                                            `}
+                                                        >
+                                                            {resident.is_verified_as_resident ? (
+                                                                <><Check className="w-3 h-3" /> מאושר</>
+                                                            ) : (
+                                                                <><X className="w-3 h-3" /> לא מאושר</>
+                                                            )}
+                                                        </button>
+                                                    </td>
+
+                                                    <td className="px-4 py-3 font-medium text-white">
                                                         {resident.firstName} {resident.lastName}
+                                                        <div className="text-xs text-slate-500 font-normal mt-0.5">גיל: {resident.age || '-'}</div>
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap">
-                                                        {resident.city || '-'}
+                                                    
+                                                    <td className="px-4 py-3">
+                                                        <div className="text-xs text-slate-400">{resident.city}</div>
+                                                        <div className="text-xs text-slate-500">{resident.address}</div>
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap">
-                                                        {resident.address || '-'}
+                                                    
+                                                    <td className="px-4 py-3" dir="ltr">
+                                                        <div className="text-xs">{resident.phone}</div>
+                                                        <div className="text-[10px] text-slate-500 truncate max-w-[120px]">{resident.email}</div>
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap" dir="ltr">
-                                                        {resident.phone || '-'}
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap">
-                                                        {resident.email || 'לא זמין'}
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap">
-                                                        {resident.age || '-'}
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap">
+
+                                                    <td className="px-4 py-3">
                                                         {resident.community_role === 'committee' ? (
-                                                            <span className="bg-amber-500/10 text-amber-500 px-2 py-1 rounded-full text-xs border border-amber-500/20 font-medium">
+                                                            <span className="text-amber-500 text-xs font-bold border border-amber-500/20 px-2 py-0.5 rounded-full bg-amber-500/10">
                                                                 ועד
                                                             </span>
                                                         ) : (
-                                                            <span className="bg-slate-700/80 text-slate-300 px-2 py-1 rounded-full text-xs">
-                                                                תושב
-                                                            </span>
+                                                            <span className="text-slate-500 text-xs">תושב</span>
                                                         )}
                                                     </td>
                                                 </tr>
@@ -204,10 +268,9 @@ export default function CommitteeDashboard() {
                                         </tbody>
                                     </table>
 
-                                    {/* הודעה אם אין נתונים */}
-                                    {residents.length === 0 && (
+                                    {filteredResidents.length === 0 && (
                                         <div className="p-12 text-center text-slate-500">
-                                            לא נמצאו תושבים ברשימה
+                                            לא נמצאו תושבים בקטגוריה זו
                                         </div>
                                     )}
                                 </div>
@@ -216,7 +279,7 @@ export default function CommitteeDashboard() {
 
                         {/* --- טאב הגדרות --- */}
                         {activeTab === 'settings' && (
-                            <div className="space-y-4">
+                            <div className="space-y-4 px-2">
                                 <h2 className="text-lg font-semibold text-slate-300">הגדרות הקהילה</h2>
                                 <div className="bg-slate-800 p-4 rounded-xl border border-slate-700">
                                     <label className="block text-sm text-slate-400 mb-1">שם הקהילה</label>
@@ -239,7 +302,7 @@ export default function CommitteeDashboard() {
     );
 }
 
-// רכיב עזר לכפתור טאב
+// כפתור טאב ראשי
 function TabButton({ active, onClick, icon, label }) {
     return (
         <button
@@ -253,6 +316,26 @@ function TabButton({ active, onClick, icon, label }) {
         >
             {icon}
             {label}
+        </button>
+    );
+}
+
+// כפתור סינון קטן
+function FilterButton({ active, onClick, label, alert }) {
+    return (
+        <button
+            onClick={onClick}
+            className={`
+                px-3 py-1.5 rounded-md text-xs font-medium transition-all relative
+                ${active 
+                    ? 'bg-slate-600 text-white shadow-sm' 
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700'}
+            `}
+        >
+            {label}
+            {alert && !active && (
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+            )}
         </button>
     );
 }
