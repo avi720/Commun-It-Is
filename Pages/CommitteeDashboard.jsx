@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Users, Store, Settings, Check, X, Shield, Filter } from 'lucide-react';
-import { supabase } from '../Api/Client';
+import { supabase, avior } from '../Api/Client';
 import { useAppData } from '../context/AppContext';
 
 export default function CommitteeDashboard() {

@@ -14,7 +14,7 @@ export default function RegisterPage() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState(''); // היה חסר לך
   const [emailSentTo, setEmailSentTo] = useState('');
-  
+
   // ריכוז כל שדות הטופס לאובייקט אחד
   const [formData, setFormData] = useState({
     email: '',
@@ -24,12 +24,12 @@ export default function RegisterPage() {
 
   // --- תוספת: שחזור מצב בטעינת הדף ---
   useEffect(() => {
-      // בודקים אם יש מייל שמחכה לאימות בזיכרון של הטאב הנוכחי
-      const pendingEmail = sessionStorage.getItem('pendingRegistrationEmail');
-      if (pendingEmail) {
-          setEmailSentTo(pendingEmail);
-          setIsSuccess(true);
-      }
+    // בודקים אם יש מייל שמחכה לאימות בזיכרון של הטאב הנוכחי
+    const pendingEmail = sessionStorage.getItem('pendingRegistrationEmail');
+    if (pendingEmail) {
+      setEmailSentTo(pendingEmail);
+      setIsSuccess(true);
+    }
   }, []);
 
   const handleChange = (e) => {
@@ -49,24 +49,24 @@ export default function RegisterPage() {
         // מנקים את המייל הזמני מהזיכרון של הטאב
         sessionStorage.removeItem('pendingRegistrationEmail');
         // רענון הקונטקסט כדי שהאפליקציה תדע שאנחנו מחוברים
-        await refresh(); 
+        await refresh();
         // ה-Router ב-App.jsx כבר יעביר אותנו ל-Onboarding כי חסרים פרטים
-        navigate('/onboarding');
+        //navigate('/onboarding');
       }
     } catch (error) {
-          console.error("Login failed:", error);
-          alert("האימות טרם הושלם או שגיאה בהתחברות. אנא נסה שוב.");
-      } finally {
-          setLoading(false);
-      }
-    };
+      console.error("Login failed:", error);
+      alert("האימות טרם הושלם או שגיאה בהתחברות. אנא נסה שוב.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleReset = () => {
-      sessionStorage.removeItem('pendingRegistrationEmail');
-      setIsSuccess(false);
-      setFormData({ email: '' });
+    sessionStorage.removeItem('pendingRegistrationEmail');
+    setIsSuccess(false);
+    setFormData({ email: '' });
   };
-  
+
   const handleRegister = async (e) => {
     e.preventDefault();
 
@@ -87,13 +87,13 @@ export default function RegisterPage() {
     }
 
     if (!specialCharRegex.test(formData.password)) {
-        setError('הסיסמה חייבת להכיל לפחות תו מיוחד אחד (!@#$...)');
-        return;
+      setError('הסיסמה חייבת להכיל לפחות תו מיוחד אחד (!@#$...)');
+      return;
     }
 
     if (!numberRegex.test(formData.password)) {
-        setError('הסיסמה חייבת להכיל לפחות מספר אחד');
-        return;
+      setError('הסיסמה חייבת להכיל לפחות מספר אחד');
+      return;
     }
 
     setLoading(true);
@@ -153,7 +153,7 @@ export default function RegisterPage() {
               </p>
             </div>
             {/* כפתור בדיקה חכם */}
-            <Button 
+            <Button
               className="w-full bg-teal-600 hover:bg-teal-700 text-white gap-2 h-12 text-lg animate-pulse"
               onClick={handleCheckVerification}
               disabled={loading}
@@ -161,7 +161,7 @@ export default function RegisterPage() {
               {loading ? "בודק..." : "אימתתי את המייל"}
             </Button>
 
-            <Button 
+            <Button
               variant="ghost"
               className="w-full bg-slate-700 hover:bg-slate-600 text-white gap-2 h-12 text-lg"
               onClick={() => {
@@ -189,13 +189,13 @@ export default function RegisterPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleRegister} className="space-y-4">
-            
+
             <div className="space-y-2">
               <div className="relative">
                 <Mail className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
-                <input 
+                <input
                   name="email"
-                  type="email" 
+                  type="email"
                   placeholder="אימייל"
                   className="w-full p-2 pl-10 rounded-md bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500"
                   required
@@ -209,9 +209,9 @@ export default function RegisterPage() {
             <div className="space-y-2">
               <div className="relative">
                 <Lock className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
-                <input 
+                <input
                   name="password"
-                  type="password" 
+                  type="password"
                   placeholder="סיסמה (לפחות 6 תווים)"
                   className="w-full p-2 pl-10 rounded-md bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500"
                   required
@@ -225,9 +225,9 @@ export default function RegisterPage() {
             <div className="space-y-2">
               <div className="relative">
                 <Lock className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
-                <input 
+                <input
                   name="confirmPassword"
-                  type="password" 
+                  type="password"
                   placeholder="אימות סיסמה"
                   className="w-full p-2 pl-10 rounded-md bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500"
                   required
@@ -244,7 +244,7 @@ export default function RegisterPage() {
               </div>
             )}
 
-            <Button 
+            <Button
               type="submit"
               disabled={loading}
               className="w-full bg-teal-600 hover:bg-teal-700 text-white h-11 text-lg font-medium transition-colors flex items-center justify-center gap-2"
@@ -257,7 +257,7 @@ export default function RegisterPage() {
               )}
             </Button>
 
-            <button 
+            <button
               type="button"
               onClick={() => navigate('/login')}
               className="w-full text-slate-400 hover:text-white p-2 text-sm flex items-center justify-center gap-2 mt-2"
