@@ -38,7 +38,7 @@ const ProtectedRoute = ({ children }) => {
     return <Navigate to="/onboarding" replace />;
   }
 
-  if (user?.isVerifiedResident === false) {
+  if (user?.is_verified_as_resident === false) {
     return <Navigate to="/resident-verification" replace />;
   }
 

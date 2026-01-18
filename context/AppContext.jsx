@@ -49,10 +49,10 @@ export function AppProvider({ children }) {
                 if (!profile.firstName || !profile.lastName || !profile.city || !profile.phone || !profile.address || !profile.age) {
                     setUser({ ...profile, isIncomplete: true });
                     // המשתמש מחובר, אך חסרים פרטים -> ינותב ל-Onboarding
-                } else if (profile.is_validated_as_resident === false) {
-                    setUser({ ...profile, isVerifiedResident: false });
-                }
-                else {
+                    // } else if (profile.is_verified_as_resident === false) {
+                    //     setUser({ ...profile, isVerifiedResident: false });
+                    // }
+                } else {
                     setUser(profile);
                 }
                 setIsAuthenticated(true);
