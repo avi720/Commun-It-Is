@@ -1,6 +1,9 @@
 import os
 import uuid
+import firebase_admin
+import json
 
+from firebase_admin import credentials, messaging
 from fastapi import UploadFile, File, Form
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -22,6 +25,28 @@ if not SUPABASE_URL or not SUPABASE_KEY:
 
 # יצירת החיבור
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+# אתחול פיירבייס עם המפתח שהורדת
+# שים לב: ב-Render נצטרך לטפל בזה אחרת בעתיד, אבל לפיתוח מקומי זה מצוין
+firebase_creds_str = os.getenv("FIREBASE_CREDENTIALS")
+
+if not firebase_creds_str:
+    # עוצרים הכל אם אין מפתח!
+    raise RuntimeError("CRITICAL ERROR: 'FIREBASE_CREDENTIALS' environment variable is missing.")
+
+try:
+    # המרת המחרוזת (JSON String) למילון פייתון
+    cred_dict = json.loads(firebase_creds_str)
+    cred = credentials.Certificate(cred_dict)
+    
+    # אתחול
+    firebase_admin.initialize_app(cred)
+    print("✅ Firebase initialized successfully from Environment Variable")
+    
+except json.JSONDecodeError:
+    raise RuntimeError("CRITICAL ERROR: 'FIREBASE_CREDENTIALS' is not a valid JSON string.")
+except Exception as e:
+    raise RuntimeError(f"CRITICAL ERROR: Failed to initialize Firebase: {str(e)}")
 
 app = FastAPI()
 
@@ -59,6 +84,12 @@ class PostSchema(BaseModel):
     user_id: str  # או int, תלוי איך זה אצלך ב-DB
     content: str
     image_url: Optional[str] = None
+
+class NotificationRequest(BaseModel):
+    title: str
+    body: str
+    community_id: str
+    sender_name: str
 
 # --- נתיבים (Routes) ---
 @app.delete("/api/users/{user_id}")
@@ -226,6 +257,57 @@ async def create_post(
 
     except Exception as e:
         print(f"Error creating post: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/notifications/send")
+async def send_community_notification(notif: NotificationRequest):
+    try:
+        # 1. שליפת כל המשתמשים בקהילה שיש להם טוקן
+        users_response = supabase.table("users") \
+            .select("fcm_token") \
+            .eq("community_id", notif.community_id) \
+            .neq("fcm_token", "null") \
+            .execute()
+        
+        tokens = [u['fcm_token'] for u in users_response.data if u.get('fcm_token')]
+        
+        if not tokens:
+            return {"message": "No users with tokens found"}
+
+        # 2. שליחת ההודעה דרך Firebase
+        message = messaging.MulticastMessage(
+            notification=messaging.Notification(
+                title=notif.title,
+                body=notif.body,
+            ),
+            tokens=tokens,
+        )
+        response = messaging.send_multicast(message)
+
+        # 3. שמירת ההודעה בהיסטוריה
+        supabase.table("notifications").insert({
+            "community_id": notif.community_id,
+            "title": notif.title,
+            "body": notif.body,
+            "sender_name": notif.sender_name
+        }).execute()
+
+        return {"success": True, "sent_count": response.success_count}
+
+    except Exception as e:
+        print(f"Error sending notification: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# עדכון טוקן של משתמש
+class TokenUpdate(BaseModel):
+    fcm_token: str
+
+@app.put("/api/users/{user_id}/token")
+async def update_user_token(user_id: str, token_data: TokenUpdate):
+    try:
+        supabase.table("users").update({"fcm_token": token_data.fcm_token}).eq("id", user_id).execute()
+        return {"message": "Token updated"}
+    except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":

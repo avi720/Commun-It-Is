@@ -149,6 +149,28 @@ export const avior = {
                 }
                 return response.json();
             }
+        },
+
+        notifications: {
+            // ועד שולח הודעה לכולם
+            sendToCommunity: async (title, body, communityId, senderName) => {
+                const response = await fetch(`${API_URL}/notifications/send`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, body, community_id: communityId, sender_name: senderName })
+                });
+                if (!response.ok) throw new Error('Failed to send notification');
+                return response.json();
+            },
+
+            // משתמש מעדכן את הטוקן שלו
+            updateToken: async (userId, token) => {
+                await fetch(`${API_URL}/users/${userId}/token`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fcm_token: token })
+                });
+            }
         }
     }
 };

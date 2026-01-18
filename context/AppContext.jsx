@@ -66,6 +66,13 @@ export function AppProvider({ children }) {
                 });
                 setIsAuthenticated(true);
             }
+            // אם יש טוקן שממתין בזיכרון, שלח אותו לשרת
+            const storedToken = localStorage.getItem('fcm_token');
+            if (storedToken && profile?.id) {
+                avior.notifications.updateToken(profile.id, storedToken)
+                    .then(() => console.log("FCM Token updated"))
+                    .catch(err => console.error("Token update failed", err));
+            }
 
         } catch (error) {
             console.error("Data loading error:", error);

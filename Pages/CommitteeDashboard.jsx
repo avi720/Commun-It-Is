@@ -7,7 +7,10 @@ export default function CommitteeDashboard() {
     const [activeTab, setActiveTab] = useState('businesses');
     const [loading, setLoading] = useState(true);
     const { user } = useAppData();
-    
+
+    const [showMsgModal, setShowMsgModal] = useState(false);
+    const [msgData, setMsgData] = useState({ title: '', body: '' });
+
     // Data States
     const [pendingBusinesses, setPendingBusinesses] = useState([]);
     const [residents, setResidents] = useState([]);
@@ -75,9 +78,9 @@ export default function CommitteeDashboard() {
     // פעולה: שינוי סטטוס תושב (Toggle)
     const toggleResidentStatus = async (residentId, currentStatus) => {
         const newStatus = !currentStatus;
-        
+
         // עדכון אופטימי (מיידי) בממשק
-        setResidents(prev => prev.map(r => 
+        setResidents(prev => prev.map(r =>
             r.id === residentId ? { ...r, is_verified_as_resident: newStatus } : r
         ));
 
@@ -90,7 +93,7 @@ export default function CommitteeDashboard() {
         if (error) {
             console.error("Error updating resident status:", error);
             // אם נכשל, נחזיר את המצב לקדמותו
-            setResidents(prev => prev.map(r => 
+            setResidents(prev => prev.map(r =>
                 r.id === residentId ? { ...r, is_verified_as_resident: currentStatus } : r
             ));
             alert("אירעה שגיאה בעדכון הסטטוס");
@@ -105,6 +108,26 @@ export default function CommitteeDashboard() {
         return true;
     });
 
+    const handleSendNotification = async () => {
+        if (!msgData.title || !msgData.body) return alert("חובה למלא כותרת ותוכן");
+
+        if (confirm("לשלוח את ההודעה לכל חברי הקהילה?")) {
+            try {
+                await avior.notifications.sendToCommunity(
+                    msgData.title,
+                    msgData.body,
+                    user.community_id,
+                    "ועד הקהילה"
+                );
+                alert("ההודעה נשלחה בהצלחה! 🚀");
+                setShowMsgModal(false);
+                setMsgData({ title: '', body: '' });
+            } catch (e) {
+                alert("שגיאה בשליחה");
+            }
+        }
+    };
+
     if (!user || user.community_role !== 'committee') {
         return <div className="p-8 text-center text-red-400">אין לך הרשאה לצפות בדף זה.</div>;
     }
@@ -118,6 +141,12 @@ export default function CommitteeDashboard() {
                     <Shield className="w-6 h-6" />
                     ניהול קהילה: {communitySettings?.name || 'טוען...'}
                 </h1>
+                <button
+                    onClick={() => setShowMsgModal(true)}
+                    className="bg-teal-600 hover:bg-teal-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-lg"
+                >
+                    📢 שלח הודעה לכולם
+                </button>
             </div>
 
             {/* טאבים למעבר */}
@@ -183,24 +212,24 @@ export default function CommitteeDashboard() {
                                     <h2 className="text-lg font-semibold text-slate-300">
                                         תושבי הקהילה ({filteredResidents.length})
                                     </h2>
-                                    
+
                                     {/* כפתורי סינון */}
                                     <div className="flex bg-slate-800 p-1 rounded-lg border border-slate-700">
-                                        <FilterButton 
-                                            active={residentFilter === 'all'} 
-                                            onClick={() => setResidentFilter('all')} 
-                                            label="הכל" 
+                                        <FilterButton
+                                            active={residentFilter === 'all'}
+                                            onClick={() => setResidentFilter('all')}
+                                            label="הכל"
                                         />
-                                        <FilterButton 
-                                            active={residentFilter === 'unverified'} 
-                                            onClick={() => setResidentFilter('unverified')} 
-                                            label="ממתינים לאישור" 
+                                        <FilterButton
+                                            active={residentFilter === 'unverified'}
+                                            onClick={() => setResidentFilter('unverified')}
+                                            label="ממתינים לאישור"
                                             alert={residents.some(r => !r.is_verified_as_resident)}
                                         />
-                                        <FilterButton 
-                                            active={residentFilter === 'verified'} 
-                                            onClick={() => setResidentFilter('verified')} 
-                                            label="מאושרים" 
+                                        <FilterButton
+                                            active={residentFilter === 'verified'}
+                                            onClick={() => setResidentFilter('verified')}
+                                            label="מאושרים"
                                         />
                                     </div>
                                 </div>
@@ -219,15 +248,15 @@ export default function CommitteeDashboard() {
                                         <tbody className="divide-y divide-slate-700">
                                             {filteredResidents.map((resident) => (
                                                 <tr key={resident.id} className="hover:bg-slate-700/50 transition-colors">
-                                                    
+
                                                     {/* עמודת סטטוס לחיצה */}
                                                     <td className="px-4 py-3 whitespace-nowrap">
-                                                        <button 
+                                                        <button
                                                             onClick={() => toggleResidentStatus(resident.id, resident.is_verified_as_resident)}
                                                             className={`
                                                                 flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium border transition-all active:scale-95
-                                                                ${resident.is_verified_as_resident 
-                                                                    ? 'bg-green-500/10 text-green-400 border-green-500/20 hover:bg-green-500/20' 
+                                                                ${resident.is_verified_as_resident
+                                                                    ? 'bg-green-500/10 text-green-400 border-green-500/20 hover:bg-green-500/20'
                                                                     : 'bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20'}
                                                             `}
                                                         >
@@ -243,12 +272,12 @@ export default function CommitteeDashboard() {
                                                         {resident.firstName} {resident.lastName}
                                                         <div className="text-xs text-slate-500 font-normal mt-0.5">גיל: {resident.age || '-'}</div>
                                                     </td>
-                                                    
+
                                                     <td className="px-4 py-3">
                                                         <div className="text-xs text-slate-400">{resident.city}</div>
                                                         <div className="text-xs text-slate-500">{resident.address}</div>
                                                     </td>
-                                                    
+
                                                     <td className="px-4 py-3" dir="ltr">
                                                         <div className="text-xs">{resident.phone}</div>
                                                         <div className="text-[10px] text-slate-500 truncate max-w-[120px]">{resident.email}</div>
@@ -298,6 +327,29 @@ export default function CommitteeDashboard() {
                     </>
                 )}
             </div>
+            {showMsgModal && (
+                <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+                    <div className="bg-slate-900 p-6 rounded-xl w-full max-w-md border border-slate-700">
+                        <h3 className="text-xl font-bold text-white mb-4">שליחת הודעה לקהילה</h3>
+                        <input
+                            className="w-full bg-slate-800 text-white p-3 rounded mb-3 border border-slate-700"
+                            placeholder="כותרת ההודעה"
+                            value={msgData.title}
+                            onChange={e => setMsgData({ ...msgData, title: e.target.value })}
+                        />
+                        <textarea
+                            className="w-full bg-slate-800 text-white p-3 rounded mb-4 h-32 border border-slate-700"
+                            placeholder="תוכן ההודעה..."
+                            value={msgData.body}
+                            onChange={e => setMsgData({ ...msgData, body: e.target.value })}
+                        />
+                        <div className="flex gap-3 justify-end">
+                            <button onClick={() => setShowMsgModal(false)} className="text-gray-400">ביטול</button>
+                            <button onClick={handleSendNotification} className="bg-teal-600 text-white px-6 py-2 rounded">שלח</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
@@ -327,8 +379,8 @@ function FilterButton({ active, onClick, label, alert }) {
             onClick={onClick}
             className={`
                 px-3 py-1.5 rounded-md text-xs font-medium transition-all relative
-                ${active 
-                    ? 'bg-slate-600 text-white shadow-sm' 
+                ${active
+                    ? 'bg-slate-600 text-white shadow-sm'
                     : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700'}
             `}
         >
