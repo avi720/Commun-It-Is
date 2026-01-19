@@ -12,7 +12,7 @@ export default function CommitteeDashboard() {
     const [msgData, setMsgData] = useState({ title: '', body: '' });
 
     // Data States
-    const [pendingBusinesses, setPendingBusinesses] = useState([]);
+    const [businesses, setBusinesses] = useState([]);
     const [residents, setResidents] = useState([]);
     const [communitySettings, setCommunitySettings] = useState(null);
 
@@ -28,14 +28,14 @@ export default function CommitteeDashboard() {
     const fetchAllData = async () => {
         setLoading(true);
         try {
-            // 1. Fetch Pending Businesses
-            const { data: busData } = await supabase
+            // 1. Fetch Businesses
+            const { data: busiData } = await supabase
                 .from('businesses')
                 .select('*')
-                .eq('community_id', user.community_id)
-                .eq('is_verified_by_committee', false);
+                .eq('community_id', user.community_id);
+            //.eq('is_verified_by_committee', false);
 
-            setPendingBusinesses(busData || []);
+            setBusinesses(busiData || []);
 
             // 2. Fetch Residents
             const { data: resData } = await supabase
@@ -70,7 +70,7 @@ export default function CommitteeDashboard() {
             .eq('id', businessId);
 
         if (!error) {
-            setPendingBusinesses(prev => prev.filter(b => b.id !== businessId));
+            setBusinesses(prev => prev.filter(b => b.id !== businessId));
             alert("העסק אושר בהצלחה!");
         }
     };
@@ -155,7 +155,7 @@ export default function CommitteeDashboard() {
                     active={activeTab === 'businesses'}
                     onClick={() => setActiveTab('businesses')}
                     icon={<Store className="w-4 h-4" />}
-                    label={`אישור עסקים (${pendingBusinesses.length})`}
+                    label={`ניהול עסקים (${businesses.length})`}
                 />
                 <TabButton
                     active={activeTab === 'residents'}
@@ -180,13 +180,13 @@ export default function CommitteeDashboard() {
                         {/* --- טאב עסקים --- */}
                         {activeTab === 'businesses' && (
                             <div className="space-y-4">
-                                <h2 className="text-lg font-semibold text-slate-300 px-2">עסקים שממתינים לאישור</h2>
-                                {pendingBusinesses.length === 0 ? (
+                                <h2 className="text-lg font-semibold text-slate-300 px-2">עסקי הקהילה</h2>
+                                {businesses.length === 0 ? (
                                     <div className="p-6 bg-slate-800 rounded-xl text-center text-slate-400 mx-2">
-                                        אין עסקים חדשים לאישור כרגע 🎉
+                                        אין עסקים בקהילה.
                                     </div>
                                 ) : (
-                                    pendingBusinesses.map(business => (
+                                    businesses.map(business => (
                                         <div key={business.id} className="bg-slate-800 p-4 rounded-xl border border-slate-700 flex justify-between items-center mx-2">
                                             <div>
                                                 <h3 className="font-bold text-lg">{business.name}</h3>
@@ -207,7 +207,7 @@ export default function CommitteeDashboard() {
 
                         {/* --- טאב תושבים (הטבלה המאוחדת) --- */}
                         {activeTab === 'residents' && (
-                            <div className="space-y-4">
+                            <div className="space-y-3">
                                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center px-2 gap-4">
                                     <h2 className="text-lg font-semibold text-slate-300">
                                         תושבי הקהילה ({filteredResidents.length})
@@ -240,7 +240,8 @@ export default function CommitteeDashboard() {
                                             <tr>
                                                 <th className="px-4 py-3 font-semibold">סטטוס (לחץ לשינוי)</th>
                                                 <th className="px-4 py-3 font-semibold">שם מלא</th>
-                                                <th className="px-4 py-3 font-semibold">פרטים</th>
+                                                <th className="px-4 py-3 font-semibold">גיל</th>
+                                                <th className="px-4 py-3 font-semibold">כתובת</th>
                                                 <th className="px-4 py-3 font-semibold">יצירת קשר</th>
                                                 <th className="px-4 py-3 font-semibold">תפקיד</th>
                                             </tr>
@@ -270,12 +271,15 @@ export default function CommitteeDashboard() {
 
                                                     <td className="px-4 py-3 font-medium text-white">
                                                         {resident.firstName} {resident.lastName}
-                                                        <div className="text-xs text-slate-500 font-normal mt-0.5">גיל: {resident.age || '-'}</div>
                                                     </td>
 
-                                                    <td className="px-4 py-3">
-                                                        <div className="text-xs text-slate-400">{resident.city}</div>
-                                                        <div className="text-xs text-slate-500">{resident.address}</div>
+                                                    <td className="px-4 py-3 font-medium text-white">
+                                                        {resident.age}
+                                                    </td>
+
+                                                    <td className="px-4 py-3 text-white">
+                                                        <div className="font-medium">{resident.city}</div>
+                                                        <div className="text-xs">{resident.address}</div>
                                                     </td>
 
                                                     <td className="px-4 py-3" dir="ltr">

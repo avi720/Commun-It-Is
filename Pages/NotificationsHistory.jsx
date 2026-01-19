@@ -31,9 +31,6 @@ export default function NotificationsHistory() {
     return (
         <div className="min-h-screen bg-slate-900 pb-20 p-4">
             <header className="mb-6 flex items-center gap-3 border-b border-slate-800 pb-4">
-                <div className="bg-teal-500/10 p-3 rounded-full">
-                    <Bell className="w-6 h-6 text-teal-400" />
-                </div>
                 <div>
                     <h1 className="text-xl font-bold text-white">לוח הודעות</h1>
                     <p className="text-sm text-slate-400">עדכונים והודעות מוועד הקהילה</p>

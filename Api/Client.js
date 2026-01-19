@@ -149,7 +149,29 @@ export const avior = {
                 }
                 return response.json();
             }
-        }
+        },
+
+        communities: {
+            getAll: async () => {
+                const { data, error } = await supabase
+                    .from('communities')
+                    .select('id, name')
+                    .order('name');
+
+                if (error) throw error;
+                return data;
+            },
+
+            joinByName: async (communityName) => {
+                const { data, error } = await supabase.rpc('join_community_by_name', {
+                    requested_name: communityName
+                });
+
+                if (error) throw error;
+                if (!data.success) throw new Error(data.error);
+                return data;
+            }
+        },
     },
 
     notifications: {

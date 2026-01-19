@@ -13,6 +13,11 @@ export default defineConfig({
       "@": path.resolve(__dirname, "."),
     },
   },
+  build: {
+    target: 'es2015', // תומך במכשירים ישנים יותר
+    outDir: 'dist',
+    minify: 'esbuild', // אופציונלי, לפעמים עוזר לביצועים
+  },
   server: {
     // 1. מאפשרים כניסה מ-ngrok
     allowedHosts: true,
