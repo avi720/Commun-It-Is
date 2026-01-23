@@ -32,12 +32,11 @@ export default function SendRide() {
             // שולחים לשרת את התאריך המדויק שנבחר
             // (המשתמש בחר תאריך ושעה בטופס, והם נשמרים ב-departure_time)
             return await avior.entities.Ride.create({
-                user_id: user.id,
                 driver_name: rideData.driver_name,
                 location: rideData.location,       // שים לב: אנחנו שולחים location
                 destination: rideData.destination,
-                seats: rideData.seats, // ברירת מחדל
-                departure_time: rideData.departure_time.toISOString()
+                departure_time: rideData.departure_time.toISOString(),
+                seats: rideData.seats // ברירת מחדל
             });
         },
         onSuccess: () => {

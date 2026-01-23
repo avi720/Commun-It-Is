@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../Api/Client';
 import { useAppData } from '../context/AppContext';
-import { Search, Phone, MessageCircle, User } from 'lucide-react';
+import { Search, Phone, MessageCircle } from 'lucide-react';
+
 
 export default function PhoneBook() {
     const { user } = useAppData();
@@ -11,31 +11,22 @@ export default function PhoneBook() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (user?.community_id) {
-            fetchContacts();
-        }
+        setLoading(true);
+        const fetchContacts = async () => {
+            if (user?.community_id) {
+                try {
+                    // קריאה לפונקציה החדשה שיצרנו בקליינט
+                    const data = await avior.phonebook.getContacts(user.community_id);
+                    setContacts(data);
+                } catch (error) {
+                    console.error("Failed to load phonebook:", error);
+                } finally {
+                    setLoading(false);
+                }
+            }
+        };
+        fetchContacts();
     }, [user]);
-
-    const fetchContacts = async () => {
-        try {
-            setLoading(true);
-            const { data, error } = await supabase
-                .from('users')
-                .select('*')
-                .eq('community_id', user.community_id)
-                .eq('is_public_in_phonebook', true) // מביא רק את מי שאישר
-                .order('firstName', { ascending: true }); // מסדר לפי א-ב
-
-            if (error) throw error;
-
-            setContacts(data || []);
-            setFilteredContacts(data || []);
-        } catch (error) {
-            console.error('Error fetching contacts:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     // סינון בזמן אמת לפי חיפוש
     const handleSearch = (e) => {

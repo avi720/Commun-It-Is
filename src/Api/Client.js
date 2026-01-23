@@ -48,7 +48,9 @@ export const avior = {
                     });
 
                     if (!response.ok) {
-                        throw new Error(`Server error: ${response.status}`);
+                        const errorText = await response.text();
+                        console.error("Server reported error:", errorText); // זה יופיע בלוגים
+                        throw new Error(`Server error: ${response.status} - ${errorText}`);
                     }
                     return await response.json();
                 } catch (error) {
@@ -173,6 +175,20 @@ export const avior = {
         },
     },
 
+    phonebook: {
+        getContacts: async (communityId) => {
+            const { data, error } = await supabase
+                .from('users')
+                .select('first_name, last_name, phone, city, street') // שולפים רק מה שצריך
+                .eq('community_id', communityId)
+                .eq('visible_on_phonebook', true) // הסנן של סופהבייס (למרות שה-RLS כבר מסנן)
+                .order('first_name');
+
+            if (error) throw error;
+            return data;
+        }
+    },
+
     notifications: {
         // ועד שולח הודעה לכולם
         sendToCommunity: async (title, body, communityId, senderName) => {
@@ -196,7 +212,7 @@ export const avior = {
 
         getHistory: async (communityId) => {
             const { data, error } = await supabase
-                .from('notifications')
+                .from('important_notifications')
                 .select('*')
                 .eq('community_id', communityId)
                 .order('created_at', { ascending: false }); // הכי חדש למעלה

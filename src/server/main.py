@@ -72,7 +72,6 @@ class UserSchema(BaseModel):
     phone: str
 
 class RideSchema(BaseModel):
-    user_id: str       # <--- השדה החדש: מזהה המשתמש (חובה!)
     driver_name: str
     location: str
     destination: str
@@ -164,14 +163,14 @@ def get_rides(city: str = None):
 @app.post("/api/rides")
 def create_ride(ride: RideSchema):
     try:
-        created_date = datetime.now(timezone.utc).isoformat()
+        #created_date = datetime.now(timezone.utc).isoformat()
         
-        ride_data = ride.dict()
+        ride_data = ride.model_dump()
         # ניקוי שדות עזר
         if "departure_minutes" in ride_data:
             del ride_data["departure_minutes"]
             
-        ride_data["created_date"] = created_date
+        #ride_data["created_date"] = created_date
         
         # השדה user_id כבר נמצא ב-ride_data כי הוספנו אותו ל-Schema
         
