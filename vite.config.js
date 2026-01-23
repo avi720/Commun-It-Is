@@ -10,7 +10,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "."),
+      "@": path.resolve(__dirname, "./src"),
     },
   },
   build: {
@@ -19,11 +19,6 @@ export default defineConfig({
     minify: 'esbuild', // אופציונלי, לפעמים עוזר לביצועים
   },
   server: {
-    // 1. מאפשרים כניסה מ-ngrok
-    allowedHosts: true,
-    hmr: {
-      clientPort: 443,
-    },
     // 2. הגדרת הפרוקסי (הקסם קורה כאן)
     proxy: {
       '/api': {
