@@ -48,8 +48,8 @@ export default function RegisterPage() {
     // 2. בדיקת מספר (בודק אם יש ספרה 0-9)
     const numberRegex = /\d/;
 
-    if (formData.password.length < 6) {
-      setError('הסיסמה חייבת להכיל לפחות 6 תווים');
+    if (formData.password.length < 8) {
+      setError('הסיסמה חייבת להכיל לפחות 8 תווים');
       return;
     }
 

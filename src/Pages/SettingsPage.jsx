@@ -4,10 +4,11 @@ import ProfileForm from '../Components/pagesComp/settings/ProfileForm';
 import DangerZone from '../Components/pagesComp/settings/DangerZone';
 import { motion } from 'framer-motion';
 import { CheckCircle, XCircle } from 'lucide-react';
+import { avior } from '../Api/Client';
 
 export default function SettingsPage() {
     // 2. שולפים הכל מהקונטקסט המרכזי
-    const { user, updateUser } = useAppData(); 
+    const { user, updateUser, session } = useAppData(); 
     
     // סטייט מקומי להודעות (טוסטים) - זה שייך רק לדף הזה
     const [message, setMessage] = useState(null);
@@ -35,7 +36,7 @@ export default function SettingsPage() {
                 // 1. קריאה לשרת למחיקת המשתמש
                 if (user && user.id) {
                     // וודא שאתה משתמש ב-avior או base44 לפי מה שיש לך בקובץ
-                    await avior.entities.User.delete(user.id);
+                    await avior.entities.User.delete(user.id, session);
                 }
 
                 // 2. ניקוי מקומי והתנתקות

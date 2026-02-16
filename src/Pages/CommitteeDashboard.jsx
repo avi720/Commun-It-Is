@@ -6,7 +6,7 @@ import { useAppData } from '../context/AppContext';
 export default function CommitteeDashboard() {
     const [activeTab, setActiveTab] = useState('businesses');
     const [loading, setLoading] = useState(true);
-    const { user } = useAppData();
+    const { user, session } = useAppData();
 
     const [showMsgModal, setShowMsgModal] = useState(false);
     const [msgData, setMsgData] = useState({ title: '', body: '' });
@@ -117,7 +117,8 @@ export default function CommitteeDashboard() {
                     msgData.title,
                     msgData.body,
                     user.community_id,
-                    "ועד הקהילה"
+                    "ועד הקהילה",
+                    session
                 );
                 alert("ההודעה נשלחה בהצלחה! 🚀");
                 setShowMsgModal(false);

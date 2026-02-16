@@ -4,8 +4,10 @@ import { Input } from "@/Components/ui/input";
 import { Button } from "@/Components/ui/button";
 import { Label } from "@/Components/ui/label";
 import { avior } from '@/Api/Client';
+import { useAppData } from '@/context/AppContext';
 
 export default function ProfileForm({ user, onSave }) {
+    const { session } = useAppData();
     // State מקומי לטופס כדי לא לשנות את הגלובלי בכל הקלדה
     const [formData, setFormData] = useState({
         firstName: '',
@@ -36,7 +38,7 @@ export default function ProfileForm({ user, onSave }) {
         setIsSaving(true);
         try {
             // 1. שליחה לשרת (חובה להעביר את ה-user.id!)
-            await avior.entities.User.update(user.id, formData);
+            await avior.entities.User.update(user.id, formData, session);
 
             // 2. עדכון מקומי (UI)
             onSave(formData);

@@ -1,0 +1,27 @@
+import { createClient } from '@supabase/supabase-js';
+
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY;
+
+// Create and export Supabase client
+export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// API base URL
+export const API_URL = "https://commun-it-is.onrender.com/api";
+
+/**
+ * Helper function to create headers with Authorization token if session is provided
+ * @param {Object|null} session - Supabase session object with access_token
+ * @returns {Object} Headers object with Content-Type and optional Authorization
+ */
+export function getAuthHeaders(session = null) {
+    const headers = {
+        'Content-Type': 'application/json',
+    };
+    
+    if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`;
+    }
+    
+    return headers;
+}

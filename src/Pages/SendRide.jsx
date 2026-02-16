@@ -10,7 +10,7 @@ import { useAppData } from "../context/AppContext";
 export default function SendRide() {
     // State למשתמש המחובר
     //const [user, setUser] = useState(null);
-    const { user } = useAppData();
+    const { user, session } = useAppData();
     // State לטופס
     const [driverName, setDriverName] = useState("");
     useEffect(() => {
@@ -37,7 +37,7 @@ export default function SendRide() {
                 destination: rideData.destination,
                 departure_time: rideData.departure_time.toISOString(),
                 seats: rideData.seats // ברירת מחדל
-            });
+            }, session);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['rides'] });
