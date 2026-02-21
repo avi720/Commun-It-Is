@@ -2,32 +2,26 @@ from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 from fastapi import APIRouter, HTTPException
+from fastapi import Depends
 
 from ..config import supabase
 from ..schemas import RideSchema
-
+from ..auth import get_user_community_id
 
 router = APIRouter(prefix="/api", tags=["rides"])
 
 
 @router.get("/rides")
-def get_rides(city: Optional[str] = None):
+def get_rides(community_id: str = Depends(get_user_community_id)):
     try:
-        if not city:
+        if not community_id:
             return []
 
-        # Step 1: fetch all user IDs that live in this city
-        user_res = supabase.table("users").select("id").eq("city", city).execute()
-        user_ids = [u["id"] for u in user_res.data]
-
-        if not user_ids:
-            return []
-
-        # Step 2: fetch rides created by these users
+        # משיכה ישירה ויעילה של כל הטרמפים ששייכים לקהילה הספציפית
         response = (
             supabase.table("rides")
             .select("*")
-            .in_("user_id", user_ids)
+            .eq("community_id", community_id)
             .execute()
         )
         all_rides = response.data
@@ -66,25 +60,12 @@ def get_rides(city: Optional[str] = None):
 @router.post("/rides")
 def create_ride(ride: RideSchema):
     try:
-        # 1. Fetch the real community from DB using the verified user ID
-        user_res = (
-            supabase.table("users")
-            .select("community_id")
-            .eq("id", ride.user_id)
-            .execute()
-        )
-
-        if not user_res.data or not user_res.data[0]["community_id"]:
-            raise HTTPException(status_code=400, detail="User has no community assigned")
-
-        real_community_id = user_res.data[0]["community_id"]
-
         # 2. Prepare data for persistence
         ride_data = ride.dict()
 
         # Overwrite sensitive fields with verified info
         ride_data["user_id"] = ride.user_id
-        ride_data["community_id"] = real_community_id
+        ride_data["community_id"] = ride.community_id
 
         # Cleanup
         if "departure_minutes" in ride_data:
@@ -95,7 +76,7 @@ def create_ride(ride: RideSchema):
 
         if len(response.data) > 0:
             print(
-                f"New ride created securely by {ride.user_id} in {real_community_id}"
+                f"New ride created securely by {ride.user_id} in {ride.community_id}"
             )
             return response.data[0]
 

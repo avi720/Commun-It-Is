@@ -31,16 +31,16 @@ export default function HomePage() {
     );
   };
 
-  useEffect(() => {
-    // טוענים פוסטים רק אם יש משתמש ויש לו עיר
-    if (user && user.city) {
-      loadPosts();
-    }
-  }, [user]);
+  // useEffect(() => {
+  //   // טוענים פוסטים רק אם יש משתמש ויש לו עיר
+  //   if (user && user.city) {
+  //     loadPosts();
+  //   }
+  // }, [user]);
 
   const loadPosts = async () => {
     try {
-      const data = await avior.entities.Post.list(user.city);
+      const data = await avior.entities.Post.list();
       setPosts(data);
     } catch (error) {
       console.error("Error loading posts:", error);

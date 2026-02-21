@@ -1,9 +1,10 @@
 from typing import Optional
 
 from fastapi import Depends
+from fastapi import UploadFile, File
 from pydantic import BaseModel
 
-from .auth import get_current_user_id
+from .auth import get_current_user_id, get_user_community_id
 
 
 # --- Pydantic models (schemas) ---
@@ -25,10 +26,9 @@ class UserSchema(BaseModel):
     age: int
     phone: str
 
-
 class RideSchema(BaseModel):
     user_id: str = Depends(get_current_user_id)
-    community_id: str
+    community_id: Depends(get_user_community_id)
     driver_name: str
     location: str
     destination: str
@@ -39,9 +39,10 @@ class RideSchema(BaseModel):
 
 class PostSchema(BaseModel):
     user_id: str = Depends(get_current_user_id)
-    community_id: str
     content: str
-    image_url: Optional[str] = None
+    is_committee: bool
+    image: Optional[UploadFile] = File(None)
+    community_id: Depends(get_user_community_id)
 
 
 class NotificationRequest(BaseModel):

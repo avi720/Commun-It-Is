@@ -46,9 +46,9 @@ export default function Sidebar({ onLogout }) {
           {/* דף הבית */}
           <button
             onClick={() => handleNavigation('/')}
-            className={`w-full flex items-center gap-3 p-3 rounded-lg transition-colors ${isActive('/') ? 'bg-teal-600 text-white' : 'text-slate-300 hover:bg-slate-800'}`}
+            className={`w-full flex items-center gap-3 p-2 text-sm rounded-lg transition-colors ${isActive('/send-ride') ? 'text-teal-400 bg-slate-800/50' : 'text-slate-400 hover:text-white'}`}
           >
-            <Home className="w-5 h-5" />
+            <Home className="w-5 h-5 text-green-400" />
             <span className="font-medium">דף הבית</span>
           </button>
 
@@ -56,7 +56,7 @@ export default function Sidebar({ onLogout }) {
           <div className="space-y-1">
             <button
               onClick={() => setIsTrempOpen(!isTrempOpen)}
-              className={`w-full flex items-center justify-between p-3 rounded-lg text-slate-300 hover:bg-slate-800 transition-colors ${['/rides', '/send'].some(p => location.pathname.includes(p)) ? 'bg-slate-800' : ''}`}
+              className={`w-full flex items-center justify-between p-3 rounded-lg text-slate-300 hover:bg-slate-800 transition-colors ${['/rides', '/send-ride'].some(p => location.pathname.includes(p)) ? 'bg-slate-800' : ''}`}
             >
               <div className="flex items-center gap-3">
                 <Car className="w-5 h-5 text-orange-400" />
@@ -87,18 +87,18 @@ export default function Sidebar({ onLogout }) {
 
             <button
               onClick={() => navigate('/phonebook')}
-              className={({ isActive }) => `w-full flex items-center space-x-3 space-x-reverse p-3 rounded-xl hover:bg-slate-800 transition-colors ${isActive('/phonebook') ? 'text-teal-400 bg-slate-800/50' : 'text-slate-400 hover:text-white'}`}
+              className={`w-full flex items-center gap-3 p-2 text-sm rounded-lg transition-colors ${isActive('/send-ride') ? 'text-teal-400 bg-slate-800/50' : 'text-slate-400 hover:text-white'}`}
             >
-              <BookUser className="w-5 h-5" />
+              <BookUser className="w-5 h-5 text-yellow-400" />
               <span className="font-medium">ספר טלפונים</span>
             </button>
           </div>
 
           <button
             onClick={() => navigate('/notifications')}
-            className={({ isActive }) => `flex items-center gap-3 p-3 rounded-xl transition-all ${isActive('/notifications') ? 'text-teal-400 bg-slate-800/50' : 'text-slate-400 hover:text-white'}`}
+            className={`w-full flex items-center gap-3 p-2 text-sm rounded-lg transition-colors ${isActive('/send-ride') ? 'text-teal-400 bg-slate-800/50' : 'text-slate-400 hover:text-white'}`}
           >
-            <Bell className="w-5 h-5" />
+            <Bell className="w-5 h-5 text-red-400" />
             <span className="font-medium">הודעות חשובות</span>
           </button>
         </div>

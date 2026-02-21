@@ -5,9 +5,9 @@ import { API_URL } from './config';
  * @param {string} userCity - City name to filter posts
  * @returns {Promise<Array>} Array of post objects
  */
-export async function list(userCity) {
+export async function list() {
     try {
-        const url = `${API_URL}/posts?city=${encodeURIComponent(userCity)}`;
+        const url = `${API_URL}/posts`;
         const response = await fetch(url);
 
         if (!response.ok) throw new Error('Failed to fetch posts');

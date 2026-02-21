@@ -1,5 +1,6 @@
 from fastapi import HTTPException, Security
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import Depends
 
 from .config import supabase
 
@@ -31,3 +32,23 @@ def get_current_user_id(
             status_code=401, detail="Invalid or expired token"
         ) from e
 
+def get_user_community_id(user_id: str = Depends(get_current_user_id)) -> str:
+    """
+    Dependency that fetches the community ID for a given user ID.
+    """
+    try:
+        user_res = (
+            supabase.table("users")
+            .select("community_id")
+            .eq("id", user_id)
+            .execute()
+        )
+
+        if not user_res.data or not user_res.data[0]["community_id"]:
+            raise HTTPException(status_code=400, detail="User has no community assigned")
+        
+        return user_res.data[0]["community_id"]
+        
+    except Exception as e:
+        print(f"Error fetching user community ID: {e}")
+        raise HTTPException(status_code=400, detail=str(e))

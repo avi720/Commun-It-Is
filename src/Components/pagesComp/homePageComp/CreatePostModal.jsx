@@ -5,7 +5,7 @@ import { avior } from '@/Api/Client';
 import { useAppData } from '@/context/AppContext';
 
 export default function CreatePostModal({ isOpen, onClose, onPostCreated }) {
-    const { user } = useAppData();
+    const { user, session } = useAppData();
     const [content, setContent] = useState('');
     const [isCommitte, setIsCommitte] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null); // הקובץ עצמו
@@ -42,7 +42,7 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }) {
         try {
             // יצירת FormData - אריזה מיוחדת לקבצים וטקסט
             const formData = new FormData();
-            formData.append('user_id', user.id); // שליחת user_id
+            //formData.append('user_id', session);
             formData.append('content', content); // שליחת התוכן
             formData.append('is_committee', isCommitte); // שליחת סוג הפוסט
             if (user?.community_id) {

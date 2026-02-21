@@ -31,7 +31,7 @@ export async function create(rideData, session = null) {
  * @param {string} userCity - City name to filter rides
  * @returns {Promise<Array>} Array of ride objects
  */
-export async function list(userCity) {
+export async function list() {
     try {
         const url = `${API_URL}/rides?city=${encodeURIComponent(userCity)}`;
         const response = await fetch(url);

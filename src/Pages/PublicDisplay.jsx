@@ -24,7 +24,7 @@ export default function PublicDisplay() {
     const { data: rides = [] } = useQuery({
         queryKey: ['rides'],
         queryFn: async () => {
-            const allRides = await avior.entities.Ride.list(user.city);
+            const allRides = await avior.entities.Ride.list();
             return allRides;
         },
         refetchInterval: 5000,
