@@ -7,7 +7,9 @@ const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY;
 export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // API base URL
-export const API_URL = "https://commun-it-is.onrender.com/api";
+// ניתן להגדיר VITE_API_URL במשתני הסביבה. אם לא הוגדר, נשתמש בנתיב היחסי "/api"
+// שעובד אוטומטית כשה-backend מתארח באותו פרויקט Vercel (ללא בעיות CORS).
+export const API_URL = import.meta.env.VITE_API_URL || "/api";
 
 /**
  * Helper function to create headers with Authorization token if session is provided
