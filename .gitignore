@@ -1,4 +1,17 @@
 node_modules
 venv
+.venv*
+src/.venv-1
 .env
 serviceAccountKey.json
+
+# Build output
+dist
+src/dist
+
+# Python
+*.pyc
+__pycache__/
+
+# Vercel
+.vercel
