@@ -17,6 +17,18 @@ export default defineConfig({
     target: 'es2015', // תומך במכשירים ישנים יותר
     outDir: 'dist',
     minify: 'esbuild', // אופציונלי, לפעמים עוזר לביצועים
+    rollupOptions: {
+      output: {
+        // פיצול ספריות הצד-שלישי לחבילות (chunks) נפרדות.
+        // הן משתנות לעיתים רחוקות, ולכן נשמרות ב-cache של הדפדפן
+        // בין פריסות - כך שעדכוני קוד שלנו לא מחייבים הורדה מחדש שלהן.
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'ui-vendor': ['framer-motion', 'lucide-react'],
+          'data-vendor': ['@supabase/supabase-js', '@tanstack/react-query', 'date-fns'],
+        },
+      },
+    },
   },
   server: {
     // 2. הגדרת הפרוקסי (הקסם קורה כאן)
