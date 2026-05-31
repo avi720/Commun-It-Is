@@ -1,10 +1,11 @@
 import React, { } from 'react';
 import { Mail, CheckCircle2, ArrowRight } from 'lucide-react';
 import { useAppData } from '@/context/AppContext';
+import { avior } from '@/Api/Client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/Components/ui/card";
 import { Button } from "@/Components/ui/button";
 
-export default function VerificationEmailSent(emailSentTo, password, setLoading, loading, navigate) {
+export default function VerificationEmailSent({ email, password, setLoading, loading, navigate }) {
 
     const { refresh } = useAppData();
 
@@ -12,7 +13,7 @@ export default function VerificationEmailSent(emailSentTo, password, setLoading,
         setLoading(true);
         try {
             await refresh();
-            const loginResponse = await avior.auth.login(emailSentTo, password);
+            const loginResponse = await avior.auth.login(email, password);
             if (loginResponse.user) {
                 // התחברות הצליחה! המייל מאומת.
                 // שומרים את המידע לשימוש באפליקציה
@@ -34,8 +35,6 @@ export default function VerificationEmailSent(emailSentTo, password, setLoading,
 
     const handleReset = () => {
         sessionStorage.removeItem('pendingRegistrationEmail');
-        setIsSuccess(false);
-        setFormData({ email: '' });
     };
 
     return (
@@ -50,7 +49,7 @@ export default function VerificationEmailSent(emailSentTo, password, setLoading,
                     <CardDescription className="text-slate-400 text-lg">
                         שלחנו מייל אימות לכתובת:
                         <br />
-                        <span className="text-white font-medium">{emailSentTo}</span>
+                        <span className="text-white font-medium">{email}</span>
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
