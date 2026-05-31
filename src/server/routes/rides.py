@@ -6,7 +6,7 @@ from fastapi import Depends
 
 from ..config import supabase
 from ..schemas import RideSchema
-from ..auth import get_user_community_id
+from ..auth import get_current_user_id, get_user_community_id
 
 router = APIRouter(prefix="/api", tags=["rides"])
 
@@ -58,14 +58,18 @@ def get_rides(community_id: str = Depends(get_user_community_id)):
 
 
 @router.post("/rides")
-def create_ride(ride: RideSchema):
+def create_ride(
+    ride: RideSchema,
+    user_id: str = Depends(get_current_user_id),
+    community_id: str = Depends(get_user_community_id),
+):
     try:
         # 2. Prepare data for persistence
         ride_data = ride.dict()
 
-        # Overwrite sensitive fields with verified info
-        ride_data["user_id"] = ride.user_id
-        ride_data["community_id"] = ride.community_id
+        # Overwrite sensitive fields with verified info from the auth token
+        ride_data["user_id"] = user_id
+        ride_data["community_id"] = community_id
 
         # Cleanup
         if "departure_minutes" in ride_data:
@@ -76,7 +80,7 @@ def create_ride(ride: RideSchema):
 
         if len(response.data) > 0:
             print(
-                f"New ride created securely by {ride.user_id} in {ride.community_id}"
+                f"New ride created securely by {user_id} in {community_id}"
             )
             return response.data[0]
 

@@ -87,13 +87,16 @@ async def update_user(
 
 
 @router.put("/token")
-async def update_user_token(token_data: fcmTokenUpdate):
+async def update_user_token(
+    token_data: fcmTokenUpdate,
+    user_id: str = Depends(get_current_user_id),
+):
     """
     Register or update a user's FCM device token.
     """
     try:
         data = {
-            "user_id": token_data.user_id,
+            "user_id": user_id,
             "fcm_token": token_data.fcm_token,
             "last_updated": datetime.now(timezone.utc).isoformat(),
         }
