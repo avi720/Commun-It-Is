@@ -1,20 +1,21 @@
 from typing import Optional
 
-from fastapi import Depends
 from fastapi import UploadFile, File
 from pydantic import BaseModel
 
-from .auth import get_current_user_id, get_user_community_id
-
 
 # --- Pydantic models (schemas) ---
+#
+# Note: authenticated fields such as ``user_id`` and ``community_id`` are NOT
+# part of these request models. They are derived from the auth token and
+# injected in the route handlers via FastAPI ``Depends`` (see auth.py). Putting
+# ``Depends`` inside a Pydantic model is invalid and crashes on import.
 
 
 class fcmTokenUpdate(BaseModel):
     """Update a user's FCM device token."""
 
     fcm_token: str
-    user_id: str = Depends(get_current_user_id)
 
 
 class UserSchema(BaseModel):
@@ -27,8 +28,6 @@ class UserSchema(BaseModel):
     phone: str
 
 class RideSchema(BaseModel):
-    user_id: str = Depends(get_current_user_id)
-    community_id: Depends(get_user_community_id)
     driver_name: str
     location: str
     destination: str
@@ -38,11 +37,9 @@ class RideSchema(BaseModel):
 
 
 class PostSchema(BaseModel):
-    user_id: str = Depends(get_current_user_id)
     content: str
     is_committee: bool
     image: Optional[UploadFile] = File(None)
-    community_id: Depends(get_user_community_id)
 
 
 class NotificationRequest(BaseModel):

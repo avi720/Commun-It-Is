@@ -6,7 +6,7 @@ from fastapi import Depends
 
 from ..schemas import PostSchema
 from ..config import supabase
-from ..auth import get_user_community_id
+from ..auth import get_current_user_id, get_user_community_id
 
 
 router = APIRouter(prefix="/api", tags=["posts"])
@@ -35,14 +35,18 @@ def get_posts(community_id: str = Depends(get_user_community_id)):
 
 
 @router.post("/posts")
-async def create_post(post: PostSchema):
+async def create_post(
+    post: PostSchema,
+    user_id: str = Depends(get_current_user_id),
+    community_id: str = Depends(get_user_community_id),
+):
     try:
         # 2. Prepare data for persistence
         post_data = post.dict()
 
-        # Overwrite sensitive fields with verified info
-        post_data["user_id"] = post.user_id
-        post_data["community_id"] = post.community_id
+        # Overwrite sensitive fields with verified info from the auth token
+        post_data["user_id"] = user_id
+        post_data["community_id"] = community_id
 
         image_url: Optional[str] = None
 
