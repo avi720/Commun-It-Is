@@ -5,8 +5,8 @@ const config: CapacitorConfig = {
   appName: 'commun-it-is',
   webDir: 'dist',
   server: {
-    // כאן שמים את הכתובת של ה-Frontend שיצרנו הרגע ב-Render
-    url: "https://commun-it-is-frontend.onrender.com",
+    // כתובת ה-Frontend המפורסם ב-Vercel (האפליקציה טוענת את אתר ה-Web)
+    url: "https://commun-it-is-phone.vercel.app",
     cleartext: true,
     androidScheme: 'https'
   }
