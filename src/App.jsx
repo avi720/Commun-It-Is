@@ -1,24 +1,34 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AppProvider, useAppData } from './context/AppContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { usePushNotifications } from './Components/hooks/usePushNotifications';
 
 import MainLayout from './Components/MainLayout';
-import PublicDisplay from './Pages/PublicDisplay';
-import SendRide from './Pages/SendRide';
-import LoginPage from './Pages/LoginPage';
-import SettingsPage from './Pages/SettingsPage';
-import HomePage from './Pages/HomePage';
-import RegisterPage from './Pages/Register/RegisterPage';
-import OnboardingPage from './Pages/Register/OnboardingPage';
-import VerificationSuccess from './Pages/Register/VerificationSuccess';
-import CommitteeDashboard from './Pages/CommitteeDashboard';
 import CommitteeRoute from './Components/routes/CommitteeRoute';
-import PhoneBook from './Pages/PhoneBook';
-import NotificationsHistory from './Pages/NotificationsHistory';
+
+// טעינה עצלה (lazy) של הדפים - כל דף נטען רק כשנכנסים אליו,
+// מה שמקטין משמעותית את החבילה הראשונית ואת זמן הטעינה הראשון.
+const PublicDisplay = lazy(() => import('./Pages/PublicDisplay'));
+const SendRide = lazy(() => import('./Pages/SendRide'));
+const LoginPage = lazy(() => import('./Pages/LoginPage'));
+const SettingsPage = lazy(() => import('./Pages/SettingsPage'));
+const HomePage = lazy(() => import('./Pages/HomePage'));
+const RegisterPage = lazy(() => import('./Pages/Register/RegisterPage'));
+const OnboardingPage = lazy(() => import('./Pages/Register/OnboardingPage'));
+const VerificationSuccess = lazy(() => import('./Pages/Register/VerificationSuccess'));
+const CommitteeDashboard = lazy(() => import('./Pages/CommitteeDashboard'));
+const PhoneBook = lazy(() => import('./Pages/PhoneBook'));
+const NotificationsHistory = lazy(() => import('./Pages/NotificationsHistory'));
 
 const queryClient = new QueryClient();
+
+// מסך טעינה אחיד שמוצג בזמן שדף עצל נטען
+const PageLoader = () => (
+  <div className="h-screen w-full flex items-center justify-center bg-slate-900 text-teal-500">
+    <div className="text-2xl font-bold animate-pulse">טוען את הקהילה שלך...</div>
+  </div>
+);
 
 // רכיב שמגן על נתיבים ומוודא שהמשתמש סיים הרשמה
 const ProtectedRoute = ({ children }) => {
@@ -66,6 +76,7 @@ function AppRoutes() {
   }
 
   return (
+    <Suspense fallback={<PageLoader />}>
     <Routes>
       {/* אזור ציבורי - פתוח לכולם */}
       <Route path="/login" element={!isAuthenticated ? <LoginPage /> : <Navigate to="/" />} />
@@ -90,6 +101,7 @@ function AppRoutes() {
         // כל נתיב אחר זורק ללוגין
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
+    </Suspense>
   );
 }
 
