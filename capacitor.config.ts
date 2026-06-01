@@ -6,7 +6,7 @@ const config: CapacitorConfig = {
   webDir: 'dist',
   server: {
     // כתובת ה-Frontend המפורסם ב-Vercel (האפליקציה טוענת את אתר ה-Web)
-    url: "https://commun-it-is-phone.vercel.app",
+    url: "https://commun-it-is.vercel.app",
     cleartext: true,
     androidScheme: 'https'
   }
