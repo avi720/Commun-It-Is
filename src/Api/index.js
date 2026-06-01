@@ -18,6 +18,7 @@ export const avior = {
     auth: {
         signUp: auth.signUp,
         login: auth.login,
+        signInWithGoogle: auth.signInWithGoogle,
     },
 
     entities: {

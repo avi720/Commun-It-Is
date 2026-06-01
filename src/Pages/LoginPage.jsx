@@ -4,6 +4,7 @@ import { Mail, Lock, LogIn, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { avior } from "../Api/Client";
 import { useAppData } from '../context/AppContext';
+import GoogleSignInButton from '../Components/auth/GoogleSignInButton';
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -91,6 +92,14 @@ export default function LoginPage() {
               {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogIn className="w-4 h-4" />}
             </button>
           </form>
+
+          <div className="flex items-center gap-3 my-2">
+            <div className="h-px flex-1 bg-slate-700" />
+            <span className="text-xs text-slate-500">או</span>
+            <div className="h-px flex-1 bg-slate-700" />
+          </div>
+
+          <GoogleSignInButton label="התחבר עם Google" />
 
           <div className="text-center text-sm text-slate-400 mt-4 select-none">
             אין לך חשבון?{' '}

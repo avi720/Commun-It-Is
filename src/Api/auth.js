@@ -32,3 +32,22 @@ export async function login(email, password) {
     if (error) throw error;
     return data;
 }
+
+/**
+ * Start the Google OAuth login/sign-up flow.
+ * Redirects the browser to Google; on return, supabase-js detects the session
+ * from the URL and onAuthStateChange (SIGNED_IN) takes over in AppContext.
+ * New users are created automatically by the `sync_user_from_auth` DB trigger
+ * and routed to /onboarding to complete their profile.
+ * @returns {Promise<Object>} OAuth response data (contains the provider URL)
+ */
+export async function signInWithGoogle() {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+            redirectTo: window.location.origin
+        }
+    });
+    if (error) throw error;
+    return data;
+}
