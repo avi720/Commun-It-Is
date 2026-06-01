@@ -17,6 +17,7 @@ const HomePage = lazy(() => import('./Pages/HomePage'));
 const RegisterPage = lazy(() => import('./Pages/Register/RegisterPage'));
 const OnboardingPage = lazy(() => import('./Pages/Register/OnboardingPage'));
 const VerificationSuccess = lazy(() => import('./Pages/Register/VerificationSuccess'));
+const ResidentVerificationPending = lazy(() => import('./Pages/Register/ResidentVerificationPending'));
 const CommitteeDashboard = lazy(() => import('./Pages/CommitteeDashboard'));
 const PhoneBook = lazy(() => import('./Pages/PhoneBook'));
 const NotificationsHistory = lazy(() => import('./Pages/NotificationsHistory'));
@@ -86,7 +87,7 @@ function AppRoutes() {
       <Route path="/verification-success" element={<VerificationSuccess />} />
       {/* נתיב מיוחד להשלמת פרטים - נגיש רק למי שמחובר אבל חסר פרופיל */}
       <Route path="/onboarding" element={<OnboardingRoute><OnboardingPage /></OnboardingRoute>} />
-      <Route path="/resident-verification" element={<div className="min-h-screen bg-slate-950 flex items-center justify-center text-teal-500">הפרטים שלך נשלחו לבדיקה. תודה על הסבלנות!</div>} />
+      <Route path="/resident-verification" element={<ResidentVerificationPending />} />
 
       {/* אזור מוגן - רק למחוברים */}
       <Route path="/" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
