@@ -55,8 +55,8 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }) {
             for (let [key, value] of formData.entries()) {
                 console.log(`${key}: ${value}`);
             }
-            // שליחה לשרת
-            await avior.entities.Post.create(formData);
+            // שליחה לשרת (חובה להעביר את ה-session לאימות מול ה-backend)
+            await avior.entities.Post.create(formData, session);
             // איפוס הטופס וסגירה
             setContent('');
             clearImage();

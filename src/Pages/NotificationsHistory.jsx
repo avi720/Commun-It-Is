@@ -20,6 +20,9 @@ export default function NotificationsHistory() {
                 } finally {
                     setLoading(false);
                 }
+            } else {
+                // אין קהילה למשתמש — לא נשארים תקועים על מסך טעינה
+                setLoading(false);
             }
         };
 

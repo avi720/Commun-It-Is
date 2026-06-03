@@ -34,7 +34,7 @@ export default defineConfig({
     // 2. הגדרת הפרוקסי (הקסם קורה כאן)
     proxy: {
       '/api': {
-        target: 'https://commun-it-is.onrender.com', // הכתובת המקומית של השרת שלך
+        target: 'https://commun-it-is.vercel.app',
         changeOrigin: true,
         secure: false,
       }

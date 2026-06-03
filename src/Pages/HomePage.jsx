@@ -9,7 +9,7 @@ import CreatePostModal from '../Components/pagesComp/homePageComp/CreatePostModa
 import MainLayout from '@/Components/MainLayout';
 
 export default function HomePage() {
-  const { user } = useAppData();
+  const { user, session } = useAppData();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -31,16 +31,17 @@ export default function HomePage() {
     );
   };
 
-  // useEffect(() => {
-  //   // טוענים פוסטים רק אם יש משתמש ויש לו עיר
-  //   if (user && user.city) {
-  //     loadPosts();
-  //   }
-  // }, [user]);
+  useEffect(() => {
+    // טוענים את הפוסטים בעת כניסה לדף הבית וגם כשה-session מתעדכן.
+    // הסינון לפי הקהילה/עיר של המשתמש נעשה בצד השרת לפי הטוקן,
+    // ולכן מעבירים את ה-session. ה-finally מוודא ש-loading תמיד נסגר
+    // כדי לא להיתקע על ספינר אינסופי.
+    loadPosts();
+  }, [session]);
 
   const loadPosts = async () => {
     try {
-      const data = await avior.entities.Post.list();
+      const data = await avior.entities.Post.list(session);
       setPosts(data);
     } catch (error) {
       console.error("Error loading posts:", error);

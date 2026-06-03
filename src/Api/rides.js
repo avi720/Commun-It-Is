@@ -27,16 +27,20 @@ export async function create(rideData, session = null) {
 }
 
 /**
- * Get list of rides filtered by city
- * @param {string} userCity - City name to filter rides
+ * Get list of rides for the current user's community.
+ * הסינון לפי קהילה נעשה בצד השרת לפי הטוקן של המשתמש
+ * (ה-backend שולף את ה-community_id מהמשתמש המאומת),
+ * ולכן חובה לשלוח את ה-session, אחרת השרת יחזיר 401.
+ * @param {Object|null} session - Supabase session object with access_token
  * @returns {Promise<Array>} Array of ride objects
  */
-export async function list() {
+export async function list(session = null) {
     try {
-        const url = `${API_URL}/rides?city=${encodeURIComponent(userCity)}`;
-        const response = await fetch(url);
+        const url = `${API_URL}/rides`;
+        const response = await fetch(url, {
+            headers: getAuthHeaders(session),
+        });
 
-        console.log("Fetching rides from:", url);
         if (!response.ok) throw new Error(`Server error: ${response.status}`);
         return await response.json();
     } catch (error) {
