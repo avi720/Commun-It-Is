@@ -27,12 +27,14 @@ export async function createProfile(profileData) {
  * @param {Object|null} session - Supabase session object with access_token
  * @returns {Promise<Object>} Updated user data
  */
-export async function update(userData, session = null) {
+export async function update(userId, userData, session = null) {
     if (!session) return;
-    const response = await fetch(`${API_URL}/users`, {
+    // ה-backend מצפה ל-PUT /api/users/{user_id} עם שדות העדכון ישירות ב-body,
+    // ומאמת שהמשתמש מעדכן את עצמו לפי הטוקן.
+    const response = await fetch(`${API_URL}/users/${userId}`, {
         method: 'PUT',
-        headers: getAuthHeaders(session.access_token),
-        body: JSON.stringify({ user_data: userData })
+        headers: getAuthHeaders(session),
+        body: JSON.stringify(userData)
     });
 
     if (!response.ok) {

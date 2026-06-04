@@ -20,10 +20,28 @@ export function getAuthHeaders(session = null) {
     const headers = {
         'Content-Type': 'application/json',
     };
-    
+
     if (session?.access_token) {
         headers['Authorization'] = `Bearer ${session.access_token}`;
     }
-    
+
+    return headers;
+}
+
+/**
+ * Headers for multipart/form-data requests (file uploads).
+ * IMPORTANT: do NOT set Content-Type here — the browser must set it
+ * automatically together with the multipart boundary. We only attach
+ * the Authorization token.
+ * @param {Object|null} session - Supabase session object with access_token
+ * @returns {Object} Headers object with optional Authorization only
+ */
+export function getAuthHeadersMultipart(session = null) {
+    const headers = {};
+
+    if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`;
+    }
+
     return headers;
 }

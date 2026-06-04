@@ -15,3 +15,6 @@ __pycache__/
 
 # Vercel
 .vercel
+
+# Local dev helper (backend launcher without firebase, for ARM64 Windows)
+run_local_backend.py

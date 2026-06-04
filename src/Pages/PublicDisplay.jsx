@@ -9,7 +9,7 @@ import RideDetailsModal from "../Components/pagesComp/publicdisplay/RideDetailsM
 import NoRidesMessage from "../Components/pagesComp/publicdisplay/NoRidesMessage";
 
 export default function PublicDisplay() {
-    const { user } = useAppData();
+    const { user, session } = useAppData();
     const [selectedRide, setSelectedRide] = useState(null);
     const [currentTime, setCurrentTime] = useState(new Date());
     const containerRef = useRef(null);
@@ -24,9 +24,10 @@ export default function PublicDisplay() {
     const { data: rides = [] } = useQuery({
         queryKey: ['rides'],
         queryFn: async () => {
-            const allRides = await avior.entities.Ride.list();
+            const allRides = await avior.entities.Ride.list(session);
             return allRides;
         },
+        enabled: !!session,
         refetchInterval: 5000,
         initialData: []
     });

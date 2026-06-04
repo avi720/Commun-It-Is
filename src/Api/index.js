@@ -25,7 +25,7 @@ export const avior = {
         // Rides
         Ride: {
             create: (rideData, session) => rides.create(rideData, session),
-            list: rides.list,
+            list: (session) => rides.list(session),
         },
 
         // Users
@@ -37,8 +37,8 @@ export const avior = {
 
         // Posts
         Post: {
-            list: posts.list,
-            create: posts.create,
+            list: (session) => posts.list(session),
+            create: (formData, session) => posts.create(formData, session),
         },
 
         // Communities

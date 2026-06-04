@@ -18,11 +18,15 @@ export default function PhoneBook() {
                     // קריאה לפונקציה החדשה שיצרנו בקליינט
                     const data = await avior.phonebook.getContacts(user.community_id);
                     setContacts(data);
+                    setFilteredContacts(data); // הצגת כל אנשי הקשר כברירת מחדל (לפני חיפוש)
                 } catch (error) {
                     console.error("Failed to load phonebook:", error);
                 } finally {
                     setLoading(false);
                 }
+            } else {
+                // אין קהילה למשתמש — לא נשארים תקועים על מסך טעינה
+                setLoading(false);
             }
         };
         fetchContacts();

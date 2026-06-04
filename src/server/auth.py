@@ -46,9 +46,51 @@ def get_user_community_id(user_id: str = Depends(get_current_user_id)) -> str:
 
         if not user_res.data or not user_res.data[0]["community_id"]:
             raise HTTPException(status_code=400, detail="User has no community assigned")
-        
+
         return user_res.data[0]["community_id"]
-        
+
+    except HTTPException:
+        raise
     except Exception as e:
         print(f"Error fetching user community ID: {e}")
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+def get_committee_community_id(user_id: str = Depends(get_current_user_id)) -> str:
+    """
+    Dependency for committee-only actions.
+
+    Returns the caller's community_id, but ONLY if they are a committee member
+    of that community. Otherwise raises 403. The community is always derived
+    from the auth token (never trusted from the request body), so a committee
+    member can only act on their own community.
+    """
+    try:
+        user_res = (
+            supabase.table("users")
+            .select("community_id, community_role")
+            .eq("id", user_id)
+            .execute()
+        )
+
+        if not user_res.data:
+            raise HTTPException(status_code=403, detail="User not found")
+
+        row = user_res.data[0]
+
+        if row.get("community_role") != "committee":
+            raise HTTPException(
+                status_code=403,
+                detail="Only committee members can perform this action",
+            )
+
+        if not row.get("community_id"):
+            raise HTTPException(status_code=400, detail="User has no community assigned")
+
+        return row["community_id"]
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error verifying committee role: {e}")
         raise HTTPException(status_code=400, detail=str(e))

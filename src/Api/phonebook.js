@@ -8,10 +8,10 @@ import { supabase } from './config';
 export async function getContacts(communityId) {
     const { data, error } = await supabase
         .from('users')
-        .select('first_name, last_name, phone, city, street')
+        .select('id, firstName, lastName, phone, city, address')
         .eq('community_id', communityId)
         .eq('visible_on_phonebook', true)
-        .order('first_name');
+        .order('firstName');
 
     if (error) throw error;
     return data;
