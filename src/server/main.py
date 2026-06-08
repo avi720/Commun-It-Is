@@ -1,3 +1,5 @@
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -11,7 +13,16 @@ from .routes.users import router as users_router
 app = FastAPI()
 
 # --- CORS configuration ---
-origins = ["*"]
+# ALLOWED_ORIGINS is a comma-separated list set via env var.
+# In Vercel production, set it to the public URL (e.g. "https://commun-it-is.vercel.app").
+# When unset (local dev), default to the Vite dev server on port 5173.
+# IMPORTANT: never use "*" here while allow_credentials is True — that would let
+# any third-party site reach the API. The wildcard is blocked at the FastAPI layer.
+allowed_origins_env = os.getenv("ALLOWED_ORIGINS")
+if allowed_origins_env:
+    origins = [o.strip() for o in allowed_origins_env.split(",") if o.strip()]
+else:
+    origins = ["http://localhost:5173"]
 
 app.add_middleware(
     CORSMiddleware,

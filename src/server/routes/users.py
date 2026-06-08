@@ -10,21 +10,21 @@ from ..auth import get_current_user_id
 router = APIRouter(prefix="/api/users", tags=["users"])
 
 
-@router.get("")
-def get_all_users():
-    """
-    Helper endpoint to fetch all users.
-    """
-    response = supabase.table("users").select("*").execute()
-    return response.data
-
-
 @router.delete("/{user_id}")
-async def delete_user(user_id: str):
+async def delete_user(
+    user_id: str,
+    current_user_id: str = Depends(get_current_user_id),
+):
     """
-    Delete a user (and optionally related rides if not using CASCADE).
+    Delete a user. Only the authenticated user can delete their own profile —
+    the user_id in the URL must match the id derived from the auth token.
     """
     try:
+        if current_user_id != user_id:
+            raise HTTPException(
+                status_code=403, detail="You can only delete your own profile"
+            )
+
         # Optional: if CASCADE is not configured, delete rides first.
         # supabase.table("rides").delete().eq("user_id", user_id).execute()
 
@@ -37,6 +37,8 @@ async def delete_user(user_id: str):
 
         raise HTTPException(status_code=404, detail="User not found")
 
+    except HTTPException:
+        raise
     except Exception as e:
         print(f"Error deleting user: {e}")
         raise HTTPException(status_code=500, detail=str(e))
