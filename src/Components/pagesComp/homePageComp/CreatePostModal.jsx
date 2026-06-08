@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { X, Image as ImageIcon, Loader2, Send, Trash2 } from 'lucide-react';
 import { Button } from "@/Components/ui/button";
-import { avior } from '@/Api/Client';
+import { avior } from '@/Api';
 import { useAppData } from '@/context/AppContext';
 
 export default function CreatePostModal({ isOpen, onClose, onPostCreated }) {
@@ -50,10 +50,6 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }) {
             }
             if (selectedFile) {
                 formData.append('image', selectedFile); // שליחת הקובץ
-            }
-            console.log("Submitting post with data:");
-            for (let [key, value] of formData.entries()) {
-                console.log(`${key}: ${value}`);
             }
             // שליחה לשרת (חובה להעביר את ה-session לאימות מול ה-backend)
             await avior.entities.Post.create(formData, session);

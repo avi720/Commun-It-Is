@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, CheckCircle2, ArrowRight, ArrowLeft, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/Components/ui/card";
-import { avior } from '@/Api/Client';
+import { avior } from '@/Api';
 import { Button } from "@/Components/ui/button";
 import VerificationEmailSent from '@/Components/pagesComp/registerPage/VerificationEmailSent';
 import GoogleSignInButton from '@/Components/auth/GoogleSignInButton';

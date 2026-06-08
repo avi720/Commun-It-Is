@@ -109,7 +109,7 @@ ID convention: `T##` numbered globally across phases. Where a finding was confir
 - **Issue:** Overlaps with [`docs/UI-AUDIT.md`](UI-AUDIT.md) F16. Tech-debt angle: every screen invents its own error pattern because there is no shared error UI to consolidate around. Also blocks observability — there is no central place to forward these to a tracker.
 - **Acceptance:** Single toast provider mounted at the app root (`sonner` or equivalent pure-JS library — no native deps, per the ARM64 constraint). All 18 `alert()` / `confirm()` call sites replaced with `toast.error(...)` / `toast.success(...)` / a proper confirmation-dialog primitive for destructive actions. Same primitives used everywhere.
 
-#### [ ] T10. 40 `console.log/error/warn` calls in production code, one leaks the session token
+#### [x] T10. 40 `console.log/error/warn` calls in production code, one leaks the session token
 - **Where:** 20 files. The most serious instance is `src/context/AppContext.jsx:34` — `console.log("Session found:", currentSession)` prints the full Supabase `access_token` and `refresh_token` to the browser console on every page load.
 - **Issue:** Information leak in the worst case (browser extensions, shoulder-surfing, screencasts that capture devtools). Noise in the general case — real errors are harder to spot. No central place to forward errors to a tracker (see T19).
 - **Acceptance:** All `console.log` removed or guarded by `if (import.meta.env.DEV)`. `console.error` retained only where it adds debugging information beyond what the user sees in the toast UI (T9). Verified — no token-shaped string appears in the production console across the full set of routes.
@@ -129,7 +129,7 @@ ID convention: `T##` numbered globally across phases. Where a finding was confir
 - **Issue:** Same JSX appears twice. If the brand colour or copy changes, only one of them gets updated.
 - **Acceptance:** Single `PageLoader` component used in both call sites.
 
-#### [ ] T14. `src/Api/Client.js` is a 3-line backward-compat shim
+#### [x] T14. `src/Api/Client.js` is a 3-line backward-compat shim
 - **Where:** `src/Api/Client.js` simply re-exports `supabase, avior` from `./index`.
 - **Issue:** Dead indirection. Every consumer either imports from `Client.js` or from `index.js` — there are two import paths for the same symbols, no behavioural difference.
 - **Acceptance:** All imports updated to `from '../Api'` (or `@/Api`). `Client.js` deleted. Build and lint pass.
@@ -144,12 +144,12 @@ ID convention: `T##` numbered globally across phases. Where a finding was confir
 - **Issue:** Mixes three tabs (businesses, residents, settings), a notification-send modal, three direct Supabase fetches, and tab-switching UI in one file. Adding a fourth tab — e.g., reports — would make it unmanageable. Also makes T8 (React Query migration) harder because there are three fetches to convert at once.
 - **Acceptance:** Split into `BusinessesTab.jsx`, `ResidentsTab.jsx`, `CommunitySettingsTab.jsx`, plus a `SendCommitteeMessageModal.jsx`. Each tab owns its data fetch via React Query (combines with T8). Top-level `CommitteeDashboard.jsx` under 100 lines and contains only the tab shell.
 
-#### [ ] T17. Duplicate `requirements.txt`, one of them UTF-16 encoded
+#### [x] T17. Duplicate `requirements.txt`, one of them UTF-16 encoded
 - **Where:** Root `/requirements.txt` (5 packages, no version pins) and `src/server/requirements.txt` (~75 packages, UTF-16 LE with BOM and spaces between every letter — clearly produced by `pip freeze > file.txt` from default-encoding PowerShell).
 - **Issue:** Two sources of truth for backend dependencies. Vercel resolves one of them (root, by convention). The other is dead noise that looks authoritative because it has version pins. The encoding is broken — `cat` shows characters with leading spaces.
 - **Acceptance:** `src/server/requirements.txt` deleted. Root `requirements.txt` pinned to known-good versions (e.g., `fastapi==0.124.0`, `supabase==2.27.1`, `firebase-admin==7.1.0`, `python-dotenv==1.2.1`, `python-multipart==0.0.21`). Verified — `vercel build` succeeds with the pinned versions.
 
-#### [ ] T18. `.env.example` referenced in README but presence unverified
+#### [x] T18. `.env.example` referenced in README but presence unverified
 - **Where:** `README.md:26` — "העתק את `.env.example` ל-`.env`".
 - **Issue:** No `.env.example` is visible in the repo root listing. If it does not exist, every new contributor (and every fresh Vercel project import) has to guess env-var names by grepping the codebase.
 - **Acceptance:** `.env.example` exists in the repo root, committed to git, and lists every env var the app uses (`VITE_SUPABASE_URL`, `VITE_SUPABASE_KEY`, `VITE_SUPABASE_SERVICE_KEY`, `VITE_GOOGLE_MAPS_API_KEY`, `VITE_API_URL`, `FIREBASE_CREDENTIALS`) with placeholder values and a one-line comment per var.

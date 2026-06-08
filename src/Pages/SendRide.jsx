@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { avior } from "../Api/Client";
+import { avior } from "../Api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CardContent, CardTitle, CardDescription } from "@/Components/ui/card";
 import { motion } from "framer-motion";

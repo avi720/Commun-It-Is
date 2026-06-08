@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppData } from '@/context/AppContext';
 import CitySelect from '@/Components/common/CitySelect';
 import CommunitiesList from '@/Components/pagesComp/onBoarding/CommunitiesList';
-import { avior } from "@/Api/Client";
+import { avior } from "@/Api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 
 export default function OnboardingPage() {
@@ -64,7 +64,6 @@ export default function OnboardingPage() {
     try {
       await avior.entities.User.createProfile(completeData);
       await avior.entities.communities.joinByName(selectedCommunityName);
-      console.log("שולח נתונים מלאים לשרת...", completeData);
 
       await refresh();
 
@@ -75,9 +74,6 @@ export default function OnboardingPage() {
       } else {
         alert("שגיאה: " + error.message);
       }
-    } finally {
-      console.log("המשתמש נוצר ונשמר בהצלחה!");
-      //navigate('/'); // הפניה לדף הבית לאחר ההרשמה
     }
   };
 

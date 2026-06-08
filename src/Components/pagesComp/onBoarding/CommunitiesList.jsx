@@ -1,4 +1,4 @@
-import { avior } from "@/Api/Client";
+import { avior } from "@/Api";
 import React, { useEffect, useState } from 'react';
 import { Users, Search, Check } from 'lucide-react';
 

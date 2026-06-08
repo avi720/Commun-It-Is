@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { supabase, avior } from '../Api/Client';
+import { supabase, avior } from '../Api';
 
 const AppContext = createContext();
 
@@ -31,7 +31,6 @@ export function AppProvider({ children }) {
                 if (showLoader) setIsLoading(false);
                 return;
             }
-            console.log("Session found:", currentSession);
             const { data: profile, error } = await supabase
                 .from('users')
                 .select('*')
@@ -70,7 +69,6 @@ export function AppProvider({ children }) {
             const storedToken = localStorage.getItem('fcm_token');
             if (storedToken && profile && currentSession) {
                 avior.notifications.updateToken(storedToken, currentSession)
-                    .then(() => console.log("FCM Token updated"))
                     .catch(err => console.error("Token update failed", err));
             }
 

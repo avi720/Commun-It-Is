@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAppData } from '../context/AppContext';
-import { avior } from '../Api/Client';
+import { avior } from '../Api';
 import { Search, Phone, MessageCircle } from 'lucide-react';
 
 

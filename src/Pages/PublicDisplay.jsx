@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { avior } from "../Api/Client";
+import { avior } from "../Api";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence } from "framer-motion";
 import { useAppData } from '../context/AppContext';

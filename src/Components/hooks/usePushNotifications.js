@@ -8,7 +8,6 @@ export const usePushNotifications = () => {
             if (Capacitor.isNativePlatform()) {
                 try {
                     await PushNotifications.addListener('registration', token => {
-                        console.info('Push registration success, token: ' + token.value);
                         localStorage.setItem('fcm_token', token.value);
                     });
 

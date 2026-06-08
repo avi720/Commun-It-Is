@@ -3,7 +3,7 @@ import { Building, Users, Star, Plus, Loader2 } from 'lucide-react';
 import { Button } from "@/Components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { useAppData } from '../context/AppContext';
-import { avior } from '../Api/Client';
+import { avior } from '../Api';
 import FeedPosts from '../Components/pagesComp/homePageComp/FeedPosts';
 import CreatePostModal from '../Components/pagesComp/homePageComp/CreatePostModal';
 import MainLayout from '@/Components/MainLayout';

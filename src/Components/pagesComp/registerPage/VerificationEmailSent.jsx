@@ -1,7 +1,7 @@
 import React, { } from 'react';
 import { Mail, CheckCircle2, ArrowRight } from 'lucide-react';
 import { useAppData } from '@/context/AppContext';
-import { avior } from '@/Api/Client';
+import { avior } from '@/Api';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/Components/ui/card";
 import { Button } from "@/Components/ui/button";
 

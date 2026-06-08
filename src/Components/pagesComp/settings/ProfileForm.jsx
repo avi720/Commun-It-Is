@@ -3,7 +3,7 @@ import { User, MapPin, Phone, Save, Loader2 } from 'lucide-react';
 import { Input } from "@/Components/ui/input";
 import { Button } from "@/Components/ui/button";
 import { Label } from "@/Components/ui/label";
-import { avior } from '@/Api/Client';
+import { avior } from '@/Api';
 import { useAppData } from '@/context/AppContext';
 
 export default function ProfileForm({ user, onSave }) {

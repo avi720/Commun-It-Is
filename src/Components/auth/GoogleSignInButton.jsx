@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Loader2 } from 'lucide-react';
-import { avior } from '@/Api/Client';
+import { avior } from '@/Api';
 
 // לוגו Google רשמי (SVG) — אין אייקון מותג ב-lucide
 function GoogleLogo({ className }) {

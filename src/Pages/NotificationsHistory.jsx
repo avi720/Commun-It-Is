@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAppData } from '../context/AppContext';
-import { avior } from '../Api/Client';
+import { avior } from '../Api';
 import { Bell, Calendar, User, AlertTriangle, Info } from 'lucide-react';
 import { formatDate } from '../lib/utils'; // וודא שיש לך פונקציה כזו או תשתמש ב-new Date().toLocaleDateString()
 

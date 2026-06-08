@@ -15,8 +15,6 @@ export async function createProfile(profileData) {
     if (error) {
         console.error('Error updating profile:', error.message);
         alert('שגיאה בשמירת הפרטים');
-    } else {
-        console.log('Profile updated successfully!');
     }
 }
 

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/Components/ui/card";
 import { Mail, Lock, LogIn, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { avior } from "../Api/Client";
+import { avior } from "../Api";
 import { useAppData } from '../context/AppContext';
 import GoogleSignInButton from '../Components/auth/GoogleSignInButton';
 

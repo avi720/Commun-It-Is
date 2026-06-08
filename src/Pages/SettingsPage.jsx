@@ -4,7 +4,7 @@ import ProfileForm from '../Components/pagesComp/settings/ProfileForm';
 import DangerZone from '../Components/pagesComp/settings/DangerZone';
 import { motion } from 'framer-motion';
 import { CheckCircle, XCircle } from 'lucide-react';
-import { avior } from '../Api/Client';
+import { avior } from '../Api';
 
 export default function SettingsPage() {
     // 2. שולפים הכל מהקונטקסט המרכזי
