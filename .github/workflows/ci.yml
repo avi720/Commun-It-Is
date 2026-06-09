@@ -66,4 +66,12 @@ jobs:
           pip install -r requirements.txt -r requirements-dev.txt
 
       - name: Run pytest
+        # src/server/config.py זורק ValueError בזמן import אם משתני סביבה חסרים.
+        # הבדיקות מוקקות את supabase ב-conftest, אבל ה-import עצמו רץ קודם —
+        # ולכן צריך ערכי דמי בלבד כדי לעבור את ה-truthiness check. הערכים האלה
+        # לא משמשים בפועל לשום בקשה אמיתית; אסור להכניס פה ערכים אמיתיים.
+        env:
+          VITE_SUPABASE_URL: 'http://localhost:54321'
+          VITE_SUPABASE_SERVICE_KEY: 'fake-test-key'
+          FIREBASE_CREDENTIALS: '{"type":"service_account"}'
         run: pytest tests/server -v
