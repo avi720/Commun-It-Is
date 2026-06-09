@@ -9,6 +9,23 @@ import { avior } from '../Api';
 import FeedPosts from '../Components/pagesComp/homePageComp/FeedPosts';
 import CreatePostModal from '../Components/pagesComp/homePageComp/CreatePostModal';
 
+// FAB חוצה רנדורים — מוגדר ברמת מודול ולא בתוך HomePage כדי שלא ייווצר טיפוס
+// קומפוננטה חדש בכל רינדור (rule: react-hooks/static-components).
+function FloatingActionButton({ onClick, isSidebarOpen }) {
+  return !isSidebarOpen ? (
+    <Button
+      onClick={onClick}
+      className="fixed bottom-16 left-6 w-14 h-14 rounded-full bg-teal-500 hover:bg-teal-600 shadow-lg shadow-teal-500/30 flex items-center justify-center z-50 transition-transform hover:scale-105"
+    >
+      <Plus className="w-8 h-8 text-white" />
+    </Button>
+  ) : (
+    <div className="fixed bottom-16 left-6 w-14 h-14 rounded-full bg-teal-500/60 hover:bg-teal-600 shadow-lg shadow-teal-500/30 flex items-center justify-center z-50 transition-transform hover:scale-105">
+      <Plus className="w-4 h-4 text-gray-400" />
+    </div>
+  );
+}
+
 export default function HomePage() {
   const { user, session } = useAppData();
   // מצב הסיידבר מועבר מ-MainLayout דרך Outlet context (ראה docs/ARCHITECTURE.md)
@@ -27,22 +44,6 @@ export default function HomePage() {
   // אחרי יצירת פוסט חדש — מבטלים את ה-cache כדי שהפיד יתרענן.
   const handlePostCreated = () => {
     queryClient.invalidateQueries({ queryKey: ['posts', user?.community_id] });
-  };
-
-  const FloatingActionButton = ({ onClick }) => {
-    return (!isSidebarOpen ? (
-      <Button
-        onClick={onClick}
-        className="fixed bottom-16 left-6 w-14 h-14 rounded-full bg-teal-500 hover:bg-teal-600 shadow-lg shadow-teal-500/30 flex items-center justify-center z-50 transition-transform hover:scale-105"
-      >
-        <Plus className="w-8 h-8 text-white" />
-      </Button>)
-      : (
-        <div className="fixed bottom-16 left-6 w-14 h-14 rounded-full bg-teal-500/60 hover:bg-teal-600 shadow-lg shadow-teal-500/30 flex items-center justify-center z-50 transition-transform hover:scale-105">
-          <Plus className="w-4 h-4 text-gray-400" />
-        </div>
-      )
-    );
   };
 
   return (
@@ -77,7 +78,7 @@ export default function HomePage() {
         )}
       </div>
       {/* כפתור הוספה */}
-      <FloatingActionButton onClick={() => setIsModalOpen(true)} />
+      <FloatingActionButton onClick={() => setIsModalOpen(true)} isSidebarOpen={isSidebarOpen} />
 
       <CreatePostModal
         isOpen={isModalOpen}

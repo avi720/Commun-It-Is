@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { User, MapPin, Calendar, CheckCircle, Home, Lock, Phone, RefreshCcw, LogOut, Users, Search, Check } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { User, MapPin, Calendar, CheckCircle, Phone, LogOut } from 'lucide-react';
 import { useAppData } from '@/context/AppContext';
 import CitySelect from '@/Components/common/CitySelect';
 import CommunitiesList from '@/Components/pagesComp/onBoarding/CommunitiesList';
@@ -10,7 +9,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 
 export default function OnboardingPage() {
   const { refresh, logout } = useAppData();
-  const navigate = useNavigate();
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     firstName: '',
@@ -131,7 +129,7 @@ export default function OnboardingPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs text-slate-400 mr-1">רחוב ומס' בית</label>
+              <label className="text-xs text-slate-400 mr-1">רחוב ומס&apos; בית</label>
               <div className="relative">
                 <MapPin className="absolute right-3 top-2.5 h-4 w-4 text-slate-500" />
                 <input

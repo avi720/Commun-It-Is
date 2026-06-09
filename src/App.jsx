@@ -32,7 +32,7 @@ const PageLoader = () => (
 );
 
 function AppRoutes() {
-  const { isAuthenticated, isLoading, user } = useAppData();
+  const { isAuthenticated, isLoading } = useAppData();
   if (isLoading) {
     return <PageLoader />;
   }

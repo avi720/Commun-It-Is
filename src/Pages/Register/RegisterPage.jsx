@@ -45,7 +45,7 @@ export default function RegisterPage() {
     }
 
     // 1. בדיקת תו מיוחד (בודק אם יש לפחות אחד מהתווים האלו)
-    const specialCharRegex = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
+    const specialCharRegex = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/;
     // 2. בדיקת מספר (בודק אם יש ספרה 0-9)
     const numberRegex = /\d/;
 

@@ -80,10 +80,10 @@ ID convention: `T##` numbered globally across phases. Where a finding was confir
 - **Issue:** Browsers ignore credentialed requests against wildcard origin, so the misconfiguration *appears* harmless — but it explicitly invites any third-party site to perform anonymous fetches against the API. Combined with T1 and T2, that is a one-click data-harvester for any attacker who learns the URL.
 - **Acceptance:** `origins` is read from an env var (production: the Vercel URL only; dev: `http://localhost:5173` only). Verified by sending a request with `Origin: https://evil.example.com` and seeing the response missing the `Access-Control-Allow-Origin` header.
 
-#### [ ] T5. No CI gate on `main` — Vercel auto-deploys unchecked code
+#### [x] T5. No CI gate on `main` — Vercel auto-deploys unchecked code
 - **Where:** No `.github/workflows/` directory exists.
-- **Issue:** **Deferred 2026-06-08** — a build-only CI workflow duplicates the `npm run build` that Vercel already runs before every deploy, so this finding is on hold pending an ESLint configuration in the repo. Re-evaluate once a flat `eslint.config.js` exists and `npm run lint` exits 0; at that point CI starts catching things `vite build` does not (the JSX-comment hazard at `src/App.jsx:102`, undefined-symbol bugs like the historic `avior` reference in T3, etc.). Original issue: push to `main` triggers a Vercel deploy with zero pre-flight checks. Lint, type-check, and build all currently rely on the developer remembering to run them locally.
-- **Acceptance:** `.github/workflows/ci.yml` runs `npm ci`, `npm run lint`, and `npm run build` on every push and PR. Branch protection on `main` requires the workflow to pass. Verified by intentionally breaking a file and seeing the workflow fail.
+- **Issue:** push to `main` triggers a Vercel deploy with zero pre-flight checks. Lint, type-check, and build all currently rely on the developer remembering to run them locally.
+- **Acceptance:** `.github/workflows/ci.yml` runs `npm ci`, `npm run lint`, and `npm run build` on every push and PR. Branch protection on `main` requires the workflow to pass. Verified by intentionally breaking a file and seeing the workflow fail. *(Closed 2026-06-09: workflow added with two jobs — frontend (lint + build + vitest + npm audit non-blocking) and backend (pytest). ESLint 9 flat config tuned for codebase patterns: `no-alert` blocks T9 regressions, `no-console` blocks T10, `react/jsx-no-comment-textnodes` blocks T12, `no-unused-expressions` blocks T25. Baseline lint pass: 0 errors, 8 informational warnings. Branch protection not enabled per single-user proprietary project preference; CI reports status on commits but doesn't block deploys.)*
 
 #### [x] T6. `docs/UI-AUDIT.md` is untracked in git
 - **Where:** `docs/UI-AUDIT.md` (only on the working tree per `git status` at session start).
@@ -172,10 +172,10 @@ ID convention: `T##` numbered globally across phases. Where a finding was confir
   3. `vitest` for `src/App.jsx` route guards — `ProtectedRoute`, `OnboardingRoute`, `CommitteeRoute` redirect correctly for each user state.
   The CI from T5 runs these on every PR.
 
-#### [ ] T21. No `npm audit` automation
+#### [x] T21. No `npm audit` automation
 - **Where:** No CI step exists.
-- **Issue:** ~~Deferred 2026-06-09 — bundled with T5. The `npm audit` step attaches to a CI workflow that doesn't exist yet; re-evaluate when T5 lands.~~ Supply-chain vulnerabilities in transitive deps surface only when the developer remembers to run `npm audit` locally.
-- **Acceptance:** A non-blocking `npm audit --audit-level=high` step in the CI workflow from T5, with results visible on each PR. Verified — a known-vulnerable dep produces a PR comment or a failing check.
+- **Issue:** Supply-chain vulnerabilities in transitive deps surface only when the developer remembers to run `npm audit` locally.
+- **Acceptance:** A non-blocking `npm audit --audit-level=high` step in the CI workflow from T5, with results visible on each PR. Verified — a known-vulnerable dep produces a PR comment or a failing check. *(Closed 2026-06-09: attached to the frontend job in `.github/workflows/ci.yml` with `continue-on-error: true` so CVEs in transitive deps surface without breaking deploys. Currently reporting 13 vulnerabilities — 10 high + 3 moderate — to investigate separately.)*
 
 #### [x] T22. No architecture documentation for the two data paths
 - **Where:** No `docs/ARCHITECTURE.md`.

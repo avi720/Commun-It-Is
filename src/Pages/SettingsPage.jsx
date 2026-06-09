@@ -28,7 +28,7 @@ export default function SettingsPage() {
 
             setMessage({ type: 'success', text: 'הפרטים נשמרו בהצלחה!' });
             setTimeout(() => setMessage(null), 3000);
-        } catch (e) {
+        } catch {
             setMessage({ type: 'error', text: 'שגיאה בשמירת הנתונים' });
         }
     };

@@ -7,12 +7,15 @@ export default function CitySelect({ value, onChange, placeholder = "בחר יי
     const [allCities, setAllCities] = useState([]);
     const [suggestions, setSuggestions] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
+    // isLoading עכשיו באמת מתחלף בזמן ה-fetch — בעבר הוא היה מוגדר אבל setIsLoading
+    // לא נקרא אף פעם, כך שהלואדר לא הציג כלום (ESLint תפס את זה).
     const [isLoading, setIsLoading] = useState(false);
     const wrapperRef = useRef(null);
 
     // 1. טעינת רשימת הערים מהמאגר הממשלתי בעלייה
     useEffect(() => {
         const fetchCities = async () => {
+            setIsLoading(true);
             try {
                 // משיכת נתונים מ-data.gov.il (רשימת יישובים)
                 const resourceId = '5c78e9fa-c2e2-4771-93ff-7f400a12f7ba'; // מזהה המאגר
@@ -21,7 +24,7 @@ export default function CitySelect({ value, onChange, placeholder = "בחר יי
 
                 const response = await fetch(url);
                 const data = await response.json();
-                
+
                 // עיבוד הנתונים: שליפת שם היישוב וניקוי רווחים מיותרים
                 const cities = data.result.records
                     .map(record => record['שם_ישוב'].trim())
@@ -32,6 +35,8 @@ export default function CitySelect({ value, onChange, placeholder = "בחר יי
             } catch (error) {
                 console.error("Failed to fetch cities:", error);
                 // במקרה של תקלה אפשר להשתמש ברשימה מקומית קטנה לגיבוי אם רוצים
+            } finally {
+                setIsLoading(false);
             }
         };
 

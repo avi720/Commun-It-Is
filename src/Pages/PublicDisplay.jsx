@@ -9,7 +9,7 @@ import RideDetailsModal from "../Components/pagesComp/publicdisplay/RideDetailsM
 import NoRidesMessage from "../Components/pagesComp/publicdisplay/NoRidesMessage";
 
 export default function PublicDisplay() {
-    const { user, session } = useAppData();
+    const { session } = useAppData();
     const [selectedRide, setSelectedRide] = useState(null);
     const [currentTime, setCurrentTime] = useState(new Date());
     const containerRef = useRef(null);

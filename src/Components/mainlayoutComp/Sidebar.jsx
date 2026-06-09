@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom'; // <--- הוקים לניווט
 import { Home, Car, Monitor, Send, Settings, X, ChevronDown, ChevronUp, LogOut, Shield, BookUser, Bell } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useAppData } from '@/context/AppContext';
 
 export default function Sidebar({ onLogout, isSidebarOpen, closeSidebar }) {

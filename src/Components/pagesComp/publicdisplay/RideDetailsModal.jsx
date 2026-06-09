@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import { X, MapPin, Calendar, User, Phone } from 'lucide-react'; // או כל ספריית אייקונים שיש לך
 import { Button } from "@/Components/ui/button";
 import { formatRideTime } from "@/lib/utils";
-import { formatDate } from 'date-fns';
 
 export default function RideDetailsModal({ ride, onClose }) {
     if (!ride) return null;
