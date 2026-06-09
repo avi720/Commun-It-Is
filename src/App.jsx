@@ -6,6 +6,8 @@ import { usePushNotifications } from './Components/hooks/usePushNotifications';
 
 import MainLayout from './Components/MainLayout';
 import CommitteeRoute from './Components/routes/CommitteeRoute';
+import ProtectedRoute from './Components/routes/ProtectedRoute';
+import OnboardingRoute from './Components/routes/OnboardingRoute';
 
 // טעינה עצלה (lazy) של הדפים - כל דף נטען רק כשנכנסים אליו,
 // מה שמקטין משמעותית את החבילה הראשונית ואת זמן הטעינה הראשון.
@@ -28,41 +30,6 @@ const PageLoader = () => (
     <div className="text-2xl font-bold animate-pulse">טוען את הקהילה שלך...</div>
   </div>
 );
-
-// רכיב שמגן על נתיבים ומוודא שהמשתמש סיים הרשמה
-const ProtectedRoute = ({ children }) => {
-  const { user, isAuthenticated, isLoading } = useAppData();
-
-  if (isLoading) return <div className="min-h-screen bg-slate-950 flex items-center justify-center text-teal-500">טוען...</div>;
-
-  // 1. אם לא מחובר -> לך להתחבר
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
-  // 2. אם מחובר אבל אין פרטים (הדגל שיצרנו ב-Context) -> לך להשלים פרטים
-  if (user?.isIncomplete) {
-    return <Navigate to="/onboarding" replace />;
-  }
-
-  if (user?.is_verified_as_resident === false) {
-    return <Navigate to="/resident-verification" replace />;
-  }
-
-  return children;
-};
-
-// רכיב להשלמת פרטים: רק למחוברים שאין להם פרופיל
-const OnboardingRoute = ({ children }) => {
-  const { isAuthenticated, user, isLoading } = useAppData();
-
-  if (isLoading) return null;
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
-  // אם המשתמש כבר שלם, אין לו מה לחפש פה -> לך הביתה
-  if (isAuthenticated && !user?.isIncomplete) return <Navigate to="/" replace />;
-
-  return children;
-};
 
 function AppRoutes() {
   const { isAuthenticated, isLoading, user } = useAppData();

@@ -94,7 +94,7 @@ ID convention: `T##` numbered globally across phases. Where a finding was confir
 
 ### Phase 2 — Important (architectural cleanup & correctness)
 
-#### [ ] T7. Two parallel data paths with different auth surfaces
+#### [x] T7. Two parallel data paths with different auth surfaces
 - **Where:** Rides, posts, notification-send, fcm-token update go through `client → avior (fetch) → FastAPI → Supabase`. Communities (`getAll`, `joinByName`), phonebook contacts, notification *history*, all data fetches in `CommitteeDashboard`, and `users.js:createProfile` go through `client → supabase-js → Supabase` directly.
 - **Issue:** Two auth surfaces. FastAPI side enforces role checks in Python. Client-direct side relies on Supabase **Row Level Security** policies that are not documented in this repo. If RLS is weak or missing for any table touched by the direct path (`businesses`, `users`, `communities`, `important_notifications`), a curious committee member can read or mutate other communities' data and the codebase would never reveal it.
 - **Acceptance:** A documented RLS policy exists for every table accessed directly from the client. Or all writes are routed through FastAPI and direct client access is limited to read-only views. Decision recorded in `docs/ARCHITECTURE.md` (see T22).
@@ -163,7 +163,7 @@ ID convention: `T##` numbered globally across phases. Where a finding was confir
 
 ### Phase 3 — Polish (test, dependency, documentation hygiene)
 
-#### [ ] T20. Zero automated tests for either layer
+#### [x] T20. Zero automated tests for either layer
 - **Where:** App-wide. No `vitest.config.*`, no `jest.config.*`, no `pytest.ini`, no `tests/` directory.
 - **Issue:** No safety net for committee-role enforcement, no regression coverage for the ride-expiration time math at `src/server/routes/rides.py:33-49`, no contract test that the auth dependencies block unauthenticated callers.
 - **Acceptance:** Three minimal test suites added (do not chase coverage targets — chase risk):
@@ -174,7 +174,7 @@ ID convention: `T##` numbered globally across phases. Where a finding was confir
 
 #### [ ] T21. No `npm audit` automation
 - **Where:** No CI step exists.
-- **Issue:** Supply-chain vulnerabilities in transitive deps surface only when the developer remembers to run `npm audit` locally.
+- **Issue:** ~~Deferred 2026-06-09 — bundled with T5. The `npm audit` step attaches to a CI workflow that doesn't exist yet; re-evaluate when T5 lands.~~ Supply-chain vulnerabilities in transitive deps surface only when the developer remembers to run `npm audit` locally.
 - **Acceptance:** A non-blocking `npm audit --audit-level=high` step in the CI workflow from T5, with results visible on each PR. Verified — a known-vulnerable dep produces a PR comment or a failing check.
 
 #### [x] T22. No architecture documentation for the two data paths
@@ -209,6 +209,11 @@ These were noted during the audit but need product or security decisions before 
 - **Where:** `src/main.jsx:8,21-23` created one `QueryClient` and provider; `src/App.jsx:25,112` created a second `QueryClient` and a nested provider.
 - **Issue:** Pages calling `useQueryClient()` got App.jsx's instance while main.jsx's instance stayed live and unused. Wasted memory, confusing semantics if anyone tried to set defaults on either, and a footgun for the React Query migration in Batch 2 of this plan (cache keys would silently belong to whichever client was nearest in the tree).
 - **Acceptance:** Single `QueryClient` in `src/main.jsx` with `defaultOptions = { queries: { staleTime: 30_000, refetchOnWindowFocus: false } }`. `App.jsx` no longer imports or instantiates anything from `@tanstack/react-query`. Build passes.
+
+#### [x] T27. Route guards `ProtectedRoute` and `OnboardingRoute` defined inline in `src/App.jsx`
+- **Where:** `src/App.jsx` (lines 32-64 historically). `CommitteeRoute` was already in its own file under `src/Components/routes/`; `ProtectedRoute` / `OnboardingRoute` were not.
+- **Issue:** The three route guards belong to the same conceptual layer but only one had its own file. Inconsistent organization, and more importantly — the two inline guards couldn't be unit-tested without rendering the whole App.
+- **Acceptance:** `ProtectedRoute` extracted to `src/Components/routes/ProtectedRoute.jsx`. `OnboardingRoute` extracted to `src/Components/routes/OnboardingRoute.jsx`. App.jsx imports both. All three guards covered by `src/Components/routes/routes.test.jsx` (12 vitest cases, all passing).
 
 #### [x] T26. Dead `formatDate` import in `NotificationsHistory.jsx` produces a build warning
 - **Where:** `src/Pages/NotificationsHistory.jsx:5` — `import { formatDate } from '../lib/utils';`. `src/lib/utils.js` exports `cn` and `formatRideTime` only; `formatDate` doesn't exist.

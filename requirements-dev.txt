@@ -1,0 +1,9 @@
+# Dev-only Python dependencies for backend tests (NOT installed by Vercel).
+# Install locally with:  pip install -r requirements-dev.txt
+#
+# Vercel installs only the root requirements.txt — these stay separate so the
+# serverless function bundle stays small.
+
+pytest==8.3.4
+pytest-asyncio==0.25.0
+httpx==0.28.1
