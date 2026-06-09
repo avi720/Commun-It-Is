@@ -1,10 +1,32 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
-import { Car, MapPin, Send, Home, Navigation, Loader2, Clock, Users } from "lucide-react";
+import { Car, MapPin, Send, Loader2, Clock, Users } from "lucide-react";
 import { formatRideTime } from "@/lib/utils";
 import Location from "./rideform/location";
+
+// חישוב מסגרת הזמנים ההתחלתית — היום, +שבוע, וגם תאריך/שעה ראשוניים
+// מתוך departureTime. רץ פעם אחת ב-mount דרך lazy useState (במקום useEffect).
+function getInitialBounds(departureTime) {
+    const target = departureTime || new Date();
+    const offset = target.getTimezoneOffset() * 60000;
+    const localISO = (new Date(target - offset)).toISOString().slice(0, -1);
+
+    const now = new Date();
+    const nowLocal = (new Date(now - offset)).toISOString().slice(0, -1);
+
+    const nextWeek = new Date(now);
+    nextWeek.setDate(now.getDate() + 7);
+    const nextWeekLocal = (new Date(nextWeek - offset)).toISOString().slice(0, -1);
+
+    return {
+        initialDate: localISO.split('T')[0],
+        initialTime: localISO.split('T')[1].slice(0, 5),
+        minDate: nowLocal.split('T')[0],
+        maxDate: nextWeekLocal.split('T')[0],
+    };
+}
 
 export default function RideForm({
     user, // מקבלים את המשתמש מהאבא
@@ -21,34 +43,12 @@ export default function RideForm({
     onSubmit,
     isSubmitting
 }) {
-    // ניהול נפרד של השדות בטופס (מחרוזות)
-    const [dateStr, setDateStr] = useState("");
-    const [timeStr, setTimeStr] = useState("");
-    const [minDate, setMinDate] = useState("");
-    const [maxDate, setMaxDate] = useState("");
-
-    // אתחול ראשוני
-    useEffect(() => {
-        const target = departureTime || new Date();
-
-        // התאמה לאזור זמן מקומי (ישראל) כדי שהתאריך ב-input יהיה נכון
-        const offset = target.getTimezoneOffset() * 60000;
-        const localISOTime = (new Date(target - offset)).toISOString().slice(0, -1);
-
-        setDateStr(localISOTime.split('T')[0]);
-        setTimeStr(localISOTime.split('T')[1].slice(0, 5));
-
-        // חישוב גבולות (היום עד עוד שבוע)
-        const now = new Date();
-        const nowLocal = (new Date(now - offset)).toISOString().slice(0, -1);
-        setMinDate(nowLocal.split('T')[0]);
-
-        const nextWeek = new Date(now);
-        nextWeek.setDate(now.getDate() + 7);
-        const nextWeekLocal = (new Date(nextWeek - offset)).toISOString().slice(0, -1);
-        setMaxDate(nextWeekLocal.split('T')[0]);
-
-    }, []); // רץ רק פעם אחת בטעינה
+    // bounds מחושב פעם אחת ב-mount דרך lazy initializer. אין צורך ב-useEffect:
+    // dateStr/timeStr נשארים mutable, minDate/maxDate הם קבועים לכל הסשן.
+    const [bounds] = useState(() => getInitialBounds(departureTime));
+    const [dateStr, setDateStr] = useState(bounds.initialDate);
+    const [timeStr, setTimeStr] = useState(bounds.initialTime);
+    const { minDate, maxDate } = bounds;
 
     // פונקציה שמאחדת תאריך ושעה ומעדכנת את האבא
     const updateParentTime = (newDateStr, newTimeStr) => {

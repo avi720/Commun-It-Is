@@ -4,7 +4,7 @@ import { useOutletContext } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button } from "@/Components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
-import { useAppData } from '../context/AppContext';
+import { useAppData } from '../context/useAppData';
 import { avior } from '../Api';
 import FeedPosts from '../Components/pagesComp/homePageComp/FeedPosts';
 import CreatePostModal from '../Components/pagesComp/homePageComp/CreatePostModal';

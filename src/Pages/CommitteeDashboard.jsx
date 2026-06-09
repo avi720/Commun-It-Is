@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Users, Store, Settings, Shield } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../Api';
-import { useAppData } from '../context/AppContext';
+import { useAppData } from '../context/useAppData';
 import BusinessesTab from '@/Components/pagesComp/committeeDashboard/BusinessesTab';
 import ResidentsTab from '@/Components/pagesComp/committeeDashboard/ResidentsTab';
 import CommunitySettingsTab from '@/Components/pagesComp/committeeDashboard/CommunitySettingsTab';

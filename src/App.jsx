@@ -1,7 +1,8 @@
 import React, { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
-import { AppProvider, useAppData } from './context/AppContext';
+import { AppProvider } from './context/AppContext';
+import { useAppData } from './context/useAppData';
 import { usePushNotifications } from './Components/hooks/usePushNotifications';
 
 import MainLayout from './Components/MainLayout';

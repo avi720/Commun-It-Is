@@ -3,7 +3,7 @@ import { X, Image as ImageIcon, Loader2, Send, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from "@/Components/ui/button";
 import { avior } from '@/Api';
-import { useAppData } from '@/context/AppContext';
+import { useAppData } from '@/context/useAppData';
 
 export default function CreatePostModal({ isOpen, onClose, onPostCreated }) {
     const { user, session } = useAppData();

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { avior } from "../Api";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence } from "framer-motion";
-import { useAppData } from '../context/AppContext';
+import { useAppData } from '../context/useAppData';
 import PublicDisplayHeader from "../Components/pagesComp/publicdisplay/PublicDisplayHeader";
 import RideCard from "../Components/pagesComp/publicdisplay/RideCard";
 import RideDetailsModal from "../Components/pagesComp/publicdisplay/RideDetailsModal";

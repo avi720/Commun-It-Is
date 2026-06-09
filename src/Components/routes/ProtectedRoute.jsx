@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { useAppData } from '@/context/AppContext';
+import { useAppData } from '@/context/useAppData';
 
 /**
  * שומר נתיב למשתמש מחובר ושהשלים את ה-onboarding.

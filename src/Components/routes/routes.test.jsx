@@ -24,7 +24,7 @@ import CommitteeRoute from './CommitteeRoute';
 
 // --- mock setup ---------------------------------------------------------------
 
-vi.mock('@/context/AppContext', () => ({
+vi.mock('@/context/useAppData', () => ({
     useAppData: vi.fn(),
 }));
 
@@ -34,7 +34,7 @@ vi.mock('@/Api', () => ({
     },
 }));
 
-import { useAppData } from '@/context/AppContext';
+import { useAppData } from '@/context/useAppData';
 import { supabase } from '@/Api';
 
 function renderAtPath(ui, { path = '/' } = {}) {

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Clock, RefreshCw, Loader2 } from 'lucide-react';
 import { supabase } from '../../Api';
-import { useAppData } from '../../context/AppContext';
+import { useAppData } from '../../context/useAppData';
 
 /**
  * מסך המתנה לאישור תושב ע"י הועד המקומי.

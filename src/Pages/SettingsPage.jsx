@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAppData } from '../context/AppContext';
+import { useAppData } from '../context/useAppData';
 import ProfileForm from '../Components/pagesComp/settings/ProfileForm';
 import DangerZone from '../Components/pagesComp/settings/DangerZone';
 import { motion } from 'framer-motion';

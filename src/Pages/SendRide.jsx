@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { avior } from "../Api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CardContent, CardTitle, CardDescription } from "@/Components/ui/card";
@@ -6,17 +6,12 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import RideForm from "../Components/pagesComp/sendride/RideForm";
 import SuccessNotification from "../Components/pagesComp/sendride/SuccessNotification";
-import { useAppData } from "../context/AppContext";
+import { useAppData } from "../context/useAppData";
 
 export default function SendRide() {
-    // State למשתמש המחובר
-    //const [user, setUser] = useState(null);
     const { user, session } = useAppData();
-    // State לטופס
-    const [driverName, setDriverName] = useState("");
-    useEffect(() => {
-        setDriverName(`${user.firstName} ${user.lastName}`);
-    }, [user]);
+    // user יציב ב-mount (ProtectedRoute מבטיח את זה) — lazy init במקום useEffect.
+    const [driverName, setDriverName] = useState(`${user.firstName} ${user.lastName}`);
     const [location, setLocation] = useState("");
     const [destination, setDestination] = useState("");
     const [seats, setSeats] = useState(4);

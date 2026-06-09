@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { Menu } from 'lucide-react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import Sidebar from './mainlayoutComp/Sidebar';
-import { useAppData } from '../context/AppContext';
+import { useAppData } from '../context/useAppData';
 
 export default function MainLayout() {
   const navigate = useNavigate();

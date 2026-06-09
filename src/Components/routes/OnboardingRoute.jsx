@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { useAppData } from '@/context/AppContext';
+import { useAppData } from '@/context/useAppData';
 
 /**
  * נתיב /onboarding — נגיש רק למי שמחובר אבל פרופילו עדיין חסר.

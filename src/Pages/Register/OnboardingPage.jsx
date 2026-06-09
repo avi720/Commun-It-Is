@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { User, MapPin, Calendar, CheckCircle, Phone, LogOut } from 'lucide-react';
-import { useAppData } from '@/context/AppContext';
+import { useAppData } from '@/context/useAppData';
 import CitySelect from '@/Components/common/CitySelect';
 import CommunitiesList from '@/Components/pagesComp/onBoarding/CommunitiesList';
 import { toast } from "sonner";

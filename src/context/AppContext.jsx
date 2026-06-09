@@ -1,7 +1,10 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 import { supabase, avior } from '../Api';
 
-const AppContext = createContext();
+// ה-context object מיוצא כדי ש-useAppData (בקובץ נפרד) יוכל להשתמש בו.
+// פיצול הזה מונע אזהרת react-refresh/only-export-components: קובץ עם קומפוננטה
+// לא יכול גם לייצא hook בלי לשבור hot module replacement.
+export const AppContext = createContext();
 
 export function AppProvider({ children }) {
     const [user, setUser] = useState(null);
@@ -80,7 +83,11 @@ export function AppProvider({ children }) {
     };
 
     useEffect(() => {
-        // בטעינה הראשונה של הדף - מציגים לואדר
+        // בטעינה הראשונה של הדף - מציגים לואדר.
+        // loadUserData הוא fetch אסינכרוני שמחייב useEffect ולא ניתן להפוך אותו
+        // ל-lazy useState init — לכן ה-warning של react-hooks/set-state-in-effect
+        // מוסר ידנית כאן.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         loadUserData(true);
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, newSession) => {
@@ -134,10 +141,4 @@ export function AppProvider({ children }) {
     );
 }
 
-export const useAppData = () => {
-    const context = useContext(AppContext);
-    if (!context) {
-        throw new Error('useAppData must be used within an AppProvider');
-    }
-    return context;
-};
+// useAppData הועבר ל-./useAppData.js — ראה ההסבר ליד הצהרת AppContext למעלה.

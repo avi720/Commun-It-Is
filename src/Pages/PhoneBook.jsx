@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useAppData } from '../context/AppContext';
+import { useAppData } from '../context/useAppData';
 import { avior } from '../Api';
 import { Search, Phone, MessageCircle } from 'lucide-react';
 

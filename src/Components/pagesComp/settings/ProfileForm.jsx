@@ -1,38 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { User, MapPin, Phone, Save, Loader2 } from 'lucide-react';
 import { Input } from "@/Components/ui/input";
 import { Button } from "@/Components/ui/button";
 import { Label } from "@/Components/ui/label";
 import { toast } from 'sonner';
 import { avior } from '@/Api';
-import { useAppData } from '@/context/AppContext';
+import { useAppData } from '@/context/useAppData';
 
 export default function ProfileForm({ user, onSave }) {
     const { session } = useAppData();
-    // State מקומי לטופס כדי לא לשנות את הגלובלי בכל הקלדה
-    const [formData, setFormData] = useState({
-        firstName: '',
-        lastName: '',
-        phone: '',
-        city: '',
-        address: '',
-        visible_on_phonebook: false
-    });
+    // State מקומי לטופס כדי לא לשנות את הגלובלי בכל הקלדה.
+    // user יציב ב-mount (ProtectedRoute מבטיח שהוא נטען) — ולכן lazy init
+    // מספיק במקום useEffect של "סנכרון כשהוא משתנה".
+    const [formData, setFormData] = useState(() => ({
+        firstName: user?.firstName || '',
+        lastName: user?.lastName || '',
+        phone: user?.phone || '',
+        city: user?.city || '',
+        address: user?.address || '',
+        visible_on_phonebook: user?.visible_on_phonebook || false,
+    }));
     const [isSaving, setIsSaving] = useState(false);
-
-    // סנכרון ראשוני כשהמשתמש נטען
-    useEffect(() => {
-        if (user) {
-            setFormData({
-                firstName: user.firstName || '',
-                lastName: user.lastName || '',
-                phone: user.phone || '',
-                city: user.city || '',
-                address: user.address || '',
-                visible_on_phonebook: user.visible_on_phonebook || false
-            });
-        }
-    }, [user]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();

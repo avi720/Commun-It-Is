@@ -1,33 +1,32 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Lock, CheckCircle2, ArrowRight, ArrowLeft, Loader2 } from 'lucide-react';
+import { Mail, Lock, ArrowRight, ArrowLeft, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/Components/ui/card";
 import { avior } from '@/Api';
 import { Button } from "@/Components/ui/button";
 import VerificationEmailSent from '@/Components/pagesComp/registerPage/VerificationEmailSent';
 import GoogleSignInButton from '@/Components/auth/GoogleSignInButton';
 
+// שחזור מצב בטעינת הדף — נקרא פעם אחת ב-mount דרך lazy useState init,
+// במקום useEffect. מחזיר אובייקט עם שני הערכים כדי לא לקרוא ל-sessionStorage
+// פעמיים.
+function restorePendingEmail() {
+  const pending = sessionStorage.getItem('pendingRegistrationEmail');
+  return { emailSentTo: pending || '', isSuccess: !!pending };
+}
+
 export default function RegisterPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [error, setError] = useState(''); // היה חסר לך
-  const [emailSentTo, setEmailSentTo] = useState('');
+  const restored = useState(restorePendingEmail)[0];
+  const [isSuccess, setIsSuccess] = useState(restored.isSuccess);
+  const [emailSentTo, setEmailSentTo] = useState(restored.emailSentTo);
+  const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     confirmPassword: ''
   });
-
-  // --- תוספת: שחזור מצב בטעינת הדף ---
-  useEffect(() => {
-    // בודקים אם יש מייל שמחכה לאימות בזיכרון של הטאב הנוכחי
-    const pendingEmail = sessionStorage.getItem('pendingRegistrationEmail');
-    if (pendingEmail) {
-      setEmailSentTo(pendingEmail);
-      setIsSuccess(true);
-    }
-  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

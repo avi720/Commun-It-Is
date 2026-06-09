@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/Com
 import { Mail, Lock, LogIn, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { avior } from "../Api";
-import { useAppData } from '../context/AppContext';
+import { useAppData } from '../context/useAppData';
 import GoogleSignInButton from '../Components/auth/GoogleSignInButton';
 
 export default function LoginPage() {
