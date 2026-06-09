@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Home, Navigation, Loader2, MapPin } from "lucide-react";
+import { toast } from "sonner";
 import { Label } from "@/Components/ui/label";
 import { Input } from "@/Components/ui/input";
 
@@ -31,7 +32,7 @@ export default function Location({
         setLocation("מאתר מיקום...");
 
         if (!navigator.geolocation) {
-            alert("הדפדפן לא תומך במיקום");
+            toast.error("הדפדפן לא תומך במיקום");
             setIsLoadingLocation(false);
             return;
         }
@@ -67,7 +68,7 @@ export default function Location({
             },
             (error) => {
                 console.error(error);
-                alert("לא הצלחנו למצוא את המיקום");
+                toast.error("לא הצלחנו למצוא את המיקום");
                 setIsLoadingLocation(false);
                 setLocation("");
             }

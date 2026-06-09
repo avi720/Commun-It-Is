@@ -1,34 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useAppData } from '../context/AppContext';
 import { avior } from '../Api';
-import { Bell, Calendar, User, AlertTriangle, Info } from 'lucide-react';
+import { Calendar, User, AlertTriangle, Info } from 'lucide-react';
 
 export default function NotificationsHistory() {
     const { user } = useAppData();
-    const [messages, setMessages] = useState([]);
-    const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchMessages = async () => {
-            if (user?.community_id) {
-                try {
-                    const data = await avior.notifications.getHistory(user.community_id);
-                    setMessages(data);
-                } catch (error) {
-                    console.error("Failed to load notifications:", error);
-                } finally {
-                    setLoading(false);
-                }
-            } else {
-                // אין קהילה למשתמש — לא נשארים תקועים על מסך טעינה
-                setLoading(false);
-            }
-        };
+    const { data: messages = [], isLoading } = useQuery({
+        queryKey: ['notifications', user?.community_id],
+        queryFn: () => avior.notifications.getHistory(user.community_id),
+        enabled: !!user?.community_id,
+    });
 
-        fetchMessages();
-    }, [user]);
-
-    if (loading) return <div className="p-8 text-center text-slate-400">טוען הודעות...</div>;
+    if (isLoading) return <div className="p-8 text-center text-slate-400">טוען הודעות...</div>;
 
     return (
         <div className="min-h-screen bg-slate-900 pb-20 p-4">
@@ -57,7 +42,6 @@ export default function NotificationsHistory() {
                                     : 'bg-slate-800 border-slate-700 shadow-sm'}
                             `}
                         >
-                            {/* פס צבע בצד */}
                             <div className={`absolute top-0 right-0 bottom-0 w-1 ${msg.is_emergency ? 'bg-red-500' : 'bg-teal-500'}`} />
 
                             <div className="flex justify-between items-start mb-2 pr-3">

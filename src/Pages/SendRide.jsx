@@ -3,6 +3,7 @@ import { avior } from "../Api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CardContent, CardTitle, CardDescription } from "@/Components/ui/card";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
 import RideForm from "../Components/pagesComp/sendride/RideForm";
 import SuccessNotification from "../Components/pagesComp/sendride/SuccessNotification";
 import { useAppData } from "../context/AppContext";
@@ -55,7 +56,7 @@ export default function SendRide() {
         e.preventDefault();
 
         if (!driverName.trim() || !location.trim() || !destination.trim() || !seats) {
-            alert("נא למלא את כל השדות");
+            toast.error("נא למלא את כל השדות");
             return;
         }
 

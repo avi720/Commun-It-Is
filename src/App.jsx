@@ -1,5 +1,6 @@
 import React, { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'sonner';
 import { AppProvider, useAppData } from './context/AppContext';
 import { usePushNotifications } from './Components/hooks/usePushNotifications';
 
@@ -106,6 +107,9 @@ export default function App() {
       <BrowserRouter>
         <AppRoutes />
       </BrowserRouter>
+      {/* Toaster יחיד לכל האפליקציה — מחליף את alert() ב-toast.success/error/info.
+          richColors נותן ירוק להצלחה ואדום לשגיאה; position מותאם ל-RTL ולמובייל. */}
+      <Toaster richColors position="top-center" closeButton dir="rtl" />
     </AppProvider>
   );
 }

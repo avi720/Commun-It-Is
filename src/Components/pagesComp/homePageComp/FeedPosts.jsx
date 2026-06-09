@@ -1,5 +1,6 @@
 import React from 'react';
 import { MessageCircle, User, Share2, Shield } from 'lucide-react';
+import { toast } from 'sonner';
 import { Card } from "@/Components/ui/card";
 import { Button } from "@/Components/ui/button";
 
@@ -8,7 +9,7 @@ export default function FeedPosts({ post }) {
     // פונקציה לניקוי מספר הטלפון והכנת הקישור
     const handleWhatsAppClick = () => {
         if (!post.users || !post.users.phone) {
-            alert("למפרסם זה אין מספר טלפון מעודכן");
+            toast.error("למפרסם זה אין מספר טלפון מעודכן");
             return;
         }
 

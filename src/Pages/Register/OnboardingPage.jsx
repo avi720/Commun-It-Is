@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppData } from '@/context/AppContext';
 import CitySelect from '@/Components/common/CitySelect';
 import CommunitiesList from '@/Components/pagesComp/onBoarding/CommunitiesList';
+import { toast } from "sonner";
 import { avior } from "@/Api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 
@@ -53,7 +54,7 @@ export default function OnboardingPage() {
       return;
     }
     if (!selectedCommunityName) {
-      alert("חובה לבחור קהילה");
+      toast.error("חובה לבחור קהילה");
       return;
     }
 
@@ -72,7 +73,7 @@ export default function OnboardingPage() {
       if (error.message.includes("already assigned")) {
         await refresh();
       } else {
-        alert("שגיאה: " + error.message);
+        toast.error("שגיאה: " + error.message);
       }
     }
   };

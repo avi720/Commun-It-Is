@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { X, Image as ImageIcon, Loader2, Send, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button } from "@/Components/ui/button";
 import { avior } from '@/Api';
 import { useAppData } from '@/context/AppContext';
@@ -61,7 +62,7 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }) {
 
         } catch (error) {
             console.error("Failed to create post:", error);
-            alert("שגיאה ביצירת הפוסט");
+            toast.error("שגיאה ביצירת הפוסט");
         } finally {
             setIsSubmitting(false);
         }

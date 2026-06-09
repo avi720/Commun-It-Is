@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { PushNotifications } from '@capacitor/push-notifications';
 import { Capacitor } from '@capacitor/core';
+import { toast } from 'sonner';
 
 export const usePushNotifications = () => {
     useEffect(() => {
@@ -16,7 +17,11 @@ export const usePushNotifications = () => {
                     });
 
                     await PushNotifications.addListener('pushNotificationReceived', notification => {
-                        alert(`הודעה חדשה:\n${notification.title}\n${notification.body}`);
+                        // הודעת push שהגיעה כשהאפליקציה בפתח — נציג toast מתמשך עם כותרת + גוף.
+                        toast(notification.title || 'הודעה חדשה', {
+                            description: notification.body,
+                            duration: 8000,
+                        });
                     });
 
                     let permStatus = await PushNotifications.checkPermissions();

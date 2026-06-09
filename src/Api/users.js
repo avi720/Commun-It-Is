@@ -8,13 +8,17 @@ import { supabase, API_URL, getAuthHeaders } from './config';
 export async function createProfile(profileData) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
+        // לא זורקים — הקורא יבדוק תוצאה דרך session/auth state. רישום לשגיאה
+        // הוא הסיגנל היחיד כל עוד אין error tracker (T19).
         console.error("User not logged in");
         return;
     }
     const { error } = await supabase.from('users').update(profileData).eq('id', user.id);
     if (error) {
         console.error('Error updating profile:', error.message);
-        alert('שגיאה בשמירת הפרטים');
+        // זורקים כדי שהקורא (OnboardingPage / ProfileForm) יציג toast.error.
+        // לא מציגים alert מכאן כי זה ה-API layer.
+        throw new Error(error.message || 'שגיאה בשמירת הפרטים');
     }
 }
 

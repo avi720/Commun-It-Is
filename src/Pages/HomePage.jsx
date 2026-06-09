@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Building, Users, Star, Plus, Loader2 } from 'lucide-react';
 import { useOutletContext } from 'react-router-dom';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button } from "@/Components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { useAppData } from '../context/AppContext';
@@ -12,9 +13,21 @@ export default function HomePage() {
   const { user, session } = useAppData();
   // מצב הסיידבר מועבר מ-MainLayout דרך Outlet context (ראה docs/ARCHITECTURE.md)
   const { isSidebarOpen } = useOutletContext();
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // הפיד נשלף דרך React Query. הסינון לפי קהילה נעשה בשרת לפי הטוקן —
+  // ולכן ה-cache key נשען על community_id, לא על ה-session ישירות.
+  const { data: posts = [], isLoading } = useQuery({
+    queryKey: ['posts', user?.community_id],
+    queryFn: () => avior.entities.Post.list(session),
+    enabled: !!session,
+  });
+
+  // אחרי יצירת פוסט חדש — מבטלים את ה-cache כדי שהפיד יתרענן.
+  const handlePostCreated = () => {
+    queryClient.invalidateQueries({ queryKey: ['posts', user?.community_id] });
+  };
 
   const FloatingActionButton = ({ onClick }) => {
     return (!isSidebarOpen ? (
@@ -32,30 +45,11 @@ export default function HomePage() {
     );
   };
 
-  useEffect(() => {
-    // טוענים את הפוסטים בעת כניסה לדף הבית וגם כשה-session מתעדכן.
-    // הסינון לפי הקהילה/עיר של המשתמש נעשה בצד השרת לפי הטוקן,
-    // ולכן מעבירים את ה-session. ה-finally מוודא ש-loading תמיד נסגר
-    // כדי לא להיתקע על ספינר אינסופי.
-    loadPosts();
-  }, [session]);
-
-  const loadPosts = async () => {
-    try {
-      const data = await avior.entities.Post.list(session);
-      setPosts(data);
-    } catch (error) {
-      console.error("Error loading posts:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <div className="min-h-screen space-y-6 relative">
 
       <div className="max-w-lg mx-auto space-y-4">
-        {loading ? (
+        {isLoading ? (
           <div className="flex justify-center pt-20">
             <Loader2 className="w-8 h-8 text-teal-500 animate-spin" />
           </div>
@@ -88,7 +82,7 @@ export default function HomePage() {
       <CreatePostModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onPostCreated={loadPosts}
+        onPostCreated={handlePostCreated}
       />
     </div>
   );

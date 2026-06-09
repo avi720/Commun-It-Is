@@ -3,6 +3,7 @@ import { User, MapPin, Phone, Save, Loader2 } from 'lucide-react';
 import { Input } from "@/Components/ui/input";
 import { Button } from "@/Components/ui/button";
 import { Label } from "@/Components/ui/label";
+import { toast } from 'sonner';
 import { avior } from '@/Api';
 import { useAppData } from '@/context/AppContext';
 
@@ -45,7 +46,7 @@ export default function ProfileForm({ user, onSave }) {
 
         } catch (error) {
             console.error("Update failed:", error);
-            alert("שגיאה בעדכון הפרטים");
+            toast.error("שגיאה בעדכון הפרטים");
         } finally {
             setIsSaving(false);
         }

@@ -1,5 +1,6 @@
 import React, { } from 'react';
 import { Mail, CheckCircle2, ArrowRight } from 'lucide-react';
+import { toast } from 'sonner';
 import { useAppData } from '@/context/AppContext';
 import { avior } from '@/Api';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/Components/ui/card";
@@ -27,7 +28,7 @@ export default function VerificationEmailSent({ email, password, setLoading, loa
             }
         } catch (error) {
             console.error("Login failed:", error);
-            alert("האימות טרם הושלם או שגיאה בהתחברות. אנא נסה שוב.");
+            toast.error("האימות טרם הושלם או שגיאה בהתחברות. אנא נסה שוב.");
         } finally {
             setLoading(false);
         }

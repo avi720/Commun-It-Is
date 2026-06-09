@@ -140,7 +140,7 @@ Loaded by Vite (`VITE_*` prefix → client bundle) or by `os.getenv` in Python. 
 
 ## Known caveats (the things future-you will trip on)
 
-1. **Stale `community_role`** — `CommitteeRoute` reads the role from the `AppContext` snapshot loaded once at sign-in. If a user is demoted, they keep the committee UI until they sign out and back in. The FastAPI side re-checks live, but the supabase-js direct calls trust the stale role. Tracked as TECH-DEBT T11.
+1. ~~**Stale `community_role`** — `CommitteeRoute` reads the role from the `AppContext` snapshot loaded once at sign-in.~~ **Resolved in Batch 2.** `CommitteeRoute` now runs a React Query (`['me', userId]`, `staleTime: 0`) on every navigation and redirects home if the role isn't `committee`. The FastAPI side still re-checks live as a server-side defence-in-depth.
 2. **Onboarding writes go direct** — `users.createProfile` bypasses FastAPI. If the corresponding RLS policy is missing or wrong, the entire onboarding flow either silently succeeds (no policy → admin-bypass via service role from somewhere else) or silently fails. Audit lives in `docs/RLS-AUDIT.md` (Batch 3).
 3. **`alert()` is everywhere** — the app uses native `alert()` / `confirm()` for in-app feedback in many places. Batch 2 of the TECH-DEBT pass migrates these to `sonner` toasts and a shadcn-style `AlertDialog`.
 4. **ARM64 Windows dev machine** — npm packages that ship x64-only `.node` binaries fail to load. Prefer pure-JS or WASM alternatives. (This is why we use Supabase JS instead of Prisma, and `sonner` instead of any toast library with native deps.)

@@ -99,12 +99,12 @@ ID convention: `T##` numbered globally across phases. Where a finding was confir
 - **Issue:** Two auth surfaces. FastAPI side enforces role checks in Python. Client-direct side relies on Supabase **Row Level Security** policies that are not documented in this repo. If RLS is weak or missing for any table touched by the direct path (`businesses`, `users`, `communities`, `important_notifications`), a curious committee member can read or mutate other communities' data and the codebase would never reveal it.
 - **Acceptance:** A documented RLS policy exists for every table accessed directly from the client. Or all writes are routed through FastAPI and direct client access is limited to read-only views. Decision recorded in `docs/ARCHITECTURE.md` (see T22).
 
-#### [ ] T8. React Query is installed but adopted in only 2 of ~6 data-fetching pages
+#### [x] T8. React Query is installed but adopted in only 2 of ~6 data-fetching pages
 - **Where:** `Pages/PublicDisplay.jsx:24` and `Pages/SendRide.jsx:27` use `useQuery` / `useMutation`. `HomePage.jsx`, `PhoneBook.jsx`, `NotificationsHistory.jsx`, `CommitteeDashboard.jsx` hand-roll `useState + useEffect + try / catch + setLoading(false)`.
 - **Issue:** Half-adopted pattern. Pages that should be cached aren't, the same network round-trip happens on every mount, and there is no consistent error/retry semantics. Onboarding effort for a new component is also higher because there are two patterns to choose from.
 - **Acceptance:** Every data-fetching page uses React Query. Manual `setLoading` state machines are removed. Cache-key conventions are documented in `docs/ARCHITECTURE.md` (e.g., committee approving a resident invalidates `["residents", communityId]`).
 
-#### [ ] T9. Native `alert()` used for in-app feedback (18 occurrences)
+#### [x] T9. Native `alert()` used for in-app feedback (18 occurrences)
 - **Where:** `HomePage`, `SendRide`, `OnboardingPage`, `SettingsPage`, `PhoneBook`, `FeedPosts`, `usePushNotifications`, `CommitteeDashboard`, `ProfileForm`, `CreatePostModal`, `location.jsx`, `VerificationEmailSent`, `Api/users.js`.
 - **Issue:** Overlaps with [`docs/UI-AUDIT.md`](UI-AUDIT.md) F16. Tech-debt angle: every screen invents its own error pattern because there is no shared error UI to consolidate around. Also blocks observability — there is no central place to forward these to a tracker.
 - **Acceptance:** Single toast provider mounted at the app root (`sonner` or equivalent pure-JS library — no native deps, per the ARM64 constraint). All 18 `alert()` / `confirm()` call sites replaced with `toast.error(...)` / `toast.success(...)` / a proper confirmation-dialog primitive for destructive actions. Same primitives used everywhere.
@@ -114,7 +114,7 @@ ID convention: `T##` numbered globally across phases. Where a finding was confir
 - **Issue:** Information leak in the worst case (browser extensions, shoulder-surfing, screencasts that capture devtools). Noise in the general case — real errors are harder to spot. No central place to forward errors to a tracker (see T19).
 - **Acceptance:** All `console.log` removed or guarded by `if (import.meta.env.DEV)`. `console.error` retained only where it adds debugging information beyond what the user sees in the toast UI (T9). Verified — no token-shaped string appears in the production console across the full set of routes.
 
-#### [ ] T11. Client-side committee route guard reads from a potentially stale profile
+#### [x] T11. Client-side committee route guard reads from a potentially stale profile
 - **Where:** `src/Components/routes/CommitteeRoute.jsx:14` — `if (user?.community_role !== 'committee') { ... }`.
 - **Issue:** `community_role` is read from the `users` table snapshot loaded once at sign-in (`AppContext.loadUserData`). If a committee member is demoted, they keep their committee UI access until they sign out and back in. The FastAPI side (`get_committee_community_id`) re-checks live, but the direct-supabase paths (T7) trust the stale role.
 - **Acceptance:** Either the role is verified via a Supabase RLS policy on the relevant tables (so a stale role cannot read/write), or the client refetches the role on every committee-route navigation. Verified by manually demoting a user in Supabase and confirming they lose access within one navigation, without sign-out.
@@ -139,7 +139,7 @@ ID convention: `T##` numbered globally across phases. Where a finding was confir
 - **Issue:** This state is consumed only by `MainLayout` and `Sidebar`. Hoisting it to global context forces every consumer of `useAppData` to re-render on sidebar toggle, including unrelated pages.
 - **Acceptance:** State moves to local component state in `MainLayout`, passed to `Sidebar` via props or via a small `useSidebar` hook scoped to the layout. `AppContext` no longer exposes sidebar APIs.
 
-#### [ ] T16. `CommitteeDashboard.jsx` is a 397-line god component
+#### [x] T16. `CommitteeDashboard.jsx` is a 397-line god component
 - **Where:** `src/Pages/CommitteeDashboard.jsx`
 - **Issue:** Mixes three tabs (businesses, residents, settings), a notification-send modal, three direct Supabase fetches, and tab-switching UI in one file. Adding a fourth tab — e.g., reports — would make it unmanageable. Also makes T8 (React Query migration) harder because there are three fetches to convert at once.
 - **Acceptance:** Split into `BusinessesTab.jsx`, `ResidentsTab.jsx`, `CommunitySettingsTab.jsx`, plus a `SendCommitteeMessageModal.jsx`. Each tab owns its data fetch via React Query (combines with T8). Top-level `CommitteeDashboard.jsx` under 100 lines and contains only the tab shell.

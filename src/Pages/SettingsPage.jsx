@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { useAppData } from '../context/AppContext'; 
+import { useAppData } from '../context/AppContext';
 import ProfileForm from '../Components/pagesComp/settings/ProfileForm';
 import DangerZone from '../Components/pagesComp/settings/DangerZone';
 import { motion } from 'framer-motion';
 import { CheckCircle, XCircle } from 'lucide-react';
+import { toast } from 'sonner';
 import { avior } from '../Api';
+import { ConfirmDialog } from '@/Components/ui/confirm-dialog';
 
 export default function SettingsPage() {
     // 2. שולפים הכל מהקונטקסט המרכזי
@@ -12,6 +14,8 @@ export default function SettingsPage() {
     
     // סטייט מקומי להודעות (טוסטים) - זה שייך רק לדף הזה
     const [message, setMessage] = useState(null);
+    // state לדיאלוג מחיקת החשבון — מחליף את window.confirm()
+    const [deleteOpen, setDeleteOpen] = useState(false);
 
     // פונקציה שעוטפת את העדכון עם הודעת הצלחה
     const handleSave = (updatedFields) => {
@@ -29,24 +33,25 @@ export default function SettingsPage() {
         }
     };
 
-    // פונקציית מחיקת חשבון (לשעבר איפוס קשיח מקומי)
-    const handleHardReset = async () => {
-        if (window.confirm("פעולה זו תמחק את החשבון שלך ואת כל המידע לצמיתות! האם אתה בטוח?")) {
-            try {
-                // 1. קריאה לשרת למחיקת המשתמש
-                if (user && user.id) {
-                    // וודא שאתה משתמש ב-avior או base44 לפי מה שיש לך בקובץ
-                    await avior.entities.User.delete(user.id, session);
-                }
+    // פתיחת דיאלוג מחיקת חשבון. הביצוע עצמו מתבצע ב-confirmHardReset כשהמשתמש
+    // לוחץ "אישור" בדיאלוג — מחליף את window.confirm() החוסם.
+    const handleHardReset = () => setDeleteOpen(true);
 
-                // 2. ניקוי מקומי והתנתקות
-                localStorage.clear();
-                window.location.href = '/login';
-                
-            } catch (error) {
-                console.error("Error deleting account:", error);
-                alert("אירעה שגיאה במחיקת החשבון. אנא נסה שוב.");
+    const confirmHardReset = async () => {
+        setDeleteOpen(false);
+        try {
+            // 1. קריאה לשרת למחיקת המשתמש
+            if (user && user.id) {
+                await avior.entities.User.delete(user.id, session);
             }
+
+            // 2. ניקוי מקומי והתנתקות
+            localStorage.clear();
+            window.location.href = '/login';
+
+        } catch (error) {
+            console.error("Error deleting account:", error);
+            toast.error("אירעה שגיאה במחיקת החשבון. אנא נסה שוב.");
         }
     };
 
@@ -90,6 +95,17 @@ export default function SettingsPage() {
                     Commun-it-is v1.0 • Developed by Hanan
                 </div>
             </motion.div>
+
+            <ConfirmDialog
+                open={deleteOpen}
+                onOpenChange={setDeleteOpen}
+                title="מחיקת חשבון לצמיתות"
+                description={"פעולה זו תמחק את החשבון שלך ואת כל המידע לצמיתות!\nהאם אתה בטוח?"}
+                confirmLabel="כן, מחק"
+                cancelLabel="ביטול"
+                destructive
+                onConfirm={confirmHardReset}
+            />
         </div>
     );
 }
