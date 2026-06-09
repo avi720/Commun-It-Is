@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { Menu } from 'lucide-react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import Sidebar from './mainlayoutComp/Sidebar';
@@ -7,7 +7,14 @@ import { useAppData } from '../context/AppContext';
 export default function MainLayout() {
   const navigate = useNavigate();
 
-  const { user, logout, toggleSidebar } = useAppData();
+  const { user, logout } = useAppData();
+
+  // מצב הסיידבר חי כאן (מקומית) ולא ב-AppContext כדי שדפים שלא צריכים אותו
+  // לא ירונדרו מחדש בכל פתיחה/סגירה. דפים שכן צריכים (למשל HomePage שמדמדם
+  // את ה-FAB מאחורי הסיידבר) מקבלים אותו דרך useOutletContext().
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const toggleSidebar = useCallback(() => setIsSidebarOpen(prev => !prev), []);
+  const closeSidebar = useCallback(() => setIsSidebarOpen(false), []);
 
   return (
     // 1. המעטפת הראשית: תופסת את כל הגובה, ומונעת גלילה של כל העמוד (רק התוכן יגלול)
@@ -49,13 +56,15 @@ export default function MainLayout() {
       <main className="flex-1 overflow-y-auto overflow-x-hidden relative bg-gradient-to-br from-slate-900 via-slate-800 to-teal-900 pb-[env(safe-area-inset-bottom)]">
         {/* ה-div הזה נותן רווח פנימי לתוכן עצמו */}
         <div className="w-full min-h-full">
-          <Outlet />
+          <Outlet context={{ isSidebarOpen }} />
         </div>
       </main>
 
       <Sidebar
         onLogout={logout}
         user={user}
+        isSidebarOpen={isSidebarOpen}
+        closeSidebar={closeSidebar}
       />
     </div>
   );

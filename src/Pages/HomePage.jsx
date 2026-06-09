@@ -1,21 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { Building, Users, Star, Plus, Loader2 } from 'lucide-react';
+import { useOutletContext } from 'react-router-dom';
 import { Button } from "@/Components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { useAppData } from '../context/AppContext';
 import { avior } from '../Api';
 import FeedPosts from '../Components/pagesComp/homePageComp/FeedPosts';
 import CreatePostModal from '../Components/pagesComp/homePageComp/CreatePostModal';
-import MainLayout from '@/Components/MainLayout';
 
 export default function HomePage() {
   const { user, session } = useAppData();
+  // מצב הסיידבר מועבר מ-MainLayout דרך Outlet context (ראה docs/ARCHITECTURE.md)
+  const { isSidebarOpen } = useOutletContext();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const FloatingActionButton = ({ onClick }) => {
-    const { isSidebarOpen } = useAppData();
     return (!isSidebarOpen ? (
       <Button
         onClick={onClick}

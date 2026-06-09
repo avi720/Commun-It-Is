@@ -4,16 +4,18 @@ import { Home, Car, Monitor, Send, Settings, X, ChevronDown, ChevronUp, LogOut, 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppData } from '@/context/AppContext';
 
-export default function Sidebar({ onLogout }) {
+export default function Sidebar({ onLogout, isSidebarOpen, closeSidebar }) {
   const [isTrempOpen, setIsTrempOpen] = useState(false);
 
   const navigate = useNavigate(); // פונקציה למעבר דפים
   const location = useLocation(); // איפה אני נמצא עכשיו?
-  const { user, isSidebarOpen, closeSidebar } = useAppData();
-  // פונקציית עזר לניווט
+  const { user } = useAppData();
+  // פונקציית עזר לניווט — תיקון באג: בעבר היה כאן `closeSidebar;` (ביטוי בלי
+  // קריאה לפונקציה), כך שהסיידבר לא נסגר בלחיצה על פריט תפריט. עכשיו קוראים
+  // לפונקציה כראוי.
   const handleNavigation = (path) => {
     navigate(path);
-    closeSidebar;
+    closeSidebar();
   };
 
   // בדיקה אם הנתיב הנוכחי פעיל (לצורך צביעת הכפתור)
@@ -46,7 +48,7 @@ export default function Sidebar({ onLogout }) {
           {/* דף הבית */}
           <button
             onClick={() => handleNavigation('/')}
-            className={`w-full flex items-center gap-3 p-2 text-sm rounded-lg transition-colors ${isActive('/send-ride') ? 'text-teal-400 bg-slate-800/50' : 'text-slate-400 hover:text-white'}`}
+            className={`w-full flex items-center gap-3 p-2 text-sm rounded-lg transition-colors ${isActive('/') ? 'text-teal-400 bg-slate-800/50' : 'text-slate-400 hover:text-white'}`}
           >
             <Home className="w-5 h-5 text-green-400" />
             <span className="font-medium">דף הבית</span>
@@ -86,8 +88,8 @@ export default function Sidebar({ onLogout }) {
 
 
             <button
-              onClick={() => navigate('/phonebook')}
-              className={`w-full flex items-center gap-3 p-2 text-sm rounded-lg transition-colors ${isActive('/send-ride') ? 'text-teal-400 bg-slate-800/50' : 'text-slate-400 hover:text-white'}`}
+              onClick={() => handleNavigation('/phonebook')}
+              className={`w-full flex items-center gap-3 p-2 text-sm rounded-lg transition-colors ${isActive('/phonebook') ? 'text-teal-400 bg-slate-800/50' : 'text-slate-400 hover:text-white'}`}
             >
               <BookUser className="w-5 h-5 text-yellow-400" />
               <span className="font-medium">ספר טלפונים</span>
@@ -95,8 +97,8 @@ export default function Sidebar({ onLogout }) {
           </div>
 
           <button
-            onClick={() => navigate('/notifications')}
-            className={`w-full flex items-center gap-3 p-2 text-sm rounded-lg transition-colors ${isActive('/send-ride') ? 'text-teal-400 bg-slate-800/50' : 'text-slate-400 hover:text-white'}`}
+            onClick={() => handleNavigation('/notifications')}
+            className={`w-full flex items-center gap-3 p-2 text-sm rounded-lg transition-colors ${isActive('/notifications') ? 'text-teal-400 bg-slate-800/50' : 'text-slate-400 hover:text-white'}`}
           >
             <Bell className="w-5 h-5 text-red-400" />
             <span className="font-medium">הודעות חשובות</span>
@@ -107,7 +109,7 @@ export default function Sidebar({ onLogout }) {
           {/* כפתור שמופיע רק לחברי ועד */}
           {user?.community_role === 'committee' && (
             <button
-              onClick={() => navigate('/committee-dashboard')}
+              onClick={() => handleNavigation('/committee-dashboard')}
               className="w-full flex items-center space-x-3 space-x-reverse p-3 rounded-xl hover:bg-slate-800 transition-colors text-amber-400"
             >
               <Shield className="w-5 h-5" />

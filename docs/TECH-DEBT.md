@@ -119,12 +119,12 @@ ID convention: `T##` numbered globally across phases. Where a finding was confir
 - **Issue:** `community_role` is read from the `users` table snapshot loaded once at sign-in (`AppContext.loadUserData`). If a committee member is demoted, they keep their committee UI access until they sign out and back in. The FastAPI side (`get_committee_community_id`) re-checks live, but the direct-supabase paths (T7) trust the stale role.
 - **Acceptance:** Either the role is verified via a Supabase RLS policy on the relevant tables (so a stale role cannot read/write), or the client refetches the role on every committee-route navigation. Verified by manually demoting a user in Supabase and confirming they lose access within one navigation, without sign-out.
 
-#### [ ] T12. JSX-mode comment syntax inside `<Routes>`
+#### [x] T12. JSX-mode comment syntax inside `<Routes>`
 - **Where:** `src/App.jsx:102` — `// כל נתיב אחר זורק ללוגין` sits between two `<Route>` siblings inside `<Routes>`.
 - **Issue:** JSX treats text between elements as a text child. `<Routes>` only accepts `<Route>` children — the line is either silently swallowed by react-router or rendered as a stray text node, depending on react-router version. A `react/jsx-no-comment-textnodes` lint rule would have caught it.
 - **Acceptance:** Comment replaced with `{/* ... */}` or removed. `npm run lint` passes with `react/jsx-no-comment-textnodes` enabled in the ESLint config.
 
-#### [ ] T13. Duplicate page-loader markup
+#### [x] T13. Duplicate page-loader markup
 - **Where:** `src/App.jsx:28-32` (the `PageLoader` component) and `src/App.jsx:73-76` (an inline copy in `AppRoutes`).
 - **Issue:** Same JSX appears twice. If the brand colour or copy changes, only one of them gets updated.
 - **Acceptance:** Single `PageLoader` component used in both call sites.
@@ -134,7 +134,7 @@ ID convention: `T##` numbered globally across phases. Where a finding was confir
 - **Issue:** Dead indirection. Every consumer either imports from `Client.js` or from `index.js` — there are two import paths for the same symbols, no behavioural difference.
 - **Acceptance:** All imports updated to `from '../Api'` (or `@/Api`). `Client.js` deleted. Build and lint pass.
 
-#### [ ] T15. Sidebar open/close state lives in global `AppContext`
+#### [x] T15. Sidebar open/close state lives in global `AppContext`
 - **Where:** `src/context/AppContext.jsx:12-16` — `isSidebarOpen`, `toggleSidebar`, `closeSidebar`.
 - **Issue:** This state is consumed only by `MainLayout` and `Sidebar`. Hoisting it to global context forces every consumer of `useAppData` to re-render on sidebar toggle, including unrelated pages.
 - **Acceptance:** State moves to local component state in `MainLayout`, passed to `Sidebar` via props or via a small `useSidebar` hook scoped to the layout. `AppContext` no longer exposes sidebar APIs.
@@ -156,7 +156,7 @@ ID convention: `T##` numbered globally across phases. Where a finding was confir
 
 #### [ ] T19. No error tracking for frontend or backend
 - **Where:** App-wide. `src/main.jsx` does not initialise a tracker; `src/server/main.py` does not initialise a tracker.
-- **Issue:** Vercel runtime logs catch backend exceptions only. Frontend errors (the silent `avior` `ReferenceError` in T3, future broken pages) leave no signal until a user reports them. As the codebase grows, signal-blindness becomes the limiting factor on iteration speed.
+- **Issue:** ~~Deferred 2026-06-09 — pending tracker choice (Sentry / Highlight / other) and DSN. Re-open when an account exists.~~ Vercel runtime logs catch backend exceptions only. Frontend errors (the silent `avior` `ReferenceError` in T3, future broken pages) leave no signal until a user reports them. As the codebase grows, signal-blindness becomes the limiting factor on iteration speed.
 - **Acceptance:** Pure-JS frontend error tracker (Sentry, Highlight, or equivalent — no native deps per the global ARM64 constraint) initialised in `src/main.jsx`. Backend tracker initialised at the top of `src/server/main.py`. One intentional error per side proves alerts reach the dashboard.
 
 ---
@@ -177,14 +177,14 @@ ID convention: `T##` numbered globally across phases. Where a finding was confir
 - **Issue:** Supply-chain vulnerabilities in transitive deps surface only when the developer remembers to run `npm audit` locally.
 - **Acceptance:** A non-blocking `npm audit --audit-level=high` step in the CI workflow from T5, with results visible on each PR. Verified — a known-vulnerable dep produces a PR comment or a failing check.
 
-#### [ ] T22. No architecture documentation for the two data paths
+#### [x] T22. No architecture documentation for the two data paths
 - **Where:** No `docs/ARCHITECTURE.md`.
 - **Issue:** The fork between `avior → FastAPI` and `supabase-js direct` (see T7) is invisible from the repo. A new contributor — or future-you in six months — will pick whichever pattern they happen to see first, and the inconsistency will deepen.
 - **Acceptance:** `docs/ARCHITECTURE.md` exists. It contains: a one-paragraph data-flow diagram (ASCII is fine), a table mapping each table → which path is the source of truth → which auth model protects it, and the rationale for the chosen path. React Query cache-key conventions from T8 live here too.
 
 #### [ ] T23. README env-var naming inconsistencies
 - **Where:** `README.md` lists `VITE_SUPABASE_KEY` while Supabase tooling and most community docs use `VITE_SUPABASE_ANON_KEY`. Backend uses `VITE_SUPABASE_SERVICE_KEY` — a `VITE_`-prefixed name for a server-only secret, which is unusual and surprising.
-- **Issue:** Onboarding friction. The `VITE_` prefix on a server secret is also a footgun — a future change that reads it from `import.meta.env` instead of `os.getenv` would expose the service key in the client bundle.
+- **Issue:** ~~Held 2026-06-09 — pending a separate batch coordinated with Vercel ENV updates (the rename is a coupled code + dashboard change).~~ Onboarding friction. The `VITE_` prefix on a server secret is also a footgun — a future change that reads it from `import.meta.env` instead of `os.getenv` would expose the service key in the client bundle.
 - **Acceptance:** Backend env var renamed to `SUPABASE_SERVICE_KEY` (no `VITE_` prefix); `src/server/config.py` updated. Optional: rename `VITE_SUPABASE_KEY` to `VITE_SUPABASE_ANON_KEY` to match Supabase docs. README + `.env.example` (T18) updated accordingly.
 
 ---
@@ -204,3 +204,18 @@ These were noted during the audit but need product or security decisions before 
 ## Discovered During Remediation
 
 > Add new findings here as they surface while working through the plan. Same format: `[ ] T##. Title` + Where / Issue / Acceptance.
+
+#### [x] T24. `QueryClientProvider` double-wrapped, with two different `QueryClient` instances
+- **Where:** `src/main.jsx:8,21-23` created one `QueryClient` and provider; `src/App.jsx:25,112` created a second `QueryClient` and a nested provider.
+- **Issue:** Pages calling `useQueryClient()` got App.jsx's instance while main.jsx's instance stayed live and unused. Wasted memory, confusing semantics if anyone tried to set defaults on either, and a footgun for the React Query migration in Batch 2 of this plan (cache keys would silently belong to whichever client was nearest in the tree).
+- **Acceptance:** Single `QueryClient` in `src/main.jsx` with `defaultOptions = { queries: { staleTime: 30_000, refetchOnWindowFocus: false } }`. `App.jsx` no longer imports or instantiates anything from `@tanstack/react-query`. Build passes.
+
+#### [x] T26. Dead `formatDate` import in `NotificationsHistory.jsx` produces a build warning
+- **Where:** `src/Pages/NotificationsHistory.jsx:5` — `import { formatDate } from '../lib/utils';`. `src/lib/utils.js` exports `cn` and `formatRideTime` only; `formatDate` doesn't exist.
+- **Issue:** Vite emits a warning on every build (`"formatDate" is not exported by "src/lib/utils.js"`). The file never actually calls `formatDate` — the rendering at line 71 uses `new Date(...).toLocaleDateString('he-IL')` inline. It's a leftover hint comment that survived. Once T19 (error tracking) lands, the warning would also surface in source-map analysis.
+- **Acceptance:** Dead import removed. Build emits no warning about `formatDate`.
+
+#### [x] T25. `Sidebar.jsx` — `closeSidebar;` is a no-op; menu items don't close the sidebar
+- **Where:** `src/Components/mainlayoutComp/Sidebar.jsx:16` had `closeSidebar;` (expression statement, function reference discarded) inside `handleNavigation`. Lines 89 and 98 used raw `navigate(...)` instead of `handleNavigation`, so even after the fix those buttons wouldn't close the sidebar.
+- **Issue:** Tapping a nav item on mobile left the sidebar open over the destination page. User had to tap the X or the backdrop to dismiss. Bug had been live since the sidebar was introduced.
+- **Acceptance:** `closeSidebar()` is called inside `handleNavigation`. All in-app nav buttons (`/`, `/phonebook`, `/notifications`, `/committee-dashboard`, `/settings`) use `handleNavigation`. Bonus: the home button's `isActive` check was wrongly comparing to `'/send-ride'` — corrected to `'/'`.

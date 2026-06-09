@@ -4,8 +4,18 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import App from './App.jsx'
 import './index.css'
 
-// יצירת מופע של הלקוח
-const queryClient = new QueryClient()
+// יצירת מופע של הלקוח — ברירות מחדל שמתאימות לאפליקציה:
+// - staleTime של 30 שניות חוסך רענונים מיותרים בין ניווטים קצרים
+// - refetchOnWindowFocus כבוי כי האפליקציה מותקנת כ-PWA / Capacitor ומיקוד חלון
+//   הוא לא אינדיקטור אמיתי לכך שהדאטה התיישן.
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            staleTime: 30_000,
+            refetchOnWindowFocus: false,
+        },
+    },
+})
 
 // שמירת האלמנט במשתנה לבדיקה
 const rootElement = document.getElementById('root')

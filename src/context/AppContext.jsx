@@ -8,12 +8,8 @@ export function AppProvider({ children }) {
     const [session, setSession] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    // 1. הוסף את ה-State החדש
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    // 2. פונקציית עזר לפתיחה/סגירה
-    const toggleSidebar = () => setIsSidebarOpen(prev => !prev);
-    // פונקציה לסגירה מפורשת (למשל כשלוחצים על לינק במובייל)
-    const closeSidebar = () => setIsSidebarOpen(false);
+    // מצב הסיידבר (isSidebarOpen/toggleSidebar/closeSidebar) הועבר ל-MainLayout
+    // והוא מועבר לדפים דרך useOutletContext() — ראה docs/ARCHITECTURE.md.
 
     // הוספנו פרמטר showLoader (ברירת מחדל: true)
     const loadUserData = async (showLoader = true) => {
@@ -127,11 +123,8 @@ export function AppProvider({ children }) {
         isAuthenticated,
         logout: handleLogout,
         refresh,
-        isSidebarOpen,
-        toggleSidebar,
-        closeSidebar
         // פונקציה לרענון שקט אם תצטרך בעתיד
-        //silentRefresh: () => loadUserData(false) 
+        //silentRefresh: () => loadUserData(false)
     };
 
     return (

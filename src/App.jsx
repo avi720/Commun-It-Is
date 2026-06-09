@@ -1,7 +1,6 @@
 import React, { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AppProvider, useAppData } from './context/AppContext';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { usePushNotifications } from './Components/hooks/usePushNotifications';
 
 import MainLayout from './Components/MainLayout';
@@ -22,9 +21,7 @@ const CommitteeDashboard = lazy(() => import('./Pages/CommitteeDashboard'));
 const PhoneBook = lazy(() => import('./Pages/PhoneBook'));
 const NotificationsHistory = lazy(() => import('./Pages/NotificationsHistory'));
 
-const queryClient = new QueryClient();
-
-// מסך טעינה אחיד שמוצג בזמן שדף עצל נטען
+// מסך טעינה אחיד שמוצג בזמן שדף עצל נטען או בזמן טעינת הסשן הראשונית
 const PageLoader = () => (
   <div className="h-screen w-full flex items-center justify-center bg-slate-900 text-teal-500">
     <div className="text-2xl font-bold animate-pulse">טוען את הקהילה שלך...</div>
@@ -69,11 +66,7 @@ const OnboardingRoute = ({ children }) => {
 function AppRoutes() {
   const { isAuthenticated, isLoading, user } = useAppData();
   if (isLoading) {
-    return (
-      <div className="h-screen w-full flex items-center justify-center bg-slate-900 text-teal-500">
-        <div className="text-2xl font-bold animate-pulse">טוען את הקהילה שלך...</div>
-      </div>
-    );
+    return <PageLoader />;
   }
 
   return (
@@ -99,7 +92,7 @@ function AppRoutes() {
         <Route path="phonebook" element={<PhoneBook />} />
         <Route path="notifications" element={<NotificationsHistory />} />
       </Route>
-        // כל נתיב אחר זורק ללוגין
+      {/* כל נתיב אחר זורק ללוגין */}
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
     </Suspense>
@@ -109,12 +102,10 @@ function AppRoutes() {
 export default function App() {
   usePushNotifications();
   return (
-    <QueryClientProvider client={queryClient}>
-      <AppProvider>
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
-      </AppProvider>
-    </QueryClientProvider>
+    <AppProvider>
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
+    </AppProvider>
   );
 }
