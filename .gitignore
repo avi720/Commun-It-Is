@@ -16,5 +16,8 @@ __pycache__/
 # Vercel
 .vercel
 
+# Claude Code local state (scheduled tasks lock, etc.) — machine-specific
+.claude/
+
 # Local dev helper (backend launcher without firebase, for ARM64 Windows)
 run_local_backend.py
