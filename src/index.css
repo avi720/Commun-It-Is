@@ -22,7 +22,8 @@
         --destructive-foreground: 210 40% 98%;
         --border: 214.3 31.8% 91.4%;
         --input: 214.3 31.8% 91.4%;
-        --ring: 222.2 84% 4.9%;
+        /* teal-400 — contrasting focus ring against the app's dark surfaces (F4). */
+        --ring: 172 66% 50%;
         --radius: 0.5rem;
     }
 
@@ -45,7 +46,7 @@
         --destructive-foreground: 210 40% 98%;
         --border: 217.2 32.6% 17.5%;
         --input: 217.2 32.6% 17.5%;
-        --ring: 212.7 26.8% 83.9%;
+        --ring: 172 66% 50%;
     }
 }
 

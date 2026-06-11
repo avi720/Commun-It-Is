@@ -65,7 +65,7 @@ createRoot(rootElement).render(
                     <p className="text-slate-400 mb-4">השגיאה דווחה אוטומטית, אנחנו כבר על זה.</p>
                     <button
                         onClick={() => window.location.reload()}
-                        className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2 rounded-lg"
+                        className="bg-teal-700 hover:bg-teal-800 text-white px-6 py-2 rounded-lg min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
                     >
                         רענן את הדף
                     </button>

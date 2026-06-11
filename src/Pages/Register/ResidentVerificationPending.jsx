@@ -79,7 +79,7 @@ export default function ResidentVerificationPending() {
                 <button
                     onClick={handleRefresh}
                     disabled={refreshing}
-                    className="w-full bg-teal-600 hover:bg-teal-700 text-white p-3 rounded-md font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
+                    className="w-full bg-teal-700 hover:bg-teal-800 text-white p-3 rounded-md font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 min-h-[44px]"
                 >
                     {refreshing ? <Loader2 className="w-5 h-5 animate-spin" /> : <RefreshCw className="w-5 h-5" />}
                     רענן סטטוס

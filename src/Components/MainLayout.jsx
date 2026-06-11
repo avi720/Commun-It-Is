@@ -31,9 +31,10 @@ export default function MainLayout() {
 
           <button
             onClick={toggleSidebar}
-            className="p-2 -ml-2 hover:bg-slate-800 rounded-full transition-colors active:scale-95 touch-manipulation"
+            aria-label="פתח תפריט"
+            className="min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-slate-800 rounded-full transition-colors active:scale-95 touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
           >
-            <Menu className="w-6 h-6 text-white" />
+            <Menu className="w-6 h-6 text-white" aria-hidden="true" />
           </button>
 
           <div

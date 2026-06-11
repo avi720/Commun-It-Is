@@ -43,8 +43,12 @@ export default function FeedPosts({ post }) {
                     <div className="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center border-none shadow-lg shadow-amber-500/20">
                         <Shield className="w-6 h-6 text-white" />
                     </div>
+                ) : post.users?.avatar_url ? (
+                    <img src={post.users.avatar_url} alt="" className="w-10 h-10 rounded-full object-cover border-none" />
                 ) : (
-                    <img src={post.users?.avatar_url} alt="User Avatar" className="w-10 h-10 rounded-full object-cover border-none" />
+                    <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-xl font-bold text-teal-400 select-none" aria-hidden="true">
+                        {post.users?.firstName?.[0] || '?'}
+                    </div>
                 )}
 
                 <div>
@@ -89,8 +93,8 @@ export default function FeedPosts({ post }) {
                 </Button>
 
                 {/* כפתור שיתוף כללי (אופציונלי) */}
-                <Button variant="ghost" size="icon" className="text-slate-400">
-                    <Share2 className="w-4 h-4" />
+                <Button variant="ghost" size="icon" aria-label="שתף פוסט" className="text-slate-400">
+                    <Share2 className="w-4 h-4" aria-hidden="true" />
                 </Button>
             </div>
         </Card>

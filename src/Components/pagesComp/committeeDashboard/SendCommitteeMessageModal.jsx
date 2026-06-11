@@ -72,7 +72,7 @@ export default function SendCommitteeMessageModal({ open, onClose, communityId }
                         <button
                             onClick={handleSendClick}
                             disabled={sendMutation.isPending}
-                            className="bg-teal-600 hover:bg-teal-700 disabled:opacity-50 text-white px-6 py-2 rounded"
+                            className="bg-teal-700 hover:bg-teal-800 disabled:opacity-50 text-white px-6 py-2 rounded min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
                         >
                             {sendMutation.isPending ? 'שולח…' : 'שלח'}
                         </button>

@@ -42,7 +42,7 @@ export default function GoogleSignInButton({ label = 'המשך עם Google' }) {
                 type="button"
                 onClick={handleClick}
                 disabled={loading}
-                className="w-full bg-white hover:bg-slate-100 text-slate-800 p-2 rounded-md font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
+                className="w-full bg-white hover:bg-slate-100 text-slate-800 p-2 rounded-md font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-70 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-800"
             >
                 {loading ? (
                     <Loader2 className="w-5 h-5 animate-spin" />

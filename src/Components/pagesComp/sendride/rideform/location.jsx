@@ -96,7 +96,7 @@ export default function Location({
                 <button
                     onClick={handleCurrentLocation}
                     className={`flex items-center justify-center gap-2 p-2 rounded-md text-sm transition-all ${originMode === 'gps'
-                        ? 'bg-teal-600 text-white shadow-sm'
+                        ? 'bg-teal-700 text-white shadow-sm'
                         : 'text-slate-400 hover:text-slate-200'
                         }`}
                 >

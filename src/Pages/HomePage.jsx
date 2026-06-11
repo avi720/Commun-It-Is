@@ -15,12 +15,13 @@ function FloatingActionButton({ onClick, isSidebarOpen }) {
   return !isSidebarOpen ? (
     <Button
       onClick={onClick}
-      className="fixed bottom-16 left-6 w-14 h-14 rounded-full bg-teal-500 hover:bg-teal-600 shadow-lg shadow-teal-500/30 flex items-center justify-center z-50 transition-transform hover:scale-105"
+      aria-label="צור פוסט חדש"
+      className="fixed bottom-16 left-6 w-14 h-14 rounded-full bg-teal-700 hover:bg-teal-800 shadow-lg shadow-teal-500/30 flex items-center justify-center z-50 transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-300 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
     >
-      <Plus className="w-8 h-8 text-white" />
+      <Plus className="w-8 h-8 text-white" aria-hidden="true" />
     </Button>
   ) : (
-    <div className="fixed bottom-16 left-6 w-14 h-14 rounded-full bg-teal-500/60 hover:bg-teal-600 shadow-lg shadow-teal-500/30 flex items-center justify-center z-50 transition-transform hover:scale-105">
+    <div className="fixed bottom-16 left-6 w-14 h-14 rounded-full bg-teal-700/60 shadow-lg shadow-teal-500/30 flex items-center justify-center z-50" aria-hidden="true">
       <Plus className="w-4 h-4 text-gray-400" />
     </div>
   );

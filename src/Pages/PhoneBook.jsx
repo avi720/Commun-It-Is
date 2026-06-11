@@ -42,14 +42,16 @@ export default function PhoneBook() {
                 <h1 className="text-2xl font-bold mb-4 text-center text-teal-400">ספר טלפונים קהילתי 📖</h1>
 
                 <div className="relative">
+                    <label htmlFor="phonebook-search" className="sr-only">חיפוש שכן</label>
                     <input
+                        id="phonebook-search"
                         type="text"
                         placeholder="חפש שכן..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full bg-slate-800 border border-slate-700 rounded-xl py-3 px-4 pr-10 focus:outline-none focus:border-teal-500 text-white"
+                        className="w-full bg-slate-700 border-2 border-slate-600 rounded-xl py-3 px-4 pr-10 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/40 text-white placeholder:text-slate-300 min-h-[44px] text-base"
                     />
-                    <Search className="absolute left-3 top-3.5 text-slate-400 w-5 h-5" />
+                    <Search className="absolute left-3 top-3.5 text-slate-300 w-5 h-5" aria-hidden="true" />
                 </div>
             </div>
 

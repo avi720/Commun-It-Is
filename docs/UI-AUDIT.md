@@ -60,47 +60,47 @@ ID convention: `F##` numbered globally across phases. Where a finding was confir
 
 ### Phase 1 — Critical (Day-1 blockers, must clear before next release)
 
-#### [ ] F1. Mobile zoom is disabled app-wide
+#### [x] F1. Mobile zoom is disabled app-wide
 - **Where:** `index.html` — viewport meta tag
 - **Issue:** `maximum-scale=1.0, user-scalable=no` blocks the OS pinch-to-zoom. Violates WCAG 1.4.4 (Resize Text). Hits exactly the older / low-vision residents this app targets.
 - **Acceptance:** On a real phone, two-finger pinch on any screen zooms the UI. Lighthouse mobile a11y audit no longer flags the viewport. Layout does not break when zoomed.
 
-#### [ ] F2. Primary CTA color fails WCAG AA contrast
+#### [x] F2. Primary CTA color fails WCAG AA contrast
 - **Where:** Every primary teal button in the app (Login, Register, Settings save, Send ride, Refresh status, etc.).
 - **Issue:** **Confirmed live.** Measured `teal-600` background with white text = 3.74:1. WCAG AA requires 4.5:1 for normal text.
 - **Acceptance:** The primary action color passes 4.5:1 against its text color on every screen. Verified with a contrast tool, not by eye.
 
-#### [ ] F3. Touch targets below 44pt across most interactive elements
+#### [x] F3. Touch targets below 44pt across most interactive elements
 - **Where:** Sidebar items, all `<Button size="default">` and `<Input>` (h-9 = 36px), header Menu/Close icons, in-card icon buttons, Google sign-in.
 - **Issue:** **Confirmed live.** Measured 9 of 15 interactive elements on Home page below the 44×44pt iOS minimum. Sidebar items "דף הבית", "ספר טלפונים", "הודעות חשובות" all 239×36. The shadcn defaults shipped here are desktop-tuned.
 - **Acceptance:** On phone widths or touch input, every tappable element measures ≥44×44pt (iOS HIG) / 48×48dp (Material). On desktop with mouse input, targets may be more compact but never below WCAG 2.5.8 (24×24 CSS px) and must keep comfortable density. The mobile baseline is never undermined by desktop styling. Spot-checked at both breakpoints across all routes.
 
-#### [ ] F4. No visible keyboard focus state on primary CTAs
+#### [x] F4. No visible keyboard focus state on primary CTAs
 - **Where:** Raw `<button>` elements in `LoginPage`, `RegisterPage`, `OnboardingPage`, `ResidentVerificationPending`, `GoogleSignInButton`, `PhoneBook` search, `CreatePostModal` controls.
 - **Issue:** **Confirmed live.** Submitted focus to the Login submit button — computed `outline: none`, `box-shadow: none`. Keyboard / screen-reader users have no indication of focus position.
 - **Acceptance:** Tabbing through any page produces a clearly visible focus ring (contrasting, ≥2px) on every focusable element. Verified by keyboard-only tab tour of every route.
 
-#### [ ] F5. Icon-only buttons missing accessibility labels
+#### [x] F5. Icon-only buttons missing accessibility labels
 - **Where:** Header Menu (MainLayout), Sidebar close X, FAB "+" on Home, Trash on image preview (CreatePostModal), Share2 in FeedPosts, X in RideDetailsModal.
 - **Issue:** Screen readers announce "button" with no purpose for any of them.
 - **Acceptance:** VoiceOver / TalkBack announces a meaningful Hebrew label for every icon-only control. Verified with a real screen reader, not just by inspecting attributes.
 
 #### [ ] F6. Sidebar does not close after navigation
 - **Where:** `src/Components/mainlayoutComp/Sidebar.jsx` — `handleNavigation`.
-- **Issue:** **Confirmed live.** After tapping a nav item the drawer stays open over the new page. Caused by a function reference that is never invoked. Several nav items also bypass the helper and call `navigate` directly, so they would still leak even after the helper is fixed.
+- **Issue:** ~~**Invalid in context 2026-06-11** — already fixed in an earlier commit (the in-file Hebrew comment near `handleNavigation` documents the previous bug where `closeSidebar;` was an expression instead of a call). Live verification on localhost confirmed all 4 nav items close the drawer in the same gesture they navigate (`closedAfterNav: true` for every route tested). No code change needed.~~ **Confirmed live.** After tapping a nav item the drawer stays open over the new page. Caused by a function reference that is never invoked. Several nav items also bypass the helper and call `navigate` directly, so they would still leak even after the helper is fixed.
 - **Acceptance:** Tapping any sidebar item navigates to the target route **and** closes the drawer in the same gesture. Verified across all nav items, including the nested "טרמפיקציה" children.
 
 #### [ ] F7. Active-route highlighting in sidebar is broken for all items
 - **Where:** `Sidebar.jsx` — `isActive(...)` calls.
-- **Issue:** **Confirmed live.** All items pass `'/send-ride'` to `isActive`, so only that one route ever appears active. Confirmed on Home: zero items reported `looksActive: true`.
+- **Issue:** ~~**Invalid in context 2026-06-11** — already fixed in an earlier commit. Each nav button now passes its own path (`/`, `/rides`, `/send-ride`, `/phonebook`, `/notifications`, `/settings`) to `isActive`. Live verification confirmed every route highlights its own item: 4 items use `text-teal-400` and Settings intentionally uses `bg-slate-800 text-white` for a distinct treatment (it lives in the footer block). Both patterns are detectable visually as "you are here".~~ **Confirmed live.** All items pass `'/send-ride'` to `isActive`, so only that one route ever appears active. Confirmed on Home: zero items reported `looksActive: true`.
 - **Acceptance:** Each sidebar item visually reflects "I am here" when its route is current — verified by visiting each route in turn and watching the highlight follow.
 
-#### [ ] F8. Broken avatar leaks alt text into the feed
+#### [x] F8. Broken avatar leaks alt text into the feed
 - **Where:** `FeedPosts.jsx` — `<img src={post.users?.avatar_url}>`.
 - **Issue:** **Confirmed live.** When `avatar_url` is empty/null the browser renders the alt text "User Avatar" inside the broken image box. Every post by a user without an uploaded avatar looks broken.
 - **Acceptance:** A post by a user with no avatar shows a clean fallback (e.g., initial in a colored circle) consistent with the avatar fallback already used in PhoneBook. No alt text is ever visible to the end user.
 
-#### [ ] F9. Phonebook search field is invisible on its background
+#### [x] F9. Phonebook search field is invisible on its background
 - **Where:** `PhoneBook.jsx` — search input styling.
 - **Issue:** **Confirmed live.** `bg-slate-800` on `bg-slate-900` produces ~1.34:1 separation; the input is undiscoverable until a user happens to tap on the empty strip and the placeholder appears.
 - **Acceptance:** The search field is clearly visible as an input at first glance on the empty PhoneBook screen (and remains visible when the list has results). Tested on light- and dark-mode displays at typical phone brightness.

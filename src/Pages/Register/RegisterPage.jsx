@@ -171,7 +171,7 @@ export default function RegisterPage() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-teal-600 hover:bg-teal-700 text-white h-11 text-lg font-medium transition-colors flex items-center justify-center gap-2"
+              className="w-full bg-teal-700 hover:bg-teal-800 text-white h-11 text-lg font-medium transition-colors flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-800"
             >
               {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (
                 <>
@@ -192,9 +192,9 @@ export default function RegisterPage() {
             <button
               type="button"
               onClick={() => navigate('/login')}
-              className="w-full text-slate-400 hover:text-white p-2 text-sm flex items-center justify-center gap-2 mt-2"
+              className="w-full text-slate-400 hover:text-white p-2 text-sm flex items-center justify-center gap-2 mt-2 min-h-[44px] rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-800"
             >
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-4 h-4" aria-hidden="true" />
               חזרה להתחברות
             </button>
 

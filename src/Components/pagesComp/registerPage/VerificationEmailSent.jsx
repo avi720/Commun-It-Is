@@ -70,7 +70,7 @@ export default function VerificationEmailSent({ email, password, setLoading, loa
                     </div>
                     {/* כפתור בדיקה חכם */}
                     <Button
-                        className="w-full bg-teal-600 hover:bg-teal-700 text-white gap-2 h-12 text-lg animate-pulse"
+                        className="w-full bg-teal-700 hover:bg-teal-800 text-white gap-2 h-12 text-lg animate-pulse"
                         onClick={handleCheckVerification}
                         disabled={loading}
                     >

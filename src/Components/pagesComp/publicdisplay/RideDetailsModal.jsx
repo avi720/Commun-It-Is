@@ -26,8 +26,12 @@ export default function RideDetailsModal({ ride, onClose }) {
                 onClick={(e) => e.stopPropagation()} // מונע סגירה כשלוחצים על המודל עצמו
             >
                 {/* כפתור סגירה */}
-                <button onClick={onClose} className="absolute top-4 left-4 p-2 text-slate-400 hover:text-white bg-slate-800/50 rounded-full z-10">
-                    <X size={20} />
+                <button
+                    onClick={onClose}
+                    aria-label="סגור פרטי נסיעה"
+                    className="absolute top-4 left-4 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-400 hover:text-white bg-slate-800/50 rounded-full z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+                >
+                    <X size={20} aria-hidden="true" />
                 </button>
 
                 {/* תמונת מפה / אזור עליון */}
@@ -77,7 +81,7 @@ export default function RideDetailsModal({ ride, onClose }) {
                     </div>
 
                     {/* כפתור פעולה */}
-                    <Button className="w-full bg-teal-600 hover:bg-teal-700 text-white py-6 text-lg">
+                    <Button className="w-full bg-teal-700 hover:bg-teal-800 text-white py-6 text-lg">
                         הצטרף לנסיעה
                     </Button>
                 </div>

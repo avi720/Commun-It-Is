@@ -77,8 +77,8 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }) {
                 {/* כותרת */}
                 <div className="flex justify-between items-center p-4 border-b border-slate-800 bg-slate-900/50">
                     <h3 className="font-bold text-white">יצירת פוסט חדש</h3>
-                    <Button variant="ghost" size="icon" onClick={onClose} className="text-slate-400 hover:text-white rounded-full">
-                        <X className="w-5 h-5" />
+                    <Button variant="ghost" size="icon" onClick={onClose} aria-label="סגור חלון יצירת פוסט" className="text-slate-400 hover:text-white rounded-full">
+                        <X className="w-5 h-5" aria-hidden="true" />
                     </Button>
                 </div>
 
@@ -111,9 +111,10 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }) {
                                 <button
                                     type="button"
                                     onClick={clearImage}
-                                    className="absolute top-2 right-2 bg-black/60 p-1.5 rounded-full text-white hover:bg-red-600/80 transition-colors"
+                                    aria-label="הסר תמונה"
+                                    className="absolute top-2 right-2 min-w-[44px] min-h-[44px] flex items-center justify-center bg-black/60 rounded-full text-white hover:bg-red-600/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
                                 >
-                                    <Trash2 className="w-4 h-4" />
+                                    <Trash2 className="w-5 h-5" aria-hidden="true" />
                                 </button>
                             </div>
                         ) : (
@@ -160,7 +161,7 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }) {
                         <Button
                             type="submit"
                             disabled={!content.trim() || isSubmitting}
-                            className="bg-teal-600 hover:bg-teal-700 text-white p-5"
+                            className="bg-teal-700 hover:bg-teal-800 text-white p-5"
                         >
                             {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : (
                                 <>

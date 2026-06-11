@@ -51,7 +51,7 @@ export default function CommitteeDashboard() {
                 </h1>
                 <button
                     onClick={() => setShowMsgModal(true)}
-                    className="bg-teal-600 hover:bg-teal-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-lg mt-2"
+                    className="bg-teal-700 hover:bg-teal-800 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-lg mt-2 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-800"
                 >
                     📢 שלח הודעה לכולם
                 </button>

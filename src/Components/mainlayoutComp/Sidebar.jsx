@@ -37,8 +37,12 @@ export default function Sidebar({ onLogout, isSidebarOpen, closeSidebar }) {
 
         <div className="p-4 flex justify-between items-center border-b border-slate-800">
           <h2 className="text-xl font-bold text-white">תפריט</h2>
-          <button onClick={closeSidebar} className="text-slate-400 hover:text-white">
-            <X className="w-6 h-6" />
+          <button
+            onClick={closeSidebar}
+            aria-label="סגור תפריט"
+            className="min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-400 hover:text-white rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+          >
+            <X className="w-6 h-6" aria-hidden="true" />
           </button>
         </div>
 
@@ -47,9 +51,9 @@ export default function Sidebar({ onLogout, isSidebarOpen, closeSidebar }) {
           {/* דף הבית */}
           <button
             onClick={() => handleNavigation('/')}
-            className={`w-full flex items-center gap-3 p-2 text-sm rounded-lg transition-colors ${isActive('/') ? 'text-teal-400 bg-slate-800/50' : 'text-slate-400 hover:text-white'}`}
+            className={`w-full flex items-center gap-3 p-3 min-h-[44px] text-sm rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 ${isActive('/') ? 'text-teal-400 bg-slate-800/50' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}
           >
-            <Home className="w-5 h-5 text-green-400" />
+            <Home className="w-5 h-5 text-green-400" aria-hidden="true" />
             <span className="font-medium">דף הבית</span>
           </button>
 
@@ -57,29 +61,30 @@ export default function Sidebar({ onLogout, isSidebarOpen, closeSidebar }) {
           <div className="space-y-1">
             <button
               onClick={() => setIsTrempOpen(!isTrempOpen)}
-              className={`w-full flex items-center justify-between p-3 rounded-lg text-slate-300 hover:bg-slate-800 transition-colors ${['/rides', '/send-ride'].some(p => location.pathname.includes(p)) ? 'bg-slate-800' : ''}`}
+              aria-expanded={isTrempOpen}
+              className={`w-full flex items-center justify-between p-3 min-h-[44px] rounded-lg text-slate-300 hover:bg-slate-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 ${['/rides', '/send-ride'].some(p => location.pathname.includes(p)) ? 'bg-slate-800' : ''}`}
             >
               <div className="flex items-center gap-3">
-                <Car className="w-5 h-5 text-orange-400" />
+                <Car className="w-5 h-5 text-orange-400" aria-hidden="true" />
                 <span className="font-medium">טרמפיקציה</span>
               </div>
-              {isTrempOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              {isTrempOpen ? <ChevronUp className="w-4 h-4" aria-hidden="true" /> : <ChevronDown className="w-4 h-4" aria-hidden="true" />}
             </button>
 
             {isTrempOpen && (
               <div className="mr-4 space-y-1 border-r-2 border-slate-700 pr-2">
                 <button
                   onClick={() => handleNavigation('/rides')}
-                  className={`w-full flex items-center gap-3 p-2 text-sm rounded-lg transition-colors ${isActive('/rides') ? 'text-teal-400 bg-slate-800/50' : 'text-slate-400 hover:text-white'}`}
+                  className={`w-full flex items-center gap-3 p-3 min-h-[44px] text-sm rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 ${isActive('/rides') ? 'text-teal-400 bg-slate-800/50' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}
                 >
-                  <Monitor className="w-4 h-4" />
+                  <Monitor className="w-4 h-4" aria-hidden="true" />
                   לוח טרמפים
                 </button>
                 <button
                   onClick={() => handleNavigation('/send-ride')}
-                  className={`w-full flex items-center gap-3 p-2 text-sm rounded-lg transition-colors ${isActive('/send-ride') ? 'text-teal-400 bg-slate-800/50' : 'text-slate-400 hover:text-white'}`}
+                  className={`w-full flex items-center gap-3 p-3 min-h-[44px] text-sm rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 ${isActive('/send-ride') ? 'text-teal-400 bg-slate-800/50' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}
                 >
-                  <Send className="w-4 h-4" />
+                  <Send className="w-4 h-4" aria-hidden="true" />
                   פרסם נסיעה
                 </button>
               </div>
@@ -88,18 +93,18 @@ export default function Sidebar({ onLogout, isSidebarOpen, closeSidebar }) {
 
             <button
               onClick={() => handleNavigation('/phonebook')}
-              className={`w-full flex items-center gap-3 p-2 text-sm rounded-lg transition-colors ${isActive('/phonebook') ? 'text-teal-400 bg-slate-800/50' : 'text-slate-400 hover:text-white'}`}
+              className={`w-full flex items-center gap-3 p-3 min-h-[44px] text-sm rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 ${isActive('/phonebook') ? 'text-teal-400 bg-slate-800/50' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}
             >
-              <BookUser className="w-5 h-5 text-yellow-400" />
+              <BookUser className="w-5 h-5 text-yellow-400" aria-hidden="true" />
               <span className="font-medium">ספר טלפונים</span>
             </button>
           </div>
 
           <button
             onClick={() => handleNavigation('/notifications')}
-            className={`w-full flex items-center gap-3 p-2 text-sm rounded-lg transition-colors ${isActive('/notifications') ? 'text-teal-400 bg-slate-800/50' : 'text-slate-400 hover:text-white'}`}
+            className={`w-full flex items-center gap-3 p-3 min-h-[44px] text-sm rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 ${isActive('/notifications') ? 'text-teal-400 bg-slate-800/50' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}
           >
-            <Bell className="w-5 h-5 text-red-400" />
+            <Bell className="w-5 h-5 text-red-400" aria-hidden="true" />
             <span className="font-medium">הודעות חשובות</span>
           </button>
         </div>
@@ -109,25 +114,25 @@ export default function Sidebar({ onLogout, isSidebarOpen, closeSidebar }) {
           {user?.community_role === 'committee' && (
             <button
               onClick={() => handleNavigation('/committee-dashboard')}
-              className="w-full flex items-center space-x-3 space-x-reverse p-3 rounded-xl hover:bg-slate-800 transition-colors text-amber-400"
+              className="w-full flex items-center space-x-3 space-x-reverse p-3 min-h-[44px] rounded-xl hover:bg-slate-800 transition-colors text-amber-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400"
             >
-              <Shield className="w-5 h-5" />
+              <Shield className="w-5 h-5" aria-hidden="true" />
               <span className="font-medium">ניהול קהילה</span>
             </button>
           )}
           <button
             onClick={() => handleNavigation('/settings')}
-            className={`w-full flex items-center gap-3 p-3 rounded-lg transition-colors ${isActive('/settings') ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}
+            className={`w-full flex items-center gap-3 p-3 min-h-[44px] rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 ${isActive('/settings') ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}
           >
-            <Settings className="w-5 h-5" />
+            <Settings className="w-5 h-5" aria-hidden="true" />
             <span>הגדרות</span>
           </button>
 
           <button
             onClick={onLogout}
-            className="w-full flex items-center gap-3 p-3 rounded-lg text-red-400 hover:bg-red-900/20 transition-colors"
+            className="w-full flex items-center gap-3 p-3 min-h-[44px] rounded-lg text-red-400 hover:bg-red-900/20 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
           >
-            <LogOut className="w-5 h-5" />
+            <LogOut className="w-5 h-5" aria-hidden="true" />
             <span>התנתק</span>
           </button>
         </div>

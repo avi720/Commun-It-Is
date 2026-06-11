@@ -58,11 +58,12 @@ export default function LoginPage() {
           <form onSubmit={handleLogin} className="space-y-4">
 
             <div className="relative">
-              <Mail className="absolute right-3 top-3 h-5 w-5 text-slate-400" />
+              <Mail className="absolute right-3 top-3 h-5 w-5 text-slate-400" aria-hidden="true" />
               <input
                 type="email"
                 placeholder="כתובת אימייל"
-                className="w-full p-2 pr-10 rounded-md bg-slate-900 border border-slate-700 text-white focus:border-teal-500 outline-none"
+                aria-label="כתובת אימייל"
+                className="w-full p-3 pr-10 rounded-md bg-slate-900 border border-slate-700 text-white text-base min-h-[44px] focus:border-teal-400 outline-none focus-visible:ring-2 focus-visible:ring-teal-400"
                 required
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -70,11 +71,12 @@ export default function LoginPage() {
             </div>
 
             <div className="relative">
-              <Lock className="absolute right-3 top-3 h-5 w-5 text-slate-400" />
+              <Lock className="absolute right-3 top-3 h-5 w-5 text-slate-400" aria-hidden="true" />
               <input
                 type="password"
                 placeholder="סיסמה"
-                className="w-full p-2 pr-10 rounded-md bg-slate-900 border border-slate-700 text-white focus:border-teal-500 outline-none"
+                aria-label="סיסמה"
+                className="w-full p-3 pr-10 rounded-md bg-slate-900 border border-slate-700 text-white text-base min-h-[44px] focus:border-teal-400 outline-none focus-visible:ring-2 focus-visible:ring-teal-400"
                 required
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
@@ -86,7 +88,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-teal-600 hover:bg-teal-700 text-white p-2 rounded-md font-medium transition-colors flex items-center justify-center gap-2"
+              className="w-full bg-teal-700 hover:bg-teal-800 text-white p-2 rounded-md font-medium transition-colors flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-800 min-h-[44px]"
             >
               התחבר
               {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogIn className="w-4 h-4" />}

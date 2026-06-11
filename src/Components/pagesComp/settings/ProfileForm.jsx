@@ -134,7 +134,7 @@ export default function ProfileForm({ user, onSave }) {
                 </div>
             </div>
             <div className="pt-2">
-                <Button type="submit" disabled={isSaving} className="w-full bg-teal-600 hover:bg-teal-700 text-white">
+                <Button type="submit" disabled={isSaving} className="w-full bg-teal-700 hover:bg-teal-800 text-white h-11">
                     {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
                     שמור שינויים
                 </Button>

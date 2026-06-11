@@ -43,7 +43,7 @@ export function ConfirmDialog({
                                 className={
                                     destructive
                                         ? ""
-                                        : "bg-teal-600 hover:bg-teal-700 text-white"
+                                        : "bg-teal-700 hover:bg-teal-800 text-white"
                                 }
                             >
                                 {confirmLabel}
