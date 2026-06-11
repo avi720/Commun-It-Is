@@ -32,6 +32,13 @@ if (import.meta.env.VITE_SENTRY_DSN) {
         replaysSessionSampleRate: 0,
         replaysOnErrorSampleRate: 1.0,
     })
+
+    // === TEMP T19 verification trigger — REMOVE after Sentry receives the event ===
+    // ביקור ב-`?sentry_test=1` ישלח אירוע אחד ל-Sentry frontend.
+    // אחרי האימות הראשון, השורות האלה יוסרו ב-commit נפרד.
+    if (new URLSearchParams(window.location.search).get('sentry_test') === '1') {
+        Sentry.captureException(new Error('sentry-test-frontend: verifying Sentry integration'));
+    }
 }
 
 // יצירת מופע של הלקוח — ברירות מחדל שמתאימות לאפליקציה:

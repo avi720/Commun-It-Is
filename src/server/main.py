@@ -53,6 +53,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# === TEMP T19 verification endpoint — REMOVE after Sentry receives the event ===
+# GET /api/sentry-test יזרוק שגיאה מכוונת שתישלח ל-Sentry backend project.
+# אחרי שהאירוע מופיע ב-dashboard, ה-route הזה יוסר ב-commit נפרד.
+@app.get("/api/sentry-test")
+def sentry_test_endpoint():
+    raise RuntimeError("sentry-test-backend: verifying Sentry integration")
+
+
 # --- Routers ---
 app.include_router(users_router)
 app.include_router(rides_router)
