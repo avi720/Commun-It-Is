@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/Components/ui/card";
+import { Label } from "@/Components/ui/label";
 import { Mail, Lock, LogIn, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { avior } from "../Api";
@@ -44,7 +45,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-900 p-4">
+    <div className="min-h-dvh flex items-center justify-center bg-slate-900 p-4">
       <Card className="w-full max-w-md bg-slate-800 border-slate-700 text-white shadow-2xl">
         <CardHeader className="text-center space-y-1">
           <CardTitle className="text-2xl font-bold text-teal-400">
@@ -57,30 +58,36 @@ export default function LoginPage() {
         <CardContent className="space-y-4">
           <form onSubmit={handleLogin} className="space-y-4">
 
-            <div className="relative">
-              <Mail className="absolute right-3 top-3 h-5 w-5 text-slate-400" aria-hidden="true" />
-              <input
-                type="email"
-                placeholder="כתובת אימייל"
-                aria-label="כתובת אימייל"
-                className="w-full p-3 pr-10 rounded-md bg-slate-900 border border-slate-700 text-white text-base min-h-[44px] focus:border-teal-400 outline-none focus-visible:ring-2 focus-visible:ring-teal-400"
-                required
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              />
+            <div className="space-y-2">
+              <Label htmlFor="login-email" className="text-slate-300">כתובת אימייל</Label>
+              <div className="relative">
+                <Mail className="absolute right-3 top-3 h-5 w-5 text-slate-400" aria-hidden="true" />
+                <input
+                  id="login-email"
+                  type="email"
+                  placeholder="name@example.com"
+                  className="flex w-full h-11 md:h-9 pr-10 px-3 py-1 rounded-md bg-slate-900 border border-slate-700 text-white text-base md:text-sm shadow-sm transition-colors placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+                  required
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                />
+              </div>
             </div>
 
-            <div className="relative">
-              <Lock className="absolute right-3 top-3 h-5 w-5 text-slate-400" aria-hidden="true" />
-              <input
-                type="password"
-                placeholder="סיסמה"
-                aria-label="סיסמה"
-                className="w-full p-3 pr-10 rounded-md bg-slate-900 border border-slate-700 text-white text-base min-h-[44px] focus:border-teal-400 outline-none focus-visible:ring-2 focus-visible:ring-teal-400"
-                required
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              />
+            <div className="space-y-2">
+              <Label htmlFor="login-password" className="text-slate-300">סיסמה</Label>
+              <div className="relative">
+                <Lock className="absolute right-3 top-3 h-5 w-5 text-slate-400" aria-hidden="true" />
+                <input
+                  id="login-password"
+                  type="password"
+                  placeholder="הזן סיסמה"
+                  className="flex w-full h-11 md:h-9 pr-10 px-3 py-1 rounded-md bg-slate-900 border border-slate-700 text-white text-base md:text-sm shadow-sm transition-colors placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+                  required
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                />
+              </div>
             </div>
 
             {error && <p className="text-red-400 text-sm text-center font-medium bg-red-900/20 p-2 rounded">{error}</p>}

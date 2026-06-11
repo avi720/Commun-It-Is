@@ -16,6 +16,7 @@ function FloatingActionButton({ onClick, isSidebarOpen }) {
     <Button
       onClick={onClick}
       aria-label="צור פוסט חדש"
+      title="צור פוסט חדש"
       className="fixed bottom-16 left-6 w-14 h-14 rounded-full bg-teal-700 hover:bg-teal-800 shadow-lg shadow-teal-500/30 flex items-center justify-center z-50 transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-300 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
     >
       <Plus className="w-8 h-8 text-white" aria-hidden="true" />
@@ -50,7 +51,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen space-y-6 relative">
 
-      <div className="max-w-lg mx-auto space-y-4">
+      <div className="max-w-lg md:max-w-2xl mx-auto space-y-4">
         {isLoading ? (
           <div className="flex justify-center pt-20">
             <Loader2 className="w-8 h-8 text-teal-500 animate-spin" />

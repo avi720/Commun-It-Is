@@ -1,5 +1,5 @@
 import { avior } from "@/Api";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Users, Search, Check } from 'lucide-react';
 
 export default function CommunitiesList({ selectedCommunityName, setSelectedCommunityName }) {
@@ -7,6 +7,7 @@ export default function CommunitiesList({ selectedCommunityName, setSelectedComm
   const [communities, setCommunities] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
+  const wrapperRef = useRef(null);
   // טעינת רשימת הקהילות בטעינת הדף
   useEffect(() => {
     const fetchCommunities = async () => {
@@ -19,13 +20,29 @@ export default function CommunitiesList({ selectedCommunityName, setSelectedComm
     };
     fetchCommunities();
   }, []);
+
+  // סגירת הרשימה בלחיצה מחוץ לרכיב (mirrors CitySelect pattern)
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, []);
+
   // סינון הקהילות לפי מונח החיפוש
   const filteredCommunities = communities.filter(c =>
     c.name.includes(searchTerm)
   );
 
   return (
-    <div className="space-y-2 relative">
+    <div ref={wrapperRef} className="space-y-2 relative">
       <label className="text-sm text-teal-400 font-medium flex items-center gap-2">
         <Users className="w-4 h-4" />
         בחר את הקהילה שלך

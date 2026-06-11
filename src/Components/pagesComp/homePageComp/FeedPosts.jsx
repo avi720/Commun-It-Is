@@ -93,7 +93,7 @@ export default function FeedPosts({ post }) {
                 </Button>
 
                 {/* כפתור שיתוף כללי (אופציונלי) */}
-                <Button variant="ghost" size="icon" aria-label="שתף פוסט" className="text-slate-400">
+                <Button variant="ghost" size="icon" aria-label="שתף פוסט" title="שתף פוסט" className="text-slate-400">
                     <Share2 className="w-4 h-4" aria-hidden="true" />
                 </Button>
             </div>

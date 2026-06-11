@@ -37,8 +37,8 @@ export default function PhoneBook() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-900 text-white pb-20 p-4">
-            <div className="sticky top-0 bg-slate-900 z-10 pb-4">
+        <div className="min-h-full text-white pb-20 p-4 max-w-3xl mx-auto">
+            <div className="sticky top-0 bg-slate-900/95 backdrop-blur-sm z-10 pb-4 -mx-4 px-4">
                 <h1 className="text-2xl font-bold mb-4 text-center text-teal-400">ספר טלפונים קהילתי 📖</h1>
 
                 <div className="relative">

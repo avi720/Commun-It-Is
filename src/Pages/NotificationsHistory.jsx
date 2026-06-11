@@ -16,7 +16,7 @@ export default function NotificationsHistory() {
     if (isLoading) return <div className="p-8 text-center text-slate-400">טוען הודעות...</div>;
 
     return (
-        <div className="min-h-screen bg-slate-900 pb-20 p-4">
+        <div className="min-h-full pb-20 p-4 max-w-3xl mx-auto">
             <header className="mb-6 flex items-center gap-3 border-b border-slate-800 pb-4">
                 <div>
                     <h1 className="text-xl font-bold text-white">לוח הודעות</h1>

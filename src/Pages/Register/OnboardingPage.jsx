@@ -77,7 +77,7 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-900 p-4">
+    <div className="min-h-dvh flex items-center justify-center bg-slate-900 p-4">
       <Card className="w-full max-w-md bg-slate-800 border-slate-700 text-white">
         <CardHeader>
           <CardTitle className="text-xl text-center text-teal-400">השלמת פרופיל</CardTitle>
@@ -92,7 +92,7 @@ export default function OnboardingPage() {
                   <User className="absolute right-3 top-2.5 h-4 w-4 text-slate-500" />
                   <input
                     type="text"
-                    className="w-full p-2 pr-9 rounded bg-slate-900 border border-slate-700 text-white text-sm focus:ring-1 focus:ring-teal-500"
+                    className="w-full p-2 pr-9 rounded bg-slate-900 border border-slate-700 text-white text-base md:text-sm focus:ring-1 focus:ring-teal-500"
                     placeholder="לדוגמא: אביאור"
                     required
                     onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
@@ -103,7 +103,7 @@ export default function OnboardingPage() {
                 <label className="text-xs text-slate-400 mr-1">שם משפחה</label>
                 <input
                   type="text"
-                  className="w-full p-2 rounded bg-slate-900 border border-slate-700 text-white text-sm focus:ring-1 focus:ring-teal-500"
+                  className="w-full p-2 rounded bg-slate-900 border border-slate-700 text-white text-base md:text-sm focus:ring-1 focus:ring-teal-500"
                   placeholder="לדוגמא: פז"
                   required
                   onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
@@ -134,7 +134,7 @@ export default function OnboardingPage() {
                 <MapPin className="absolute right-3 top-2.5 h-4 w-4 text-slate-500" />
                 <input
                   type="text"
-                  className="w-full p-2 pr-9 rounded bg-slate-900 border border-slate-700 text-white text-sm focus:ring-1 focus:ring-teal-500"
+                  className="w-full p-2 pr-9 rounded bg-slate-900 border border-slate-700 text-white text-base md:text-sm focus:ring-1 focus:ring-teal-500"
                   placeholder="לדוגמה: הרימון 12"
                   required
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
@@ -148,7 +148,7 @@ export default function OnboardingPage() {
                 <Phone className="absolute right-3 top-2.5 h-4 w-4 text-slate-500" />
                 <input
                   type="tel"
-                  className="w-full p-2 pr-9 rounded bg-slate-900 border border-slate-700 text-white text-sm focus:ring-1 focus:ring-teal-500"
+                  className="w-full p-2 pr-9 rounded bg-slate-900 border border-slate-700 text-white text-base md:text-sm focus:ring-1 focus:ring-teal-500"
                   placeholder="לדוגמה: 0521234567"
                   required
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
@@ -164,7 +164,7 @@ export default function OnboardingPage() {
                   type="number"
                   min="16"
                   max="120"
-                  className="w-full p-2 pr-9 rounded bg-slate-900 border border-slate-700 text-white text-sm focus:ring-1 focus:ring-teal-500"
+                  className="w-full p-2 pr-9 rounded bg-slate-900 border border-slate-700 text-white text-base md:text-sm focus:ring-1 focus:ring-teal-500"
                   required
                   onChange={(e) => setFormData({ ...formData, age: e.target.value })}
                 />
@@ -186,6 +186,7 @@ export default function OnboardingPage() {
             </button>
 
             <button
+              type="button"
               onClick={logout}
               className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm"
             >

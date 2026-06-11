@@ -60,7 +60,7 @@ export default function ResidentVerificationPending() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4" dir="rtl">
+        <div className="min-h-dvh bg-slate-950 flex items-center justify-center p-4" dir="rtl">
             <div className="w-full max-w-md bg-slate-900 border border-teal-500/40 rounded-2xl shadow-2xl p-8 text-center space-y-6">
                 <div className="mx-auto w-20 h-20 bg-teal-500/15 rounded-full flex items-center justify-center border-2 border-teal-500/60">
                     <Clock className="w-10 h-10 text-teal-400" />

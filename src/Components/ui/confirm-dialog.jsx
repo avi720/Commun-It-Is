@@ -8,6 +8,9 @@ import { Button } from "./button";
  * הקורא מנהל את ה-state של open/onOpenChange, ומקבל את onConfirm להפעלת
  * הפעולה אחרי שהמשתמש אישר. עבור פעולות הרסניות (מחיקת חשבון, שליחה לכל
  * הקהילה) — destructive=true צובע את כפתור האישור באדום.
+ *
+ * confirmText (אופציונלי, F17): כשמועבר — דורש שהמשתמש יקליד את הטקסט המדויק
+ * כדי להפעיל את כפתור האישור. חיכוך כנגד muscle-memory בפעולה בלתי הפיכה.
  */
 export function ConfirmDialog({
     open,
@@ -18,9 +21,22 @@ export function ConfirmDialog({
     cancelLabel = "ביטול",
     onConfirm,
     destructive = false,
+    confirmText,
 }) {
+    const [typed, setTyped] = React.useState("");
+    const requireType = typeof confirmText === "string" && confirmText.length > 0;
+    const matches = typed.trim() === confirmText;
+    const inputId = React.useId();
+
+    // איפוס הקלדה כשהדיאלוג נסגר — דרך onOpenChange wrapper במקום useEffect,
+    // כדי לא להפר את חוקי react-hooks/set-state-in-effect.
+    const handleOpenChange = React.useCallback((next) => {
+        if (!next) setTyped("");
+        onOpenChange?.(next);
+    }, [onOpenChange]);
+
     return (
-        <AlertDialog.Root open={open} onOpenChange={onOpenChange}>
+        <AlertDialog.Root open={open} onOpenChange={handleOpenChange}>
             <AlertDialog.Portal>
                 <AlertDialog.Overlay className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
                 <AlertDialog.Content
@@ -31,15 +47,31 @@ export function ConfirmDialog({
                         {title}
                     </AlertDialog.Title>
                     {description && (
-                        <AlertDialog.Description className="mb-6 text-sm leading-relaxed text-slate-300 whitespace-pre-wrap">
+                        <AlertDialog.Description className="mb-4 text-sm leading-relaxed text-slate-300 whitespace-pre-wrap">
                             {description}
                         </AlertDialog.Description>
+                    )}
+                    {requireType && (
+                        <div className="mb-6 space-y-2">
+                            <label htmlFor={inputId} className="block text-sm text-slate-300">
+                                כדי לאשר, הקלד <span className="font-mono font-bold text-red-400">{confirmText}</span>
+                            </label>
+                            <input
+                                id={inputId}
+                                type="text"
+                                value={typed}
+                                onChange={(e) => setTyped(e.target.value)}
+                                autoComplete="off"
+                                className="w-full min-h-[44px] rounded-md border-2 border-slate-700 bg-slate-950 px-3 py-2 text-base text-white focus:border-red-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+                            />
+                        </div>
                     )}
                     <div className="flex flex-row-reverse gap-3 justify-start">
                         <AlertDialog.Action asChild>
                             <Button
                                 variant={destructive ? "destructive" : "default"}
                                 onClick={onConfirm}
+                                disabled={requireType && !matches}
                                 className={
                                     destructive
                                         ? ""

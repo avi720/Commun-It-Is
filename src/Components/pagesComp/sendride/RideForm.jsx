@@ -117,6 +117,10 @@ export default function RideForm({
                 </Label>
                 <Input
                     id="seats"
+                    type="number"
+                    inputMode="numeric"
+                    min="1"
+                    max="8"
                     value={seats}
                     onChange={(e) => setSeats(e.target.value)}
                     placeholder='לדוגמה: 4'

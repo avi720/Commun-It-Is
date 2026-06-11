@@ -40,7 +40,7 @@ export default function VerificationEmailSent({ email, password, setLoading, loa
 
     return (
 
-        <div className="min-h-screen flex items-center justify-center bg-slate-900 p-4" dir="rtl">
+        <div className="min-h-dvh flex items-center justify-center bg-slate-900 p-4" dir="rtl">
             <Card className="w-full max-w-md bg-slate-800 border-slate-700 animate-in fade-in zoom-in-95 duration-300">
                 <CardHeader className="text-center space-y-4">
                     <div className="mx-auto w-16 h-16 bg-teal-500/20 rounded-full flex items-center justify-center border border-teal-500/30">
@@ -70,7 +70,7 @@ export default function VerificationEmailSent({ email, password, setLoading, loa
                     </div>
                     {/* כפתור בדיקה חכם */}
                     <Button
-                        className="w-full bg-teal-700 hover:bg-teal-800 text-white gap-2 h-12 text-lg animate-pulse"
+                        className="w-full bg-teal-700 hover:bg-teal-800 text-white gap-2 h-12 text-lg"
                         onClick={handleCheckVerification}
                         disabled={loading}
                     >

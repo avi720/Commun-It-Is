@@ -69,7 +69,7 @@ export default function SendRide() {
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="w-full max-w-md"
+                className="w-full max-w-md md:max-w-xl"
             >
                 <div className="space-y-1 pt-2 px-6">
                     <CardTitle className="text-4xl font-bold text-center bg-gradient-to-r from-teal-400 to-blue-500 bg-clip-text text-transparent">

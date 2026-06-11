@@ -17,14 +17,11 @@ export default function MainLayout() {
   const closeSidebar = useCallback(() => setIsSidebarOpen(false), []);
 
   return (
-    // 1. המעטפת הראשית: תופסת את כל הגובה, ומונעת גלילה של כל העמוד (רק התוכן יגלול)
-    <div className="flex flex-col h-screen w-full bg-[#0f172a] text-white overflow-hidden">
+    // F25: h-dvh (dynamic viewport height) avoids iOS Safari address-bar jumps that h-screen produced.
+    // F45: at md+ the sidebar is persistent (rendered always in-flow), so main shifts with md:mr-64.
+    <div className="flex flex-col h-dvh w-full bg-[#0f172a] text-white overflow-hidden">
 
-      {/* 2. HEADER: 
-          משתמש ב-padding-top דינמי כדי לא לדרוס את השעון/סוללה.
-          הרקע נמתח עד הכי למעלה.
-      */}
-      <header className="w-full flex-none z-30 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 pt-[env(safe-area-inset-top)] shadow-sm transition-all duration-300">
+      <header className="md:mr-64 w-auto flex-none z-30 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 pt-[env(safe-area-inset-top)] shadow-sm transition-all duration-300">
 
         {/* ה-div הפנימי: מחזיק את הכפתורים בגובה קבוע ונוח לאצבע */}
         <div className="h-14 w-full flex items-center justify-between px-4">
@@ -32,7 +29,8 @@ export default function MainLayout() {
           <button
             onClick={toggleSidebar}
             aria-label="פתח תפריט"
-            className="min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-slate-800 rounded-full transition-colors active:scale-95 touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+            title="פתח תפריט"
+            className="md:hidden min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-slate-800 rounded-full transition-colors active:scale-95 touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
           >
             <Menu className="w-6 h-6 text-white" aria-hidden="true" />
           </button>
@@ -54,7 +52,7 @@ export default function MainLayout() {
           הגלילה קורית *רק* כאן (overflow-y-auto).
           ה-padding-bottom דואג שהתוכן האחרון לא יוסתר על ידי הפס של האייפון.
       */}
-      <main className="flex-1 overflow-y-auto overflow-x-hidden relative bg-gradient-to-br from-slate-900 via-slate-800 to-teal-900 pb-[env(safe-area-inset-bottom)]">
+      <main className="md:mr-64 flex-1 overflow-y-auto overflow-x-hidden relative bg-gradient-to-br from-slate-900 via-slate-800 to-teal-900 pb-[env(safe-area-inset-bottom)]">
         {/* ה-div הזה נותן רווח פנימי לתוכן עצמו */}
         <div className="w-full min-h-full">
           <Outlet context={{ isSidebarOpen }} />

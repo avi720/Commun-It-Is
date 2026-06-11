@@ -1,6 +1,7 @@
 import { StrictMode } from 'react' // ייבוא ספציפי במקום הכללי
 import { createRoot } from 'react-dom/client' // ייבוא הפונקציה ישירות
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { MotionConfig } from 'framer-motion'
 import * as Sentry from '@sentry/react'
 import App from './App.jsx'
 import './index.css'
@@ -60,7 +61,7 @@ createRoot(rootElement).render(
         {/* Sentry.ErrorBoundary תופס שגיאות render שלא נתפסו ע"י React. */}
         <Sentry.ErrorBoundary
             fallback={({ error }) => (
-                <div className="min-h-screen flex flex-col items-center justify-center bg-slate-900 text-white p-6 text-center">
+                <div className="min-h-dvh flex flex-col items-center justify-center bg-slate-900 text-white p-6 text-center">
                     <h1 className="text-2xl font-bold text-red-400 mb-3">משהו השתבש</h1>
                     <p className="text-slate-400 mb-4">השגיאה דווחה אוטומטית, אנחנו כבר על זה.</p>
                     <button
@@ -79,7 +80,10 @@ createRoot(rootElement).render(
         >
             {/* עטיפת האפליקציה כולה בספק הנתונים */}
             <QueryClientProvider client={queryClient}>
-                <App />
+                {/* F23: makes all framer-motion components honor prefers-reduced-motion. */}
+                <MotionConfig reducedMotion="user">
+                    <App />
+                </MotionConfig>
             </QueryClientProvider>
         </Sentry.ErrorBoundary>
     </StrictMode>,

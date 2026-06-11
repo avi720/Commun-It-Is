@@ -73,8 +73,10 @@ export default function ProfileForm({ user, onSave }) {
                 <Input
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="bg-slate-900 border-slate-700 text-white ltr"
+                    className="bg-slate-900 border-slate-700 text-white text-left"
                     type="tel"
+                    inputMode="tel"
+                    dir="ltr"
                 />
             </div>
 
@@ -106,32 +108,28 @@ export default function ProfileForm({ user, onSave }) {
 
             <div className="bg-slate-900/50 p-4 rounded-xl border border-slate-800 flex items-center justify-between mt-4">
                 <div className="space-y-1">
-                    <label htmlFor="phonebook-visibility" className="text-sm font-medium text-white block cursor-pointer">
+                    <span id="phonebook-visibility-label" className="text-sm font-medium text-white block">
                         הופעה בספר הטלפונים
-                    </label>
+                    </span>
                     <p className="text-xs text-slate-400">
                         אפשר לתושבים לראות את שמך ומספר הטלפון שלך
                     </p>
                 </div>
 
-                <div className="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
-                    <input
-                        type="checkbox"
-                        name="visible_on_phonebook"
-                        id="phonebook-visibility"
-                        className="input-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer transition-all duration-300"
-                        style={{
-                            right: formData.visible_on_phonebook ? '0' : '50%',
-                            borderColor: formData.visible_on_phonebook ? '#0d9488' : '#cbd5e1'
-                        }}
-                        checked={formData.visible_on_phonebook || false}
-                        onChange={(e) => setFormData({ ...formData, visible_on_phonebook: e.target.checked })}
+                <button
+                    type="button"
+                    role="switch"
+                    aria-checked={!!formData.visible_on_phonebook}
+                    aria-labelledby="phonebook-visibility-label"
+                    onClick={() => setFormData({ ...formData, visible_on_phonebook: !formData.visible_on_phonebook })}
+                    className={`relative inline-block h-6 w-12 shrink-0 cursor-pointer rounded-full transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-slate-800 ${formData.visible_on_phonebook ? 'bg-teal-600' : 'bg-slate-600'}`}
+                >
+                    <span
+                        aria-hidden="true"
+                        style={{ right: formData.visible_on_phonebook ? '2px' : '24px' }}
+                        className="pointer-events-none absolute top-0.5 inline-block h-5 w-5 rounded-full bg-white shadow transition-all duration-300"
                     />
-                    <label
-                        htmlFor="phonebook-visibility"
-                        className={`input-label block overflow-hidden h-6 rounded-full cursor-pointer transition-colors duration-300 ${formData.visible_on_phonebook ? 'bg-teal-600' : 'bg-slate-600'}`}
-                    ></label>
-                </div>
+                </button>
             </div>
             <div className="pt-2">
                 <Button type="submit" disabled={isSaving} className="w-full bg-teal-700 hover:bg-teal-800 text-white h-11">

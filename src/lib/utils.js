@@ -6,10 +6,10 @@ export function cn(...inputs) {
 }
 
 // --- הוסף את זה: פונקציה לפורמט תאריך נסיעה ---
-export function formatRideTime(date) {
+export function formatRideTime(date, nowInput = new Date()) {
   if (!date) return '';
   const d = new Date(date);
-  const now = new Date();
+  const now = nowInput instanceof Date ? nowInput : new Date(nowInput);
   
   // איפוס שעות לצורך השוואת ימים בלבד
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());

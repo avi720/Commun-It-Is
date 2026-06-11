@@ -7,7 +7,8 @@ import { cn } from "@/lib/utils"
 const buttonVariants = cva(
   // F3: h-11 (44px) baseline = iOS HIG / Material 48dp minimum. md:h-9 keeps desktop denser without dropping below WCAG 2.5.8 (24px).
   // F4: focus-visible ring=2 + offset; --ring is teal-400 so it shows against any dark surface.
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  // F46: hover gets a shadow lift (distinct from pressed); active stays as press feedback (scale shrink).
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all hover:shadow-md hover:shadow-black/30 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 disabled:pointer-events-none disabled:opacity-50 disabled:hover:shadow-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {

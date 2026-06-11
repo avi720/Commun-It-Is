@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, ArrowRight, ArrowLeft, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/Components/ui/card";
+import { Label } from "@/Components/ui/label";
 import { avior } from '@/Api';
 import { Button } from "@/Components/ui/button";
 import VerificationEmailSent from '@/Components/pagesComp/registerPage/VerificationEmailSent';
@@ -103,7 +104,7 @@ export default function RegisterPage() {
 
   // --- תצוגה 2: טופס הרשמה ---
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-900 p-4" dir="rtl">
+    <div className="min-h-dvh flex items-center justify-center bg-slate-900 p-4" dir="rtl">
       <Card className="w-full max-w-md bg-slate-800 border-slate-700 text-white">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-teal-400">הרשמה</CardTitle>
@@ -115,13 +116,15 @@ export default function RegisterPage() {
           <form onSubmit={handleRegister} className="space-y-4">
 
             <div className="space-y-2">
+              <Label htmlFor="register-email" className="text-slate-300">כתובת אימייל</Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
+                <Mail className="absolute right-3 top-3 h-5 w-5 text-slate-400" aria-hidden="true" />
                 <input
+                  id="register-email"
                   name="email"
                   type="email"
-                  placeholder="אימייל"
-                  className="w-full p-2 pl-10 rounded-md bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  placeholder="name@example.com"
+                  className="flex w-full h-11 md:h-9 pr-10 px-3 py-1 rounded-md bg-slate-900 border border-slate-700 text-white text-base md:text-sm shadow-sm transition-colors placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
                   required
                   value={formData.email}
                   onChange={handleChange}
@@ -131,13 +134,15 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="register-password" className="text-slate-300">סיסמה</Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
+                <Lock className="absolute right-3 top-3 h-5 w-5 text-slate-400" aria-hidden="true" />
                 <input
+                  id="register-password"
                   name="password"
                   type="password"
-                  placeholder="סיסמה (לפחות 6 תווים)"
-                  className="w-full p-2 pl-10 rounded-md bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  placeholder="לפחות 8 תווים, מספר ותו מיוחד"
+                  className="flex w-full h-11 md:h-9 pr-10 px-3 py-1 rounded-md bg-slate-900 border border-slate-700 text-white text-base md:text-sm shadow-sm transition-colors placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
                   required
                   value={formData.password}
                   onChange={handleChange}
@@ -147,13 +152,15 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="register-confirm-password" className="text-slate-300">אימות סיסמה</Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
+                <Lock className="absolute right-3 top-3 h-5 w-5 text-slate-400" aria-hidden="true" />
                 <input
+                  id="register-confirm-password"
                   name="confirmPassword"
                   type="password"
-                  placeholder="אימות סיסמה"
-                  className="w-full p-2 pl-10 rounded-md bg-slate-900 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  placeholder="הזן שוב את הסיסמה"
+                  className="flex w-full h-11 md:h-9 pr-10 px-3 py-1 rounded-md bg-slate-900 border border-slate-700 text-white text-base md:text-sm shadow-sm transition-colors placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
                   required
                   value={formData.confirmPassword}
                   onChange={handleChange}

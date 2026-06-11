@@ -29,6 +29,7 @@ export default function RideDetailsModal({ ride, onClose }) {
                 <button
                     onClick={onClose}
                     aria-label="סגור פרטי נסיעה"
+                    title="סגור פרטי נסיעה"
                     className="absolute top-4 left-4 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-400 hover:text-white bg-slate-800/50 rounded-full z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
                 >
                     <X size={20} aria-hidden="true" />

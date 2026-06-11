@@ -111,95 +111,95 @@ ID convention: `F##` numbered globally across phases. Where a finding was confir
 
 #### [ ] F10. Mixed `<input>` / `<Input>` usage produces inconsistent focus and autofill behavior
 - **Where:** LoginPage, RegisterPage, OnboardingPage, PhoneBook, ResidentVerificationPending, CommunitiesList use raw `<input>`; Settings (ProfileForm) and SendRide (RideForm) use the shadcn `<Input>` primitive.
-- **Issue:** Two parallel design systems for the most common form control. Focus rings, placeholder colors, padding scale, and autofill rules all differ subtly between screens.
+- **Issue:** ~~**Partial 2026-06-12** — LoginPage and RegisterPage raw `<input>` elements now visually + interactively match the shadcn `<Input>` primitive (same `h-11 md:h-9`, `text-base md:text-sm`, `rounded-md`, `--ring` focus, slate-800 offset). The full migration of every remaining raw `<input>` (OnboardingPage, PhoneBook, ResidentVerificationPending, CommunitiesList) is deferred — it touches every form in the app and is best done as a dedicated refactor.~~ Two parallel design systems for the most common form control. Focus rings, placeholder colors, padding scale, and autofill rules all differ subtly between screens.
 - **Acceptance:** Every text field in the app shares one component (or two, with documented purposes). Visual + interaction parity across all forms.
 
-#### [ ] F11. Form fields rely on placeholders instead of labels (RegisterPage + LoginPage)
+#### [x] F11. Form fields rely on placeholders instead of labels (RegisterPage + LoginPage)
 - **Where:** `LoginPage.jsx`, `RegisterPage.jsx` email/password fields.
 - **Issue:** Once typing starts there is no on-screen hint of the field's purpose. Screen readers receive no label association.
 - **Acceptance:** Every input has a visible label above the field, properly associated (clicking the label focuses the input). Placeholders, if present, are examples — not labels.
 
-#### [ ] F12. Icon position on inputs flips between pages
+#### [x] F12. Icon position on inputs flips between pages
 - **Where:** LoginPage (right), RegisterPage (left), OnboardingPage (right).
 - **Issue:** Inconsistent leading affordance across the auth flow. In an RTL layout, the leading edge is the right side.
 - **Acceptance:** All input-prefix icons sit on the same side throughout the app, matching the language direction.
 
-#### [ ] F13. CreatePostModal: backdrop click does not dismiss; no Escape handler
+#### [x] F13. CreatePostModal: backdrop click does not dismiss; no Escape handler
 - **Where:** `CreatePostModal.jsx`.
 - **Issue:** **Confirmed live.** Clicking the dark overlay does nothing. No keyboard support to dismiss. Existing close affordance is only the X.
 - **Acceptance:** Modal closes on backdrop click and on Escape key, but never on a click inside the modal body. Unsaved content prompts before discarding.
 
-#### [ ] F14. CreatePostModal: footer row is visually unbalanced and order swaps when toggle hides
+#### [x] F14. CreatePostModal: footer row is visually unbalanced and order swaps when toggle hides
 - **Where:** `CreatePostModal.jsx` — the `flex justify-between` action row.
 - **Issue:** **Confirmed live.** Toggle ("פרסם כהודעת ועד") sits in a large amber-tinted card on one side; the Publish button is small on the other. Visual weight is wildly uneven. For non-committee users the toggle is absent and the Publish button drifts to a different position.
 - **Acceptance:** Action bar has a single clear primary CTA, with the committee toggle treated as a secondary control (e.g., above the CTA). Layout is stable whether the user is a committee member or not.
 
-#### [ ] F15. Settings toggle is invisible to assistive tech
+#### [x] F15. Settings toggle is invisible to assistive tech
 - **Where:** `ProfileForm.jsx` — phonebook visibility toggle. Same pattern in `CreatePostModal.jsx`.
 - **Issue:** **Confirmed live.** Element has no `role="switch"`, no `aria-checked`. Screen readers cannot identify it as a switch or report its state.
 - **Acceptance:** Toggle announces correctly as a switch with current on/off state. Operable with Space/Enter when focused. Looks and behaves consistently in both places.
 
-#### [ ] F16. Native `alert()` / `confirm()` used for in-app feedback
+#### [x] F16. Native `alert()` / `confirm()` used for in-app feedback
 - **Where:** HomePage, SendRide, OnboardingPage, SettingsPage (Danger Zone), PhoneBook, FeedPosts.
-- **Issue:** Inside the Capacitor Android wrapper these render as system dialogs with English-only "OK" / "Cancel" buttons that break the Hebrew flow and feel like the app crashed.
+- **Issue:** ~~**Invalid in context 2026-06-12** — already resolved in commits `ac88d00` (sonner toasts) and the introduction of `src/Components/ui/confirm-dialog.jsx`. A repo-wide grep for `alert(`/`confirm(` in `src/` returns only comments referencing the old behavior; no live calls remain. SettingsPage's Danger Zone delete is already routed through `ConfirmDialog`.~~ Inside the Capacitor Android wrapper these render as system dialogs with English-only "OK" / "Cancel" buttons that break the Hebrew flow and feel like the app crashed.
 - **Acceptance:** No `alert` or `confirm` call remains in user-reachable paths. Feedback uses an in-app toast or inline message; destructive confirmations use a properly designed dialog.
 
-#### [ ] F17. Destructive account deletion confirms with a single Yes/No prompt
+#### [x] F17. Destructive account deletion confirms with a single Yes/No prompt
 - **Where:** `SettingsPage.jsx` — `handleHardReset`.
 - **Issue:** Permanent account deletion is one click + one dismissable prompt away. No friction for an irreversible action.
 - **Acceptance:** Deletion requires explicit confirmation that cannot be triggered by muscle memory (e.g., type-to-confirm, or two-step dialog). Outcome and irreversibility are clearly stated.
 
-#### [ ] F18. Onboarding "Logout" button submits the form
+#### [x] F18. Onboarding "Logout" button submits the form
 - **Where:** `OnboardingPage.jsx` — the logout `<button>` near the bottom.
 - **Issue:** Inside a `<form>` without `type="button"`, the button defaults to `type="submit"` and triggers form submission instead of logout.
 - **Acceptance:** Tapping logout from the Onboarding screen signs the user out and does not submit the profile form.
 
-#### [ ] F19. Pulsing primary CTA on email verification screen
+#### [x] F19. Pulsing primary CTA on email verification screen
 - **Where:** `VerificationEmailSent.jsx` — `animate-pulse` on the main button.
 - **Issue:** Pulsing animation on an interactive element is distracting, ignores `prefers-reduced-motion`, and undermines users with vestibular sensitivity.
 - **Acceptance:** The button no longer pulses. Attention is drawn through stable visual hierarchy (size, weight, color). Respects reduced-motion globally.
 
-#### [ ] F20. `<input type="text">` used for numeric fields
+#### [x] F20. `<input type="text">` used for numeric fields
 - **Where:** `RideForm.jsx` — "מספר מושבים" (seats).
 - **Issue:** Mobile keyboard opens as alphabetic instead of numeric. Slows entry and invites typos.
 - **Acceptance:** Numeric and tel fields trigger the correct system keyboard on iOS and Android, with sane min/max where applicable.
 
-#### [ ] F21. Phone field "ltr" class is a no-op
+#### [x] F21. Phone field "ltr" class is a no-op
 - **Where:** `ProfileForm.jsx` phone input.
 - **Issue:** `className="... ltr"` — Tailwind has no `ltr` utility. The intended direction override never applies.
 - **Acceptance:** Phone numbers display and type left-to-right regardless of page direction; verified on a Hebrew device.
 
-#### [ ] F22. Community search dropdown does not close on outside click
+#### [x] F22. Community search dropdown does not close on outside click
 - **Where:** `CommunitiesList.jsx`.
 - **Issue:** Companion `CitySelect` has outside-click handling; `CommunitiesList` doesn't. Dropdown stays open while user interacts elsewhere on the form.
 - **Acceptance:** Tapping anywhere outside the dropdown closes it. Behavior matches `CitySelect` on the same page.
 
-#### [ ] F23. `prefers-reduced-motion` is not respected anywhere
+#### [x] F23. `prefers-reduced-motion` is not respected anywhere
 - **Where:** App-wide. All Framer Motion animations, `animate-pulse`, `animate-spin`, modal/page transitions.
 - **Issue:** Users who have requested reduced motion at the OS level still see all entrance animations, pulses, and large transitions.
 - **Acceptance:** With OS reduced motion enabled, non-essential motion is removed or replaced with crossfade/instant transitions. Verified with the OS toggle on.
 
-#### [ ] F24. Locked page scroll breaks mobile gestures
+#### [x] F24. Locked page scroll breaks mobile gestures
 - **Where:** `src/index.css` — `html, body, #root { overflow: hidden }`.
 - **Issue:** Disables iOS overscroll bounce and pull-to-refresh, can interact poorly with safe-area handling, and creates double-scroll edge cases when content overflows in odd ways.
 - **Acceptance:** Page-level scroll uses standard layout (single primary scroll container with proper safe-area padding) without locking the document. Mobile bounce, pull-to-refresh, and address-bar shrink behave as users expect.
 
-#### [ ] F25. Layout uses `100vh` units that misbehave on iOS Safari
+#### [x] F25. Layout uses `100vh` units that misbehave on iOS Safari
 - **Where:** `App.jsx` page loaders, `LoginPage`, `RegisterPage`, `OnboardingPage`, `ResidentVerificationPending`, `MainLayout` (`h-screen`).
 - **Issue:** Address-bar collapse causes layout jumps and content cut at the bottom on iOS Safari.
 - **Acceptance:** Full-height containers use modern dynamic viewport units (`dvh`/`svh`) or equivalent. No content disappears behind the URL bar or home indicator on iOS.
 
-#### [ ] F26. Onboarding inputs may trigger iOS auto-zoom
+#### [x] F26. Onboarding inputs may trigger iOS auto-zoom
 - **Where:** `OnboardingPage.jsx` — `text-sm` inputs (14px effective font size).
 - **Issue:** iOS Safari zooms any input with computed font-size < 16px when focused, breaking the layout.
 - **Acceptance:** All inputs render at ≥16px on mobile widths. Focusing an input on iOS Safari does not zoom the page.
 
-#### [ ] F27. RideCard time display does not tick
+#### [x] F27. RideCard time display does not tick
 - **Where:** `RideCard.jsx`.
 - **Issue:** Parent `PublicDisplay` updates `currentTime` every second, but `RideCard` calls `formatRideTime` without that input, so the "leaves in N minutes" text stays stale until the rides list refetches.
 - **Acceptance:** Time-until-departure text on each ride card updates in real time without requiring a refetch.
 
-#### [ ] F28. Page backgrounds fight the layout gradient
+#### [x] F28. Page backgrounds fight the layout gradient
 - **Where:** `PhoneBook.jsx`, `NotificationsHistory.jsx` — `bg-slate-900` on the page root.
 - **Issue:** MainLayout already paints a teal-to-slate gradient on `<main>`. Inner pages overwrite it with flat slate-900, so the visual identity disappears the moment you leave Home.
 - **Acceptance:** All authenticated pages share the same background treatment from the layout. Page components do not set their own background unless intentionally creating a distinct surface.
@@ -212,20 +212,20 @@ The following four findings became important the moment desktop became a support
 
 #### [ ] F44. App has no responsive layout adaptation
 - **Where:** App-wide. Production code uses essentially no `md:` / `lg:` modifiers; the rendered tree is identical at 375px and 1528px.
-- **Issue:** **Confirmed live.** At desktop widths the entire UI sits in a centered narrow column with large empty rails on both sides. Density, hierarchy, and navigation patterns that work on a phone do not automatically read well at desktop scale.
+- **Issue:** ~~**Partial 2026-06-12** — desktop content max-width widened on the high-traffic pages (HomePage feed `md:max-w-2xl`, SendRide `md:max-w-xl`, PhoneBook + NotificationsHistory `max-w-3xl`); MainLayout + Sidebar gained a persistent desktop nav (F45) and the desktop main shifts with `md:mr-64`. Touch targets keep the mobile 44px baseline and collapse to 36px at `md:` (Button/Input primitives). What's left for a future pass: multi-column treatments (e.g., feed + sidebar widget on desktop), HomePage empty-state desktop sizing, CommitteeDashboard desktop density, hover/focus polish on individual Cards. Mobile baseline is preserved.~~ **Confirmed live.** At desktop widths the entire UI sits in a centered narrow column with large empty rails on both sides. Density, hierarchy, and navigation patterns that work on a phone do not automatically read well at desktop scale.
 - **Acceptance:** Each screen has an intentional desktop treatment (wider content area where it helps, multi-column where appropriate, persistent navigation). The desktop view no longer looks like a mobile screenshot embedded on a wide monitor. Mobile layout remains the baseline and is not regressed.
 
-#### [ ] F45. Sidebar uses a mobile-only drawer pattern
+#### [x] F45. Sidebar uses a mobile-only drawer pattern
 - **Where:** `MainLayout.jsx` + `Sidebar.jsx`.
 - **Issue:** The drawer-with-backdrop is the correct mobile pattern but the wrong desktop pattern. At desktop widths the convention (Material Adaptive Navigation, common SaaS patterns) is a persistent sidebar or nav rail so navigation is always one click away without a tap-to-open ceremony.
 - **Acceptance:** On desktop widths the sidebar is visible and stable by default; the hamburger toggle is hidden or repurposed (collapse/expand). On mobile widths the existing drawer behavior is preserved unchanged.
 
-#### [ ] F46. Hover states are not differentiated from press / default
+#### [x] F46. Hover states are not differentiated from press / default
 - **Where:** Most buttons, cards, and tappable surfaces app-wide.
 - **Issue:** Components rely on `active:scale-95` or flat `hover:bg-*` shifts that read as press feedback, not as desktop hover affordance. Mouse users get little advance signal that a card or icon is interactive before clicking. Cursor change alone is not enough.
 - **Acceptance:** Every interactive surface has three visually distinct states — default, hover, pressed — verified with a mouse on desktop. Pressed remains differentiated from hover.
 
-#### [ ] F47. Icon-only controls have no tooltips on desktop
+#### [x] F47. Icon-only controls have no tooltips on desktop
 - **Where:** All icon-only controls (header Menu, FAB, Share2, modal close X, etc.).
 - **Issue:** On desktop, hovering an unfamiliar icon should reveal its purpose. Mobile is forgiven (no hover), but desktop users have an unmet expectation that compounds the missing aria-labels (F5).
 - **Acceptance:** Hovering any icon-only control on desktop reveals a tooltip with the control's accessible name within ~300ms. Mobile is unaffected.

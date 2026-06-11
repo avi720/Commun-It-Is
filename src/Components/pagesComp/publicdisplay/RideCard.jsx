@@ -3,11 +3,12 @@ import { motion } from "framer-motion";
 import { Car, MapPin, Clock, User } from "lucide-react";
 import { formatRideTime } from "@/lib/utils"; // <--- הייבוא החשוב
 
-export default function RideCard({ ride }) {
+export default function RideCard({ ride, currentTime }) {
 
     // חישוב צבע לפי הזמן (דחוף = אדום, רחוק = ירוק)
+    // currentTime נדרש מהפרנט; אין fallback ל-Date.now() כדי לשמור על הרכיב טהור.
     const getTimeColor = () => {
-        const now = new Date();
+        const now = currentTime instanceof Date ? currentTime : new Date(currentTime);
         const departure = new Date(ride.departure_time);
         const diffMinutes = (departure - now) / 1000 / 60;
 
@@ -56,7 +57,7 @@ export default function RideCard({ ride }) {
                                 {/* שורה 2: זמן יציאה */}
                                 <div className="flex items-center gap-1.5 pt-1 text-teal-400 text-sm font-medium">
                                     <Clock className="w-3.5 h-3.5" />
-                                    {formatRideTime(ride.departure_time)}
+                                    {formatRideTime(ride.departure_time, currentTime)}
                                 </div>
 
                             </div>

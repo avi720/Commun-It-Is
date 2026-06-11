@@ -100,8 +100,9 @@ export default function SettingsPage() {
                 open={deleteOpen}
                 onOpenChange={setDeleteOpen}
                 title="מחיקת חשבון לצמיתות"
-                description={"פעולה זו תמחק את החשבון שלך ואת כל המידע לצמיתות!\nהאם אתה בטוח?"}
-                confirmLabel="כן, מחק"
+                description={"פעולה בלתי הפיכה: כל הפרטים, הפוסטים, הנסיעות והקשרים שלך יימחקו לתמיד."}
+                confirmText="מחק"
+                confirmLabel="כן, מחק לצמיתות"
                 cancelLabel="ביטול"
                 destructive
                 onConfirm={confirmHardReset}

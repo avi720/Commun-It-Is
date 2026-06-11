@@ -61,16 +61,16 @@
     }
 }
 
-/* index.css - הוספה בסוף הקובץ */
-
+/* F24/F25: gives html/body 100% height so MainLayout's flex tree can claim it,
+   but does NOT lock document overflow — that broke iOS bounce, pull-to-refresh
+   and address-bar shrink. Page-level scroll happens inside the dedicated <main>
+   container in MainLayout. */
 @layer base {
 
     html,
     body,
     #root {
         height: 100%;
-        overflow: hidden;
-        /* מונע גלילה של כל העמוד */
     }
 }
 
@@ -84,6 +84,18 @@
     /* IE and Edge */
     scrollbar-width: none;
     /* Firefox */
+}
+
+/* F23: respect OS-level "reduce motion" — neutralizes Tailwind's animate-* and transition utilities for users who opt out. */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        scroll-behavior: auto !important;
+    }
 }
 
 /* תיקון מקיף להשלמה אוטומטית - כולל מצב פוקוס */
