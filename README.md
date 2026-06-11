@@ -38,7 +38,7 @@ uvicorn src.server.main:app --reload --port 8000
 | משתנה | תיאור |
 |-------|-------|
 | `VITE_SUPABASE_URL` | אותו ערך כמו ב-frontend |
-| `VITE_SUPABASE_SERVICE_KEY` | מפתח service role של Supabase |
+| `SUPABASE_SERVICE_KEY` | מפתח service role של Supabase (server-only) |
 | `FIREBASE_CREDENTIALS` | מפתח Firebase Admin כ-JSON במחרוזת אחת |
 
 ## פריסה ל-Vercel

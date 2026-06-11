@@ -72,6 +72,6 @@ jobs:
         # לא משמשים בפועל לשום בקשה אמיתית; אסור להכניס פה ערכים אמיתיים.
         env:
           VITE_SUPABASE_URL: 'http://localhost:54321'
-          VITE_SUPABASE_SERVICE_KEY: 'fake-test-key'
+          SUPABASE_SERVICE_KEY: 'fake-test-key'
           FIREBASE_CREDENTIALS: '{"type":"service_account"}'
         run: pytest tests/server -v

@@ -130,7 +130,7 @@ Loaded by Vite (`VITE_*` prefix → client bundle) or by `os.getenv` in Python. 
 |---|---|---|
 | `VITE_SUPABASE_URL` | client + server | Same URL on both sides. |
 | `VITE_SUPABASE_KEY` | client | Anon key (will become `VITE_SUPABASE_ANON_KEY` — see T23 deferral in TECH-DEBT.md). |
-| `VITE_SUPABASE_SERVICE_KEY` | server | Service role key. Despite the `VITE_` prefix, this is **only** read server-side; nothing in `src/` reads it. The `VITE_` prefix is a footgun left over from history — to be renamed under T23 in a future batch. |
+| `SUPABASE_SERVICE_KEY` | server | Service role key — server-only; never exposed to the client bundle. |
 | `VITE_GOOGLE_MAPS_API_KEY` | client | Used by `CitySelect`. |
 | `VITE_API_URL` | client | Backend URL. Optional — defaults to same origin. |
 | `FIREBASE_CREDENTIALS` | server | JSON service-account credentials. |

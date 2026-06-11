@@ -182,10 +182,10 @@ ID convention: `T##` numbered globally across phases. Where a finding was confir
 - **Issue:** The fork between `avior → FastAPI` and `supabase-js direct` (see T7) is invisible from the repo. A new contributor — or future-you in six months — will pick whichever pattern they happen to see first, and the inconsistency will deepen.
 - **Acceptance:** `docs/ARCHITECTURE.md` exists. It contains: a one-paragraph data-flow diagram (ASCII is fine), a table mapping each table → which path is the source of truth → which auth model protects it, and the rationale for the chosen path. React Query cache-key conventions from T8 live here too.
 
-#### [ ] T23. README env-var naming inconsistencies
+#### [x] T23. README env-var naming inconsistencies
 - **Where:** `README.md` lists `VITE_SUPABASE_KEY` while Supabase tooling and most community docs use `VITE_SUPABASE_ANON_KEY`. Backend uses `VITE_SUPABASE_SERVICE_KEY` — a `VITE_`-prefixed name for a server-only secret, which is unusual and surprising.
-- **Issue:** ~~Held 2026-06-09 — pending a separate batch coordinated with Vercel ENV updates (the rename is a coupled code + dashboard change).~~ Onboarding friction. The `VITE_` prefix on a server secret is also a footgun — a future change that reads it from `import.meta.env` instead of `os.getenv` would expose the service key in the client bundle.
-- **Acceptance:** Backend env var renamed to `SUPABASE_SERVICE_KEY` (no `VITE_` prefix); `src/server/config.py` updated. Optional: rename `VITE_SUPABASE_KEY` to `VITE_SUPABASE_ANON_KEY` to match Supabase docs. README + `.env.example` (T18) updated accordingly.
+- **Issue:** Onboarding friction. The `VITE_` prefix on a server secret is also a footgun — a future change that reads it from `import.meta.env` instead of `os.getenv` would expose the service key in the client bundle.
+- **Acceptance:** Backend env var renamed to `SUPABASE_SERVICE_KEY` (no `VITE_` prefix); `src/server/config.py` updated. Optional: rename `VITE_SUPABASE_KEY` to `VITE_SUPABASE_ANON_KEY` to match Supabase docs. README + `.env.example` (T18) updated accordingly. *(Closed 2026-06-10: dual-read fallback (SUPABASE_SERVICE_KEY OR VITE_SUPABASE_SERVICE_KEY) in src/server/config.py lets the deploy keep working while the user transitions Vercel ENV. User action remaining: (1) add SUPABASE_SERVICE_KEY to Vercel with the same value as the old var, (2) remove the old VITE_SUPABASE_SERVICE_KEY, (3) a future PR can drop the fallback in config.py. Optional rename of VITE_SUPABASE_KEY → VITE_SUPABASE_ANON_KEY left for a future small PR — not security-relevant.)*
 
 ---
 
