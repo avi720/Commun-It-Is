@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
+import * as Sentry from '@sentry/react';
 import { supabase, avior } from '../Api';
 
 // ה-context object מיוצא כדי ש-useAppData (בקובץ נפרד) יוכל להשתמש בו.
@@ -27,9 +28,14 @@ export function AppProvider({ children }) {
                 // אבל כאן נשאיר את זה פשוט.
                 setUser(null);
                 setIsAuthenticated(false);
+                // ננקה את זיהוי המשתמש ב-Sentry כדי ששגיאות עתידיות לא ישויכו למי שהיה מחובר
+                Sentry.setUser(null);
                 if (showLoader) setIsLoading(false);
                 return;
             }
+            // מסמנים את ה-user.id ב-Sentry — UUID בלבד, בלי שם/מייל/טלפון.
+            // מאפשר לסנן שגיאות לפי משתמש בלי לשלוח PII.
+            Sentry.setUser({ id: currentSession.user.id });
             const { data: profile, error } = await supabase
                 .from('users')
                 .select('*')
@@ -118,6 +124,7 @@ export function AppProvider({ children }) {
             console.error("Logout error:", error);
         }
         localStorage.removeItem('tremp_userData');
+        Sentry.setUser(null);
     };
 
     // כשקוראים לרענון ידני (למשל מכפתור "אימתתי מייל"), כן נרצה לראות לואדר

@@ -154,10 +154,10 @@ ID convention: `T##` numbered globally across phases. Where a finding was confir
 - **Issue:** No `.env.example` is visible in the repo root listing. If it does not exist, every new contributor (and every fresh Vercel project import) has to guess env-var names by grepping the codebase.
 - **Acceptance:** `.env.example` exists in the repo root, committed to git, and lists every env var the app uses (`VITE_SUPABASE_URL`, `VITE_SUPABASE_KEY`, `VITE_SUPABASE_SERVICE_KEY`, `VITE_GOOGLE_MAPS_API_KEY`, `VITE_API_URL`, `FIREBASE_CREDENTIALS`) with placeholder values and a one-line comment per var.
 
-#### [ ] T19. No error tracking for frontend or backend
+#### [x] T19. No error tracking for frontend or backend
 - **Where:** App-wide. `src/main.jsx` does not initialise a tracker; `src/server/main.py` does not initialise a tracker.
-- **Issue:** ~~Deferred 2026-06-09 — pending tracker choice (Sentry / Highlight / other) and DSN. Re-open when an account exists.~~ Vercel runtime logs catch backend exceptions only. Frontend errors (the silent `avior` `ReferenceError` in T3, future broken pages) leave no signal until a user reports them. As the codebase grows, signal-blindness becomes the limiting factor on iteration speed.
-- **Acceptance:** Pure-JS frontend error tracker (Sentry, Highlight, or equivalent — no native deps per the global ARM64 constraint) initialised in `src/main.jsx`. Backend tracker initialised at the top of `src/server/main.py`. One intentional error per side proves alerts reach the dashboard.
+- **Issue:** Vercel runtime logs catch backend exceptions only. Frontend errors (the silent `avior` `ReferenceError` in T3, future broken pages) leave no signal until a user reports them. As the codebase grows, signal-blindness becomes the limiting factor on iteration speed.
+- **Acceptance:** Pure-JS frontend error tracker (Sentry, Highlight, or equivalent — no native deps per the global ARM64 constraint) initialised in `src/main.jsx`. Backend tracker initialised at the top of `src/server/main.py`. One intentional error per side proves alerts reach the dashboard. *(Closed 2026-06-10: Sentry chosen, EU region (ingest.de.sentry.io). Two projects: `commun-it-is-frontend` + `commun-it-is-backend`. `@sentry/react` 10.x with `browserTracingIntegration` + `replayIntegration` (maskAllText, replays only on error). `sentry-sdk[fastapi]` 2.62 with default FastAPI auto-instrumentation. `sendDefaultPii=false`; `Sentry.setUser({ id })` called with UUID only on auth, cleared on logout. DSNs in env vars (`VITE_SENTRY_DSN`, `SENTRY_DSN`); silent when unset for local dev / CI. Verification: user triggers `throw new Error('sentry-test')` from DevTools console — appears in dashboard within ~30s.)*
 
 ---
 

@@ -3,3 +3,4 @@ supabase
 firebase-admin
 python-dotenv
 python-multipart
+sentry-sdk[fastapi]
