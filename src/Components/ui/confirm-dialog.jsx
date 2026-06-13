@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
 import { Button } from "./button";
+import { Input } from "./input";
 
 /**
  * דיאלוג אישור controlled — מחליף את `window.confirm()`.
@@ -56,13 +57,13 @@ export function ConfirmDialog({
                             <label htmlFor={inputId} className="block text-sm text-slate-300">
                                 כדי לאשר, הקלד <span className="font-mono font-bold text-red-400">{confirmText}</span>
                             </label>
-                            <input
+                            <Input
                                 id={inputId}
                                 type="text"
                                 value={typed}
                                 onChange={(e) => setTyped(e.target.value)}
                                 autoComplete="off"
-                                className="w-full min-h-[44px] rounded-md border-2 border-slate-700 bg-slate-950 px-3 py-2 text-base text-white focus:border-red-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+                                className="border-2 border-slate-700 bg-slate-950 text-white focus:border-red-500 focus-visible:ring-red-500 focus-visible:ring-offset-slate-900"
                             />
                         </div>
                     )}

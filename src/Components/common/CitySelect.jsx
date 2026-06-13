@@ -1,6 +1,7 @@
 //import CitySelect from '../Components/ui/CitySelect';
 import React, { useState, useEffect, useRef } from 'react';
 import { Map, Loader2, Check } from 'lucide-react';
+import { Input } from "@/Components/ui/input";
 
 export default function CitySelect({ value, onChange, placeholder = "בחר יישוב" }) {
     const [query, setQuery] = useState(value || '');
@@ -81,12 +82,12 @@ export default function CitySelect({ value, onChange, placeholder = "בחר יי
         <div ref={wrapperRef} className="relative w-full">
             <div className="relative">
                 <Map className="absolute right-3 top-3 h-5 w-5 text-slate-400 z-10" />
-                <input
+                <Input
                     type="text"
                     value={query}
                     onChange={handleInputChange}
                     placeholder={placeholder}
-                    className="w-full p-3 pr-10 bg-slate-900 border border-slate-700 rounded-lg text-white focus:border-teal-500 outline-none transition-colors"
+                    className="bg-slate-900 border-slate-700 pr-10 text-white rounded-lg focus:border-teal-500"
                     onFocus={() => query.length > 1 && setIsOpen(true)}
                     required
                 />

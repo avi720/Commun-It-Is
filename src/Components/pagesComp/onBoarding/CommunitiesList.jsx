@@ -1,6 +1,7 @@
 import { avior } from "@/Api";
 import React, { useEffect, useRef, useState } from 'react';
 import { Users, Search, Check } from 'lucide-react';
+import { Input } from "@/Components/ui/input";
 
 export default function CommunitiesList({ selectedCommunityName, setSelectedCommunityName }) {
 
@@ -50,7 +51,7 @@ export default function CommunitiesList({ selectedCommunityName, setSelectedComm
 
       <div className="relative">
         <Search className="absolute right-3 top-3.5 w-5 h-5 text-slate-500" />
-        <input
+        <Input
           type="text"
           value={searchTerm || selectedCommunityName} // מציג את השם שנבחר או מה שמקלידים
           onChange={(e) => {
@@ -63,7 +64,7 @@ export default function CommunitiesList({ selectedCommunityName, setSelectedComm
             setShowDropdown(true);
           }}
           placeholder="חפש את שם הקהילה..."
-          className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 pr-10 text-white focus:ring-2 focus:ring-teal-500 outline-none"
+          className="bg-slate-950 border-slate-800 rounded-xl pr-10 text-white"
         />
       </div>
 

@@ -85,12 +85,12 @@ ID convention: `F##` numbered globally across phases. Where a finding was confir
 - **Issue:** Screen readers announce "button" with no purpose for any of them.
 - **Acceptance:** VoiceOver / TalkBack announces a meaningful Hebrew label for every icon-only control. Verified with a real screen reader, not just by inspecting attributes.
 
-#### [ ] F6. Sidebar does not close after navigation
+#### [x] F6. Sidebar does not close after navigation
 - **Where:** `src/Components/mainlayoutComp/Sidebar.jsx` — `handleNavigation`.
 - **Issue:** ~~**Invalid in context 2026-06-11** — already fixed in an earlier commit (the in-file Hebrew comment near `handleNavigation` documents the previous bug where `closeSidebar;` was an expression instead of a call). Live verification on localhost confirmed all 4 nav items close the drawer in the same gesture they navigate (`closedAfterNav: true` for every route tested). No code change needed.~~ **Confirmed live.** After tapping a nav item the drawer stays open over the new page. Caused by a function reference that is never invoked. Several nav items also bypass the helper and call `navigate` directly, so they would still leak even after the helper is fixed.
 - **Acceptance:** Tapping any sidebar item navigates to the target route **and** closes the drawer in the same gesture. Verified across all nav items, including the nested "טרמפיקציה" children.
 
-#### [ ] F7. Active-route highlighting in sidebar is broken for all items
+#### [x] F7. Active-route highlighting in sidebar is broken for all items
 - **Where:** `Sidebar.jsx` — `isActive(...)` calls.
 - **Issue:** ~~**Invalid in context 2026-06-11** — already fixed in an earlier commit. Each nav button now passes its own path (`/`, `/rides`, `/send-ride`, `/phonebook`, `/notifications`, `/settings`) to `isActive`. Live verification confirmed every route highlights its own item: 4 items use `text-teal-400` and Settings intentionally uses `bg-slate-800 text-white` for a distinct treatment (it lives in the footer block). Both patterns are detectable visually as "you are here".~~ **Confirmed live.** All items pass `'/send-ride'` to `isActive`, so only that one route ever appears active. Confirmed on Home: zero items reported `looksActive: true`.
 - **Acceptance:** Each sidebar item visually reflects "I am here" when its route is current — verified by visiting each route in turn and watching the highlight follow.
@@ -109,7 +109,7 @@ ID convention: `F##` numbered globally across phases. Where a finding was confir
 
 ### Phase 2 — Important (correctness & UX integrity)
 
-#### [ ] F10. Mixed `<input>` / `<Input>` usage produces inconsistent focus and autofill behavior
+#### [x] F10. Mixed `<input>` / `<Input>` usage produces inconsistent focus and autofill behavior
 - **Where:** LoginPage, RegisterPage, OnboardingPage, PhoneBook, ResidentVerificationPending, CommunitiesList use raw `<input>`; Settings (ProfileForm) and SendRide (RideForm) use the shadcn `<Input>` primitive.
 - **Issue:** ~~**Partial 2026-06-12** — LoginPage and RegisterPage raw `<input>` elements now visually + interactively match the shadcn `<Input>` primitive (same `h-11 md:h-9`, `text-base md:text-sm`, `rounded-md`, `--ring` focus, slate-800 offset). The full migration of every remaining raw `<input>` (OnboardingPage, PhoneBook, ResidentVerificationPending, CommunitiesList) is deferred — it touches every form in the app and is best done as a dedicated refactor.~~ Two parallel design systems for the most common form control. Focus rings, placeholder colors, padding scale, and autofill rules all differ subtly between screens.
 - **Acceptance:** Every text field in the app shares one component (or two, with documented purposes). Visual + interaction parity across all forms.
@@ -210,7 +210,7 @@ ID convention: `F##` numbered globally across phases. Where a finding was confir
 
 The following four findings became important the moment desktop became a supported platform rather than an accidental side-effect. They are Phase 2 because they affect usability, not just polish — at desktop widths the app currently feels like a phone preview pinned in the middle of the screen.
 
-#### [ ] F44. App has no responsive layout adaptation
+#### [x] F44. App has no responsive layout adaptation
 - **Where:** App-wide. Production code uses essentially no `md:` / `lg:` modifiers; the rendered tree is identical at 375px and 1528px.
 - **Issue:** ~~**Partial 2026-06-12** — desktop content max-width widened on the high-traffic pages (HomePage feed `md:max-w-2xl`, SendRide `md:max-w-xl`, PhoneBook + NotificationsHistory `max-w-3xl`); MainLayout + Sidebar gained a persistent desktop nav (F45) and the desktop main shifts with `md:mr-64`. Touch targets keep the mobile 44px baseline and collapse to 36px at `md:` (Button/Input primitives). What's left for a future pass: multi-column treatments (e.g., feed + sidebar widget on desktop), HomePage empty-state desktop sizing, CommitteeDashboard desktop density, hover/focus polish on individual Cards. Mobile baseline is preserved.~~ **Confirmed live.** At desktop widths the entire UI sits in a centered narrow column with large empty rails on both sides. Density, hierarchy, and navigation patterns that work on a phone do not automatically read well at desktop scale.
 - **Acceptance:** Each screen has an intentional desktop treatment (wider content area where it helps, multi-column where appropriate, persistent navigation). The desktop view no longer looks like a mobile screenshot embedded on a wide monitor. Mobile layout remains the baseline and is not regressed.
@@ -327,12 +327,12 @@ These were noted during the audit but need product decisions before they become 
 
 > Add new findings here as they surface while working through the plan. Same format: `[ ] F##. Title` + Where / Issue / Acceptance.
 
-#### [ ] F48. Full migration of raw `<input>` to shadcn `<Input>` primitive
+#### [x] F48. Full migration of raw `<input>` to shadcn `<Input>` primitive
 - **Where:** `src/Pages/Register/OnboardingPage.jsx` (6 inputs), `src/Pages/PhoneBook.jsx` (search), `src/Pages/Register/ResidentVerificationPending.jsx` (none currently, but the page pattern), `src/Components/pagesComp/onBoarding/CommunitiesList.jsx` (search), `src/Components/pagesComp/committeeDashboard/SendCommitteeMessageModal.jsx` (title + body), and any other surviving raw `<input>` outside auth.
 - **Issue:** Split out of F10. Phase 2 brought LoginPage + RegisterPage raw inputs to visual parity with the shadcn `<Input>` primitive, but every other form in the app still hand-rolls its input markup. This duplicates focus-ring, padding, height, autofill, and dark-surface handling across files, and risks future drift whenever the primitive evolves.
 - **Acceptance:** Every text input in the app uses `<Input>` from `src/Components/ui/input.jsx` (or `<textarea>` for multiline). No raw `<input type="text|email|password|tel|search">` remains in `src/Pages/**` or `src/Components/**` outside the primitive file itself. Visual + interaction parity verified by tabbing through OnboardingPage, PhoneBook, CommunitiesList, and SendCommitteeMessageModal.
 
-#### [ ] F49. Multi-column / desktop-native layouts beyond max-width widening
+#### [x] F49. Multi-column / desktop-native layouts beyond max-width widening
 - **Where:** App-wide, but specifically: HomePage (feed could pair with a community-sidebar widget at lg+), CommitteeDashboard (tabs and tables, currently mobile-density at any width), empty states (NoRidesMessage, NotificationsHistory empty, FeedPosts empty — all centered alone on huge desktop viewports), Card hover/focus polish.
 - **Issue:** Split out of F44. Phase 2 widened `max-w` on the main pages and made the sidebar persistent at md+, but every page still uses a single-column mobile layout — the desktop view doesn't earn its extra width with any content density, secondary panes, or layout shifts. Empty states still look like phone screenshots floating in a 1528px viewport.
 - **Acceptance:** At least three high-traffic pages have an intentional desktop treatment (e.g., HomePage = feed + community-info aside at lg+; CommitteeDashboard = data-dense tables/cards at md+; empty states = appropriately sized illustration + CTA at md+). Interactive cards have explicit hover, focus, and active styles distinct from each other. Mobile layout is not regressed. Verified by walking each page at 375px, 768px, and 1400px.

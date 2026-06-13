@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/Components/ui/card";
+import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { Mail, Lock, LogIn, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -62,11 +63,11 @@ export default function LoginPage() {
               <Label htmlFor="login-email" className="text-slate-300">כתובת אימייל</Label>
               <div className="relative">
                 <Mail className="absolute right-3 top-3 h-5 w-5 text-slate-400" aria-hidden="true" />
-                <input
+                <Input
                   id="login-email"
                   type="email"
                   placeholder="name@example.com"
-                  className="flex w-full h-11 md:h-9 pr-10 px-3 py-1 rounded-md bg-slate-900 border border-slate-700 text-white text-base md:text-sm shadow-sm transition-colors placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-500 pr-10 focus-visible:ring-offset-slate-800"
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -78,11 +79,11 @@ export default function LoginPage() {
               <Label htmlFor="login-password" className="text-slate-300">סיסמה</Label>
               <div className="relative">
                 <Lock className="absolute right-3 top-3 h-5 w-5 text-slate-400" aria-hidden="true" />
-                <input
+                <Input
                   id="login-password"
                   type="password"
                   placeholder="הזן סיסמה"
-                  className="flex w-full h-11 md:h-9 pr-10 px-3 py-1 rounded-md bg-slate-900 border border-slate-700 text-white text-base md:text-sm shadow-sm transition-colors placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-500 pr-10 focus-visible:ring-offset-slate-800"
                   required
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}

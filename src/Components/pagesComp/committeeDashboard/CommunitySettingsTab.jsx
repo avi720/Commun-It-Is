@@ -1,5 +1,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Input } from "@/Components/ui/input";
 import { supabase } from '@/Api';
 
 /**
@@ -30,11 +31,11 @@ export default function CommunitySettingsTab({ communityId }) {
             <h2 className="text-lg font-semibold text-slate-300">הגדרות הקהילה</h2>
             <div className="bg-slate-800 p-4 rounded-xl border border-slate-700">
                 <label className="block text-sm text-slate-400 mb-1">שם הקהילה</label>
-                <input
+                <Input
                     type="text"
                     disabled
                     value={community?.name || ''}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white opacity-50"
+                    className="bg-slate-900 border-slate-700 rounded-lg text-white"
                 />
                 <p className="text-xs text-slate-400 mt-2">
                     * כרגע לא ניתן לשנות שם קהילה באופן עצמאי.

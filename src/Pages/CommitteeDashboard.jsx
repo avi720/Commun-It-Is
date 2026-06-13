@@ -45,21 +45,21 @@ export default function CommitteeDashboard() {
     return (
         <div className="w-full h-full flex flex-col text-white pb-20">
             {/* F36: title block uses min-w-0 + truncate inside flex to prevent the long community name from pushing past the viewport edge */}
-            <div className="p-4 bg-slate-800/50 border-b border-slate-700">
+            <div className="p-4 bg-slate-800/50 border-b border-slate-700 md:flex md:items-center md:justify-between md:gap-4">
                 <h1 className="text-xl font-bold flex items-center gap-2 text-amber-400 min-w-0">
                     <Shield className="w-6 h-6 shrink-0" aria-hidden="true" />
                     <span className="truncate">ניהול קהילה: {community?.name || 'טוען...'}</span>
                 </h1>
                 <button
                     onClick={() => setShowMsgModal(true)}
-                    className="bg-teal-700 hover:bg-teal-800 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-lg mt-2 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-800"
+                    className="bg-teal-700 hover:bg-teal-800 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-lg mt-2 md:mt-0 md:shrink-0 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-800"
                 >
                     <Megaphone className="w-4 h-4" aria-hidden="true" />
                     שלח הודעה לכולם
                 </button>
             </div>
 
-            <div className="flex p-2 gap-2 overflow-x-auto border-b border-slate-800">
+            <div className="flex p-2 gap-2 md:gap-3 md:px-4 overflow-x-auto border-b border-slate-800">
                 <TabButton
                     active={activeTab === 'businesses'}
                     onClick={() => setActiveTab('businesses')}
@@ -80,7 +80,7 @@ export default function CommitteeDashboard() {
                 />
             </div>
 
-            <div className="flex-1 overflow-y-auto pt-4 px-2">
+            <div className="flex-1 overflow-y-auto pt-4 px-2 md:px-6">
                 {activeTab === 'businesses' && (
                     <BusinessesTab communityId={communityId} onCountChange={setBusinessesCount} />
                 )}
@@ -101,10 +101,10 @@ function TabButton({ active, onClick, icon, label }) {
     return (
         <button
             onClick={onClick}
-            className={`flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap transition-all text-sm ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap transition-all text-sm min-h-[44px] md:min-h-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 ${
                 active
                     ? 'bg-amber-500 text-white font-bold shadow-md'
-                    : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+                    : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200'
             }`}
         >
             {icon}

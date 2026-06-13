@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { avior } from '@/Api';
 import { useAppData } from '@/context/useAppData';
+import { Input } from "@/Components/ui/input";
 import { ConfirmDialog } from '@/Components/ui/confirm-dialog';
 
 /**
@@ -53,8 +54,8 @@ export default function SendCommitteeMessageModal({ open, onClose, communityId }
             <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
                 <div className="bg-slate-900 p-6 rounded-xl w-full max-w-md border border-slate-700">
                     <h3 className="text-xl font-bold text-white mb-4">שליחת הודעה לקהילה</h3>
-                    <input
-                        className="w-full bg-slate-800 text-white p-3 rounded mb-3 border border-slate-700"
+                    <Input
+                        className="bg-slate-800 text-white border-slate-700 mb-3"
                         placeholder="כותרת ההודעה"
                         value={data.title}
                         onChange={e => setData({ ...data, title: e.target.value })}

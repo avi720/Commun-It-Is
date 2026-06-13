@@ -25,7 +25,7 @@ export default function NotificationsHistory() {
             </header>
 
             {messages.length === 0 ? (
-                <div className="max-w-md mx-auto bg-slate-800/50 border border-slate-800 rounded-xl py-12 px-6 text-center">
+                <div className="max-w-md md:max-w-lg mx-auto bg-slate-800/50 border border-slate-800 rounded-xl py-12 px-6 text-center">
                     <Bell className="w-16 h-16 text-slate-500 mx-auto mb-4" aria-hidden="true" />
                     <h3 className="text-xl md:text-2xl font-semibold text-slate-200 mb-3">עדיין שקט בקהילה</h3>
                     <p className="text-slate-400 text-sm mb-6">
@@ -44,8 +44,8 @@ export default function NotificationsHistory() {
                             className={`
                                 relative overflow-hidden rounded-xl border p-4 transition-all
                                 ${msg.is_emergency
-                                    ? 'bg-red-950/30 border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.1)]'
-                                    : 'bg-slate-800 border-slate-700 shadow-sm'}
+                                    ? 'bg-red-950/30 border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.1)] hover:bg-red-950/40'
+                                    : 'bg-slate-800 border-slate-700 shadow-sm hover:bg-slate-800/80 hover:border-slate-600'}
                             `}
                         >
                             <div className={`absolute top-0 right-0 bottom-0 w-1 ${msg.is_emergency ? 'bg-red-500' : 'bg-teal-500'}`} />

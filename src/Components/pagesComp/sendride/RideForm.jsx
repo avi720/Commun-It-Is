@@ -139,24 +139,24 @@ export default function RideForm({
                 <div className="flex gap-2">
                     {/* שדה תאריך */}
                     <div className="relative flex-1">
-                        <input
+                        <Input
                             type="date"
                             value={dateStr}
                             min={minDate}
                             max={maxDate}
                             onChange={handleDateChange}
-                            className="w-full p-3 bg-slate-900 border border-slate-700 rounded-md text-white focus:ring-teal-500 text-center"
+                            className="bg-slate-900 border-slate-700 text-white text-center"
                             required
                         />
                     </div>
 
                     {/* שדה שעה */}
                     <div className="relative flex-1">
-                        <input
+                        <Input
                             type="time"
                             value={timeStr}
                             onChange={handleTimeChange}
-                            className="w-full p-3 bg-slate-900 border border-slate-700 rounded-md text-white focus:ring-teal-500 text-center text-lg tracking-wide"
+                            className="bg-slate-900 border-slate-700 text-white text-center text-lg tracking-wide"
                             required
                         />
                     </div>

@@ -51,7 +51,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen space-y-6 relative">
 
-      <div className="max-w-lg md:max-w-2xl mx-auto space-y-4">
+      <div className="max-w-lg md:max-w-2xl lg:max-w-3xl mx-auto space-y-4">
         {isLoading ? (
           // F43: pair spinner with explicit Hebrew text so reduced-motion users still see a loading signal
           <div className="flex flex-col items-center gap-2 pt-20" role="status" aria-live="polite">
@@ -59,7 +59,7 @@ export default function HomePage() {
             <span className="text-slate-400 text-sm">טוען...</span>
           </div>
         ) : posts.length === 0 ? (
-          <div className="text-center text-slate-500 pt-24">
+          <div className="text-center text-slate-500 pt-24 max-w-md md:max-w-lg mx-auto">
             <Card className="bg-slate-800/50 border-slate-700">
               <CardHeader>
                 <CardTitle className="text-lg text-white flex items-center gap-2">
@@ -82,7 +82,7 @@ export default function HomePage() {
         )}
       </div>
       {/* F41: desktop replacement for the FAB — full-width visible button under the feed. md:block keeps it off mobile. */}
-      <div className="hidden md:block max-w-2xl mx-auto mt-6">
+      <div className="hidden md:block max-w-2xl lg:max-w-3xl mx-auto mt-6">
         <Button
           onClick={() => setIsModalOpen(true)}
           className="w-full bg-teal-700 hover:bg-teal-800 text-white"

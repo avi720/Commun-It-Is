@@ -31,11 +31,11 @@ export default function FeedPosts({ post }) {
     };
 
     return (
-        <Card id={`post-${post.id}`} className={`rounded-none mb-4 overflow-hidden border
+        <Card id={`post-${post.id}`} className={`rounded-none mb-4 overflow-hidden border transition-colors
                 ${is_committee
-                ? 'bg-gradient-to-br from-slate-900 to-slate-800 border-none'
-                : 'bg-slate-800 border-none'}
-                >`}>
+                ? 'bg-gradient-to-br from-slate-900 to-slate-800 border-none hover:from-slate-800 hover:to-slate-700'
+                : 'bg-slate-800 border-none hover:bg-slate-700/60'}
+                `}>
             {/* כותרת: פרטי המפרסם */}
             <div className="p-4 flex items-center gap-3 border-none">
                 {/* אייקון משתמש */}

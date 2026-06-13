@@ -6,6 +6,7 @@ import CommunitiesList from '@/Components/pagesComp/onBoarding/CommunitiesList';
 import { toast } from "sonner";
 import { avior } from "@/Api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
+import { Input } from "@/Components/ui/input";
 
 export default function OnboardingPage() {
   const { refresh, logout } = useAppData();
@@ -90,9 +91,9 @@ export default function OnboardingPage() {
                 <label className="text-xs text-slate-400 mr-1">שם פרטי</label>
                 <div className="relative">
                   <User className="absolute right-3 top-2.5 h-4 w-4 text-slate-500" />
-                  <input
+                  <Input
                     type="text"
-                    className="w-full p-2 pr-9 rounded bg-slate-900 border border-slate-700 text-white text-base md:text-sm focus:ring-1 focus:ring-teal-500"
+                    className="bg-slate-900 border-slate-700 text-white pr-9"
                     placeholder="לדוגמא: אביאור"
                     required
                     onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
@@ -101,9 +102,9 @@ export default function OnboardingPage() {
               </div>
               <div className="space-y-1">
                 <label className="text-xs text-slate-400 mr-1">שם משפחה</label>
-                <input
+                <Input
                   type="text"
-                  className="w-full p-2 rounded bg-slate-900 border border-slate-700 text-white text-base md:text-sm focus:ring-1 focus:ring-teal-500"
+                  className="bg-slate-900 border-slate-700 text-white"
                   placeholder="לדוגמא: פז"
                   required
                   onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
@@ -132,9 +133,9 @@ export default function OnboardingPage() {
               <label className="text-xs text-slate-400 mr-1">רחוב ומס&apos; בית</label>
               <div className="relative">
                 <MapPin className="absolute right-3 top-2.5 h-4 w-4 text-slate-500" />
-                <input
+                <Input
                   type="text"
-                  className="w-full p-2 pr-9 rounded bg-slate-900 border border-slate-700 text-white text-base md:text-sm focus:ring-1 focus:ring-teal-500"
+                  className="bg-slate-900 border-slate-700 text-white pr-9"
                   placeholder="לדוגמה: הרימון 12"
                   required
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
@@ -146,9 +147,9 @@ export default function OnboardingPage() {
               <label className="text-xs text-slate-400 mr-1">טלפון</label>
               <div className="relative">
                 <Phone className="absolute right-3 top-2.5 h-4 w-4 text-slate-500" />
-                <input
+                <Input
                   type="tel"
-                  className="w-full p-2 pr-9 rounded bg-slate-900 border border-slate-700 text-white text-base md:text-sm focus:ring-1 focus:ring-teal-500"
+                  className="bg-slate-900 border-slate-700 text-white pr-9"
                   placeholder="לדוגמה: 0521234567"
                   required
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
@@ -160,11 +161,11 @@ export default function OnboardingPage() {
               <label className="text-xs text-slate-400 mr-1">גיל</label>
               <div className="relative">
                 <Calendar className="absolute right-3 top-2.5 h-4 w-4 text-slate-500" />
-                <input
+                <Input
                   type="number"
                   min="16"
                   max="120"
-                  className="w-full p-2 pr-9 rounded bg-slate-900 border border-slate-700 text-white text-base md:text-sm focus:ring-1 focus:ring-teal-500"
+                  className="bg-slate-900 border-slate-700 text-white pr-9"
                   required
                   onChange={(e) => setFormData({ ...formData, age: e.target.value })}
                 />
