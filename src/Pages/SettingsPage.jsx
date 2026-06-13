@@ -91,7 +91,7 @@ export default function SettingsPage() {
                 
                 <DangerZone onReset={handleHardReset} />
 
-                <div className="text-center text-slate-600 text-xs mt-10">
+                <div className="text-center text-slate-400 text-xs mt-10">
                     Commun-it-is v1.0 • Developed by Hanan
                 </div>
             </motion.div>

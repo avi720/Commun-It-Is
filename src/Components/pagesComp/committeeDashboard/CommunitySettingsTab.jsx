@@ -36,7 +36,7 @@ export default function CommunitySettingsTab({ communityId }) {
                     value={community?.name || ''}
                     className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white opacity-50"
                 />
-                <p className="text-xs text-slate-500 mt-2">
+                <p className="text-xs text-slate-400 mt-2">
                     * כרגע לא ניתן לשנות שם קהילה באופן עצמאי.
                 </p>
             </div>

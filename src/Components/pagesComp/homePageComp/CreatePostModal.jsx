@@ -188,7 +188,13 @@ export default function CreatePostModal({ isOpen, onClose, onPostCreated }) {
                                 disabled={!content.trim() || isSubmitting}
                                 className="w-full bg-teal-700 hover:bg-teal-800 text-white p-5"
                             >
-                                {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : (
+                                {isSubmitting ? (
+                                    // F43: spinner + Hebrew text so reduced-motion users still see a progress signal
+                                    <span className="inline-flex items-center gap-2">
+                                        <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+                                        <span className="text-sm">מפרסם...</span>
+                                    </span>
+                                ) : (
                                     <span className="inline-flex items-center gap-2">
                                         <span className="text-sm">פרסם</span>
                                         <Send className="w-4 h-4" aria-hidden="true" />

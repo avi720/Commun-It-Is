@@ -135,7 +135,7 @@ export default function ResidentsTab({ communityId }) {
                                 </td>
                                 <td className="px-4 py-3" dir="ltr">
                                     <div className="text-xs">{resident.phone}</div>
-                                    <div className="text-[10px] text-slate-500 truncate max-w-[120px]">{resident.email}</div>
+                                    <div className="text-[10px] text-slate-400 truncate max-w-[120px]">{resident.email}</div>
                                 </td>
                                 <td className="px-4 py-3">
                                     {resident.community_role === 'committee' ? (
@@ -143,7 +143,7 @@ export default function ResidentsTab({ communityId }) {
                                             ועד
                                         </span>
                                     ) : (
-                                        <span className="text-slate-500 text-xs">תושב</span>
+                                        <span className="text-slate-400 text-xs">תושב</span>
                                     )}
                                 </td>
                             </tr>
@@ -152,7 +152,7 @@ export default function ResidentsTab({ communityId }) {
                 </table>
 
                 {filtered.length === 0 && (
-                    <div className="p-12 text-center text-slate-500">לא נמצאו תושבים בקטגוריה זו</div>
+                    <div className="p-12 text-center text-slate-400">לא נמצאו תושבים בקטגוריה זו</div>
                 )}
             </div>
         </div>

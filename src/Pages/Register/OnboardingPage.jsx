@@ -179,7 +179,7 @@ export default function OnboardingPage() {
 
             <button
               type="submit"
-              className="w-full mt-6 bg-gradient-to-r from-teal-700 to-emerald-700 hover:from-teal-800 hover:to-emerald-800 text-white p-2 rounded-md font-bold transition-all shadow-lg flex justify-center items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-800 min-h-[44px]"
+              className="w-full mt-6 bg-teal-700 hover:bg-teal-800 text-white p-2 rounded-md font-bold transition-all shadow-lg flex justify-center items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-800 min-h-[44px]"
             >
               סיום והרשמה
               <CheckCircle className="w-5 h-5" />

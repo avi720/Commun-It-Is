@@ -172,7 +172,7 @@ export default function RideForm({
             <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-5 text-lg font-bold bg-gradient-to-r from-orange-500 to-pink-600 hover:from-orange-600 hover:to-pink-700 shadow-lg text-white border-0"
+                className="w-full py-5 text-lg font-bold bg-teal-700 hover:bg-teal-800 shadow-lg text-white border-0"
             >
                 {isSubmitting ? (
                     <div className="flex items-center gap-2">

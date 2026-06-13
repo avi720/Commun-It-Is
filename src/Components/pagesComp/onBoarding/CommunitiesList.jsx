@@ -70,7 +70,7 @@ export default function CommunitiesList({ selectedCommunityName, setSelectedComm
       {showDropdown && (searchTerm || communities.length > 0) && (
         <div className="absolute z-10 w-full bg-slate-800 border border-slate-700 rounded-xl mt-1 max-h-48 overflow-y-auto shadow-2xl">
           {filteredCommunities.length === 0 ? (
-            <div className="p-3 text-slate-500 text-center text-sm">לא נמצאו קהילות</div>
+            <div className="p-3 text-slate-400 text-center text-sm">לא נמצאו קהילות</div>
           ) : (
             filteredCommunities.map(community => (
               <div

@@ -9,22 +9,22 @@ import { avior } from '../Api';
 import FeedPosts from '../Components/pagesComp/homePageComp/FeedPosts';
 import CreatePostModal from '../Components/pagesComp/homePageComp/CreatePostModal';
 
-// FAB חוצה רנדורים — מוגדר ברמת מודול ולא בתוך HomePage כדי שלא ייווצר טיפוס
-// קומפוננטה חדש בכל רינדור (rule: react-hooks/static-components).
+// F41: when the drawer is open we DON'T render the FAB at all (was: rendered but dimmed,
+// which left it in the tab order and reachable via edge gestures). md:hidden hides it on
+// desktop entirely — the in-feed "+ פוסט חדש" CTA below the feed takes its place there.
+// safe-area-inset-bottom prevents collision with the iOS gesture bar.
 function FloatingActionButton({ onClick, isSidebarOpen }) {
-  return !isSidebarOpen ? (
+  if (isSidebarOpen) return null;
+  return (
     <Button
       onClick={onClick}
       aria-label="צור פוסט חדש"
       title="צור פוסט חדש"
-      className="fixed bottom-16 left-6 w-14 h-14 rounded-full bg-teal-700 hover:bg-teal-800 shadow-lg shadow-teal-500/30 flex items-center justify-center z-50 transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-300 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+      className="md:hidden fixed left-6 w-14 h-14 rounded-full bg-teal-700 hover:bg-teal-800 shadow-lg shadow-teal-500/30 flex items-center justify-center z-50 transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-300 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+      style={{ bottom: 'calc(4rem + env(safe-area-inset-bottom))' }}
     >
       <Plus className="w-8 h-8 text-white" aria-hidden="true" />
     </Button>
-  ) : (
-    <div className="fixed bottom-16 left-6 w-14 h-14 rounded-full bg-teal-700/60 shadow-lg shadow-teal-500/30 flex items-center justify-center z-50" aria-hidden="true">
-      <Plus className="w-4 h-4 text-gray-400" />
-    </div>
   );
 }
 
@@ -53,8 +53,10 @@ export default function HomePage() {
 
       <div className="max-w-lg md:max-w-2xl mx-auto space-y-4">
         {isLoading ? (
-          <div className="flex justify-center pt-20">
-            <Loader2 className="w-8 h-8 text-teal-500 animate-spin" />
+          // F43: pair spinner with explicit Hebrew text so reduced-motion users still see a loading signal
+          <div className="flex flex-col items-center gap-2 pt-20" role="status" aria-live="polite">
+            <Loader2 className="w-8 h-8 text-teal-500 animate-spin" aria-hidden="true" />
+            <span className="text-slate-400 text-sm">טוען...</span>
           </div>
         ) : posts.length === 0 ? (
           <div className="text-center text-slate-500 pt-24">
@@ -79,7 +81,18 @@ export default function HomePage() {
           ))
         )}
       </div>
-      {/* כפתור הוספה */}
+      {/* F41: desktop replacement for the FAB — full-width visible button under the feed. md:block keeps it off mobile. */}
+      <div className="hidden md:block max-w-2xl mx-auto mt-6">
+        <Button
+          onClick={() => setIsModalOpen(true)}
+          className="w-full bg-teal-700 hover:bg-teal-800 text-white"
+        >
+          <Plus className="w-5 h-5" aria-hidden="true" />
+          צור פוסט חדש
+        </Button>
+      </div>
+
+      {/* כפתור הוספה (מובייל) */}
       <FloatingActionButton onClick={() => setIsModalOpen(true)} isSidebarOpen={isSidebarOpen} />
 
       <CreatePostModal

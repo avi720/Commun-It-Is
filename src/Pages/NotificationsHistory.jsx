@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useAppData } from '../context/useAppData';
 import { avior } from '../Api';
-import { Calendar, User, AlertTriangle, Info } from 'lucide-react';
+import { Calendar, User, AlertTriangle, Bell, BellRing } from 'lucide-react';
 
 export default function NotificationsHistory() {
     const { user } = useAppData();
@@ -25,10 +25,16 @@ export default function NotificationsHistory() {
             </header>
 
             {messages.length === 0 ? (
-                <div className="text-center py-20 bg-slate-800/50 rounded-xl border border-slate-800 border-dashed">
-                    <Info className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-slate-300">אין הודעות כרגע</h3>
-                    <p className="text-slate-500">תיבת ההודעות של הקהילה ריקה</p>
+                <div className="max-w-md mx-auto bg-slate-800/50 border border-slate-800 rounded-xl py-12 px-6 text-center">
+                    <Bell className="w-16 h-16 text-slate-500 mx-auto mb-4" aria-hidden="true" />
+                    <h3 className="text-xl md:text-2xl font-semibold text-slate-200 mb-3">עדיין שקט בקהילה</h3>
+                    <p className="text-slate-400 text-sm mb-6">
+                        כשהוועד או חברי הקהילה יפרסמו עדכון או הודעה חשובה, היא תופיע כאן.
+                    </p>
+                    <p className="text-slate-400 text-sm inline-flex items-center gap-2 justify-center">
+                        <BellRing className="w-4 h-4 text-teal-400 shrink-0" aria-hidden="true" />
+                        <span>אתה יכול לאפשר התראות בהגדרות הדפדפן/האפליקציה כדי לא לפספס עדכונים.</span>
+                    </p>
                 </div>
             ) : (
                 <div className="space-y-4">

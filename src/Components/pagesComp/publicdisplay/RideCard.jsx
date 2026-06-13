@@ -49,13 +49,14 @@ export default function RideCard({ ride, currentTime }) {
                                     <span className="text-xl font-bold text-white leading-tight">
                                         {ride.driver_name},
                                     </span>
-                                    <span className="text-sm text-slate-300 leading-tight">
+                                    <span className="text-sm text-slate-300 leading-tight tabular-nums">
                                         מקומות פנויים: {ride.seats}
                                     </span>
                                 </div>
 
                                 {/* שורה 2: זמן יציאה */}
-                                <div className="flex items-center gap-1.5 pt-1 text-teal-400 text-sm font-medium">
+                                {/* F37: tabular-nums keeps the ticking countdown ("N דקות") from jittering column width */}
+                                <div className="flex items-center gap-1.5 pt-1 text-teal-400 text-sm font-medium tabular-nums">
                                     <Clock className="w-3.5 h-3.5" />
                                     {formatRideTime(ride.departure_time, currentTime)}
                                 </div>

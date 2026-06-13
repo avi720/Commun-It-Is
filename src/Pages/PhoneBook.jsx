@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useAppData } from '../context/useAppData';
 import { avior } from '../Api';
-import { Search, Phone, MessageCircle } from 'lucide-react';
+import { Search, Phone, MessageCircle, BookUser } from 'lucide-react';
 
 export default function PhoneBook() {
     const { user } = useAppData();
@@ -39,7 +39,10 @@ export default function PhoneBook() {
     return (
         <div className="min-h-full text-white pb-20 p-4 max-w-3xl mx-auto">
             <div className="sticky top-0 bg-slate-900/95 backdrop-blur-sm z-10 pb-4 -mx-4 px-4">
-                <h1 className="text-2xl font-bold mb-4 text-center text-teal-400">ספר טלפונים קהילתי 📖</h1>
+                <h1 className="text-2xl font-bold mb-4 text-center text-teal-400 flex items-center justify-center gap-2">
+                    <BookUser className="w-6 h-6 text-teal-400" aria-hidden="true" />
+                    <span>ספר טלפונים קהילתי</span>
+                </h1>
 
                 <div className="relative">
                     <label htmlFor="phonebook-search" className="sr-only">חיפוש שכן</label>
@@ -60,7 +63,7 @@ export default function PhoneBook() {
             ) : (
                 <div className="space-y-3">
                     {filteredContacts.length === 0 ? (
-                        <div className="text-center mt-10 text-slate-500">
+                        <div className="text-center mt-10 text-slate-400">
                             {searchTerm ? 'לא נמצאו תוצאות' : 'אין עדיין אנשי קשר בספר הקהילתי'}
                         </div>
                     ) : (

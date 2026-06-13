@@ -39,7 +39,7 @@ export default function MainLayout() {
             onClick={() => navigate('/')}
             className="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity active:scale-95"
           >
-            <h1 className="text-lg font-bold bg-gradient-to-r from-teal-400 to-blue-500 bg-clip-text text-transparent select-none truncate max-w-[200px]">
+            <h1 className="text-lg font-bold bg-gradient-to-r from-teal-400 to-blue-500 bg-clip-text text-transparent select-none truncate max-w-[200px] md:max-w-[360px]">
               {user?.city ? `קהילת ${user.city}` : 'קהילת טרמפיקציה'}
             </h1>
           </div>

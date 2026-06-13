@@ -55,7 +55,7 @@ export default function Sidebar({ onLogout, isSidebarOpen, closeSidebar }) {
             onClick={() => handleNavigation('/')}
             className={`w-full flex items-center gap-3 p-3 min-h-[44px] text-sm rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 ${isActive('/') ? 'text-teal-400 bg-slate-800/50' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}
           >
-            <Home className="w-5 h-5 text-green-400" aria-hidden="true" />
+            <Home className="w-5 h-5" aria-hidden="true" />
             <span className="font-medium">דף הבית</span>
           </button>
 
@@ -67,7 +67,7 @@ export default function Sidebar({ onLogout, isSidebarOpen, closeSidebar }) {
               className={`w-full flex items-center justify-between p-3 min-h-[44px] rounded-lg text-slate-300 hover:bg-slate-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 ${['/rides', '/send-ride'].some(p => location.pathname.includes(p)) ? 'bg-slate-800' : ''}`}
             >
               <div className="flex items-center gap-3">
-                <Car className="w-5 h-5 text-orange-400" aria-hidden="true" />
+                <Car className="w-5 h-5" aria-hidden="true" />
                 <span className="font-medium">טרמפיקציה</span>
               </div>
               {isTrempOpen ? <ChevronUp className="w-4 h-4" aria-hidden="true" /> : <ChevronDown className="w-4 h-4" aria-hidden="true" />}
@@ -97,7 +97,7 @@ export default function Sidebar({ onLogout, isSidebarOpen, closeSidebar }) {
               onClick={() => handleNavigation('/phonebook')}
               className={`w-full flex items-center gap-3 p-3 min-h-[44px] text-sm rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 ${isActive('/phonebook') ? 'text-teal-400 bg-slate-800/50' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}
             >
-              <BookUser className="w-5 h-5 text-yellow-400" aria-hidden="true" />
+              <BookUser className="w-5 h-5" aria-hidden="true" />
               <span className="font-medium">ספר טלפונים</span>
             </button>
           </div>
@@ -106,7 +106,7 @@ export default function Sidebar({ onLogout, isSidebarOpen, closeSidebar }) {
             onClick={() => handleNavigation('/notifications')}
             className={`w-full flex items-center gap-3 p-3 min-h-[44px] text-sm rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 ${isActive('/notifications') ? 'text-teal-400 bg-slate-800/50' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}
           >
-            <Bell className="w-5 h-5 text-red-400" aria-hidden="true" />
+            <Bell className="w-5 h-5" aria-hidden="true" />
             <span className="font-medium">הודעות חשובות</span>
           </button>
         </div>
@@ -118,7 +118,9 @@ export default function Sidebar({ onLogout, isSidebarOpen, closeSidebar }) {
               onClick={() => handleNavigation('/committee-dashboard')}
               className="w-full flex items-center space-x-3 space-x-reverse p-3 min-h-[44px] rounded-xl hover:bg-slate-800 transition-colors text-amber-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400"
             >
-              <Shield className="w-5 h-5" aria-hidden="true" />
+              <div className="w-7 h-7 rounded-full bg-amber-500 flex items-center justify-center shadow-lg shadow-amber-500/20">
+                <Shield className="w-4 h-4 text-white" aria-hidden="true" />
+              </div>
               <span className="font-medium">ניהול קהילה</span>
             </button>
           )}

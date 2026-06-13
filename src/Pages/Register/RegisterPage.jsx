@@ -190,7 +190,7 @@ export default function RegisterPage() {
 
             <div className="flex items-center gap-3 my-1">
               <div className="h-px flex-1 bg-slate-700" />
-              <span className="text-xs text-slate-500">או</span>
+              <span className="text-xs text-slate-400">או</span>
               <div className="h-px flex-1 bg-slate-700" />
             </div>
 

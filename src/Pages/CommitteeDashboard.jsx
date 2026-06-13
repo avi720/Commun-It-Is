@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Users, Store, Settings, Shield } from 'lucide-react';
+import { Users, Store, Settings, Shield, Megaphone } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../Api';
 import { useAppData } from '../context/useAppData';
@@ -43,17 +43,19 @@ export default function CommitteeDashboard() {
     }
 
     return (
-        <div className="w-full h-full flex flex-col bg-slate-900 text-white pb-20">
+        <div className="w-full h-full flex flex-col text-white pb-20">
+            {/* F36: title block uses min-w-0 + truncate inside flex to prevent the long community name from pushing past the viewport edge */}
             <div className="p-4 bg-slate-800/50 border-b border-slate-700">
-                <h1 className="text-xl font-bold flex items-center gap-2 text-amber-400">
-                    <Shield className="w-6 h-6" />
-                    ניהול קהילה: {community?.name || 'טוען...'}
+                <h1 className="text-xl font-bold flex items-center gap-2 text-amber-400 min-w-0">
+                    <Shield className="w-6 h-6 shrink-0" aria-hidden="true" />
+                    <span className="truncate">ניהול קהילה: {community?.name || 'טוען...'}</span>
                 </h1>
                 <button
                     onClick={() => setShowMsgModal(true)}
                     className="bg-teal-700 hover:bg-teal-800 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-lg mt-2 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-800"
                 >
-                    📢 שלח הודעה לכולם
+                    <Megaphone className="w-4 h-4" aria-hidden="true" />
+                    שלח הודעה לכולם
                 </button>
             </div>
 

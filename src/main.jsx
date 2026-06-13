@@ -48,6 +48,10 @@ const queryClient = new QueryClient({
     },
 })
 
+// F42: marks the document as dark-themed so the scoped autofill rule applies.
+// Removed when a light theme variant is introduced (the class becomes conditional).
+document.body.classList.add('theme-dark')
+
 // שמירת האלמנט במשתנה לבדיקה
 const rootElement = document.getElementById('root')
 

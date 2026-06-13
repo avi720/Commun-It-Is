@@ -234,77 +234,77 @@ The following four findings became important the moment desktop became a support
 
 ### Phase 3 — Polish (consistency, micro-interactions, content)
 
-#### [ ] F29. Five different primary-CTA styles in one app
+#### [x] F29. Five different primary-CTA styles in one app
 - **Where:** LoginPage (raw, ~40px, teal-600), RegisterPage (44px, teal-600), SendRide (~64px, orange→pink gradient), Settings (36px, teal-600), VerificationEmailSent (48px, teal-600 + pulse), Onboarding (teal→emerald gradient).
 - **Issue:** Inconsistent height, color, and treatment for the same role across the app.
 - **Acceptance:** One documented primary CTA style. Variants (size, destructive, secondary) are clearly defined and reused.
 
-#### [ ] F30. Sidebar icons use a rainbow without meaning
+#### [x] F30. Sidebar icons use a rainbow without meaning
 - **Where:** `Sidebar.jsx`.
 - **Issue:** Home=green, Car=orange, Phonebook=yellow, Bell=red, Shield=amber, Settings=default, Logout=red. Color is decorative for nav items but semantic for destructive — the signal is diluted.
 - **Acceptance:** Color in the sidebar conveys meaning only where it must (destructive = red, active = brand). Decorative nav icons share a neutral treatment so the red Logout stands out.
 
-#### [ ] F31. Filled-vs-outline icon mixing for the same concept
+#### [x] F31. Filled-vs-outline icon mixing for the same concept
 - **Where:** Committee Shield is filled (amber circle) in FeedPosts, stroked (no fill) in Sidebar.
 - **Issue:** Inconsistent visual language for the same role.
 - **Acceptance:** Each concept uses one icon variant across the app.
 
-#### [ ] F32. Emoji used as iconography
+#### [x] F32. Emoji used as iconography
 - **Where:** PhoneBook title contains a "📖" emoji.
 - **Issue:** Renders inconsistently across OS versions, cannot be themed, and breaks the Lucide-only icon family.
 - **Acceptance:** No emoji used as structural icons anywhere. Lucide (or another vector set) is the sole icon source.
 
-#### [ ] F33. Rides empty state is oversized and offers no action
+#### [x] F33. Rides empty state is oversized and offers no action
 - **Where:** `NoRidesMessage.jsx`.
 - **Issue:** `text-4xl` "אין טרמפים כרגע" on `text-white/40` is huge and washed-out. There is no CTA to drive the user toward publishing a ride themselves.
 - **Acceptance:** Empty state is appropriately sized at both phone and desktop widths (not centered alone in an oceanic desktop viewport), meets contrast, and includes a primary action that converts visitors into contributors ("שתף נסיעה" / publish a ride).
 
-#### [ ] F34. Notifications empty state has the same washed-out problem
+#### [x] F34. Notifications empty state has the same washed-out problem
 - **Where:** `NotificationsHistory.jsx`.
 - **Issue:** Low-contrast text and no follow-up action.
 - **Acceptance:** Empty state is readable and contextual ("the committee hasn't posted lately — here's how to subscribe / enable push" or similar).
 
-#### [ ] F35. RTL arrow rendered as Unicode glyph instead of an icon
+#### [x] F35. RTL arrow rendered as Unicode glyph instead of an icon
 - **Where:** `RideDetailsModal.jsx` — `◄` between origin and destination.
 - **Issue:** Unicode arrows render inconsistently and don't respect direction logically; mixes a glyph into a Lucide-only system.
 - **Acceptance:** Direction arrows use Lucide icons and point correctly in RTL contexts.
 
-#### [ ] F36. CommitteeDashboard layout overflows horizontally
+#### [x] F36. CommitteeDashboard layout overflows horizontally
 - **Where:** `CommitteeDashboard` (live URL — file not yet audited in detail).
 - **Issue:** **Confirmed live.** Heading content runs off the right edge of the viewport even at desktop widths. Untested on actual mobile but very likely to be worse.
 - **Acceptance:** Page audit completed; no horizontal overflow on any device width; tabs/headings wrap or truncate gracefully.
 
-#### [ ] F37. Tabular figures missing on time/seat counts
+#### [x] F37. Tabular figures missing on time/seat counts
 - **Where:** RideCard ("N דקות"), PublicDisplay countdown.
 - **Issue:** Proportional digits cause layout shimmer as numbers count down or update.
 - **Acceptance:** All countdown/count text uses tabular figures, eliminating column jitter.
 
-#### [ ] F38. Container max-widths are inconsistent
+#### [x] F38. Container max-widths are inconsistent
 - **Where:** Various pages use `max-w-md`, `max-w-lg`, `max-w-2xl` interchangeably.
 - **Issue:** Different "ideal width" per page makes the app feel like several apps stitched together on tablet/desktop.
 - **Acceptance:** A small set of named content widths (e.g., narrow / standard / wide) is defined and used purposefully per page type.
 
-#### [ ] F39. Header gradient title truncates mid-word
+#### [x] F39. Header gradient title truncates mid-word
 - **Where:** `MainLayout.jsx` — `max-w-[200px]` on the city/community heading.
 - **Issue:** Long community names get cut without ellipsis; in RTL the cut is at the start of the word, which reads as broken.
 - **Acceptance:** Long community names truncate with a proper ellipsis OR shrink/wrap gracefully, never appearing as a half-word with a hard edge.
 
-#### [ ] F40. Secondary text contrast is borderline or failing
+#### [x] F40. Secondary text contrast is borderline or failing
 - **Where:** `text-slate-500` and `text-slate-600` used for footer credits, hints, "no contacts" message, etc.
 - **Issue:** Measured `slate-500` on `slate-900` = 3.75:1 (large-text only); `slate-600` on `slate-900` = 2.36:1 (fail).
 - **Acceptance:** All informational text meets WCAG AA (4.5:1 for body, 3:1 for large). Truly de-emphasized text is achieved through weight / hierarchy, not by lowering contrast below the threshold.
 
-#### [ ] F41. FAB stays interactive while sidebar is open
+#### [x] F41. FAB stays interactive while sidebar is open
 - **Where:** `HomePage.jsx` — `FloatingActionButton`.
 - **Issue:** When the drawer is open, the FAB is rendered dimmed but still in the tab order and can be activated through edge gestures. Also positioned without `safe-area-inset-bottom`, risking collision with the iOS gesture bar. FAB is a mobile-native pattern — on desktop a floating action at the bottom corner reads as out-of-place.
 - **Acceptance:** On mobile, FAB is fully removed (not just visually dimmed) while the sidebar is open, and its position respects the bottom safe area. On desktop, the same action ("create post") is reachable from a desktop-natural location (header CTA, sidebar action, or keyboard shortcut) instead of — or in addition to — the FAB.
 
-#### [ ] F42. Autofill override is hard-coded to a dark surface color
+#### [x] F42. Autofill override is hard-coded to a dark surface color
 - **Where:** `src/index.css` — `:-webkit-autofill` rule.
 - **Issue:** Forces `#0f172a` background. Works for current dark forms; will look broken the day a form lands on a lighter surface.
 - **Acceptance:** Autofill background follows theme tokens (or the rule is scoped to dark surfaces explicitly), so adding a light-surface form does not introduce a black autofilled box.
 
-#### [ ] F43. Spinners have no text fallback for reduced-motion
+#### [x] F43. Spinners have no text fallback for reduced-motion
 - **Where:** Every `<Loader2 className="animate-spin" />` usage.
 - **Issue:** With reduced motion on, the spinner can appear frozen, giving no signal that work is in progress.
 - **Acceptance:** Loading states pair the spinner with explicit "טוען..." text (or equivalent) so users always know the app is working.
@@ -326,3 +326,14 @@ These were noted during the audit but need product decisions before they become 
 ## Discovered During Remediation
 
 > Add new findings here as they surface while working through the plan. Same format: `[ ] F##. Title` + Where / Issue / Acceptance.
+
+#### [ ] F48. Full migration of raw `<input>` to shadcn `<Input>` primitive
+- **Where:** `src/Pages/Register/OnboardingPage.jsx` (6 inputs), `src/Pages/PhoneBook.jsx` (search), `src/Pages/Register/ResidentVerificationPending.jsx` (none currently, but the page pattern), `src/Components/pagesComp/onBoarding/CommunitiesList.jsx` (search), `src/Components/pagesComp/committeeDashboard/SendCommitteeMessageModal.jsx` (title + body), and any other surviving raw `<input>` outside auth.
+- **Issue:** Split out of F10. Phase 2 brought LoginPage + RegisterPage raw inputs to visual parity with the shadcn `<Input>` primitive, but every other form in the app still hand-rolls its input markup. This duplicates focus-ring, padding, height, autofill, and dark-surface handling across files, and risks future drift whenever the primitive evolves.
+- **Acceptance:** Every text input in the app uses `<Input>` from `src/Components/ui/input.jsx` (or `<textarea>` for multiline). No raw `<input type="text|email|password|tel|search">` remains in `src/Pages/**` or `src/Components/**` outside the primitive file itself. Visual + interaction parity verified by tabbing through OnboardingPage, PhoneBook, CommunitiesList, and SendCommitteeMessageModal.
+
+#### [ ] F49. Multi-column / desktop-native layouts beyond max-width widening
+- **Where:** App-wide, but specifically: HomePage (feed could pair with a community-sidebar widget at lg+), CommitteeDashboard (tabs and tables, currently mobile-density at any width), empty states (NoRidesMessage, NotificationsHistory empty, FeedPosts empty — all centered alone on huge desktop viewports), Card hover/focus polish.
+- **Issue:** Split out of F44. Phase 2 widened `max-w` on the main pages and made the sidebar persistent at md+, but every page still uses a single-column mobile layout — the desktop view doesn't earn its extra width with any content density, secondary panes, or layout shifts. Empty states still look like phone screenshots floating in a 1528px viewport.
+- **Acceptance:** At least three high-traffic pages have an intentional desktop treatment (e.g., HomePage = feed + community-info aside at lg+; CommitteeDashboard = data-dense tables/cards at md+; empty states = appropriately sized illustration + CTA at md+). Interactive cards have explicit hover, focus, and active styles distinct from each other. Mobile layout is not regressed. Verified by walking each page at 375px, 768px, and 1400px.
+

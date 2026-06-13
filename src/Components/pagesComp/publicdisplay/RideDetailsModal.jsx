@@ -1,7 +1,7 @@
 // Components/RideDetailsModal.jsx
 import React from 'react';
 import { motion } from 'framer-motion';
-import { X, MapPin, Calendar, User, Phone } from 'lucide-react'; // או כל ספריית אייקונים שיש לך
+import { X, MapPin, Calendar, User, Phone, ArrowLeft } from 'lucide-react'; // או כל ספריית אייקונים שיש לך
 import { Button } from "@/Components/ui/button";
 import { formatRideTime } from "@/lib/utils";
 
@@ -57,7 +57,11 @@ export default function RideDetailsModal({ ride, onClose }) {
                         <h2 className="text-2xl font-bold text-white mb-2">פרטי הנסיעה</h2>
                         <div className="flex items-center gap-2 text-teal-400">
                             <MapPin size={18} />
-                            <span className="text-lg">{ride.location} ◄ {ride.destination}</span>
+                            <span className="text-lg inline-flex items-center gap-2">
+                                {ride.location}
+                                <ArrowLeft className="w-4 h-4 text-teal-400" aria-hidden="true" />
+                                {ride.destination}
+                            </span>
                         </div>
                     </div>
 
