@@ -77,6 +77,24 @@ export function AppProvider({ children }) {
                     .catch(err => console.error("Token update failed", err));
             }
 
+            // OAuth avatar fallback: if the user has no avatar set in our DB
+            // but their identity provider supplied one (Google → `picture`,
+            // others → `avatar_url`), copy it over once. Silent and idempotent
+            // — failures don't disrupt login.
+            if (profile && currentSession && !profile.avatar_url) {
+                const meta = currentSession.user?.user_metadata || {};
+                const providerAvatar = meta.picture || meta.avatar_url;
+                if (providerAvatar) {
+                    avior.entities.User.update(
+                        currentSession.user.id,
+                        { avatar_url: providerAvatar },
+                        currentSession,
+                    )
+                        .then(() => setUser((prev) => prev ? { ...prev, avatar_url: providerAvatar } : prev))
+                        .catch((err) => console.error("OAuth avatar copy failed:", err));
+                }
+            }
+
         } catch (error) {
             console.error("Data loading error:", error);
             // במקרה של שגיאה קריטית, נשאיר את המשתמש מחובר אך ללא נתונים כדי לא לזרוק אותו סתם
@@ -130,6 +148,14 @@ export function AppProvider({ children }) {
     // כשקוראים לרענון ידני (למשל מכפתור "אימתתי מייל"), כן נרצה לראות לואדר
     const refresh = () => loadUserData(true);
 
+    // Optimistic local update: callers that already PUT-ed the user to the
+    // server can call this to keep the UI in sync without a full refetch.
+    // Accepts either a partial patch (merged onto the current user) or a
+    // full user object — both shapes work because we always spread `user`.
+    const updateUser = (patch) => {
+        setUser((prev) => (prev ? { ...prev, ...patch } : patch));
+    };
+
     const value = {
         user,
         session,
@@ -137,6 +163,7 @@ export function AppProvider({ children }) {
         isAuthenticated,
         logout: handleLogout,
         refresh,
+        updateUser,
         // פונקציה לרענון שקט אם תצטרך בעתיד
         //silentRefresh: () => loadUserData(false)
     };

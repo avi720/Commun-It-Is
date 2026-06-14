@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { User, MapPin, Phone, Save, Loader2 } from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import { User, MapPin, Phone, Save, Loader2, Camera, Trash2 } from 'lucide-react';
 import { Input } from "@/Components/ui/input";
 import { Button } from "@/Components/ui/button";
 import { Label } from "@/Components/ui/label";
@@ -8,7 +8,7 @@ import { avior } from '@/Api';
 import { useAppData } from '@/context/useAppData';
 
 export default function ProfileForm({ user, onSave }) {
-    const { session } = useAppData();
+    const { session, updateUser } = useAppData();
     // State מקומי לטופס כדי לא לשנות את הגלובלי בכל הקלדה.
     // user יציב ב-mount (ProtectedRoute מבטיח שהוא נטען) — ולכן lazy init
     // מספיק במקום useEffect של "סנכרון כשהוא משתנה".
@@ -21,6 +21,58 @@ export default function ProfileForm({ user, onSave }) {
         visible_on_phonebook: user?.visible_on_phonebook || false,
     }));
     const [isSaving, setIsSaving] = useState(false);
+    // Avatar state — separate from formData because uploads go through
+    // their own pipeline (direct to Storage) and persist immediately,
+    // not on "Save". We track avatar_url locally so the preview updates
+    // without waiting for a context refresh.
+    const [avatarUrl, setAvatarUrl] = useState(user?.avatar_url || null);
+    const [isAvatarBusy, setIsAvatarBusy] = useState(false);
+    const fileInputRef = useRef(null);
+
+    const initials = `${(user?.firstName || '?')[0] || ''}${(user?.lastName || '')[0] || ''}`.toUpperCase();
+
+    const handleAvatarFile = async (e) => {
+        const file = e.target.files?.[0];
+        // Reset the input so re-picking the same file fires onChange again
+        if (fileInputRef.current) fileInputRef.current.value = '';
+        if (!file) return;
+        if (!file.type.startsWith('image/')) {
+            toast.error('יש לבחור קובץ תמונה');
+            return;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+            toast.error('הקובץ גדול מדי (מקסימום 5MB)');
+            return;
+        }
+        setIsAvatarBusy(true);
+        try {
+            const { avatar_url } = await avior.entities.User.uploadAvatar(file, session);
+            setAvatarUrl(avatar_url);
+            updateUser?.({ avatar_url });
+            toast.success('תמונת הפרופיל עודכנה');
+        } catch (err) {
+            console.error(err);
+            toast.error('העלאת התמונה נכשלה');
+        } finally {
+            setIsAvatarBusy(false);
+        }
+    };
+
+    const handleAvatarRemove = async () => {
+        if (!avatarUrl) return;
+        setIsAvatarBusy(true);
+        try {
+            await avior.entities.User.deleteAvatar(session);
+            setAvatarUrl(null);
+            updateUser?.({ avatar_url: null });
+            toast.success('תמונת הפרופיל הוסרה');
+        } catch (err) {
+            console.error(err);
+            toast.error('הסרת התמונה נכשלה');
+        } finally {
+            setIsAvatarBusy(false);
+        }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -46,6 +98,58 @@ export default function ProfileForm({ user, onSave }) {
                 <User className="w-5 h-5 text-teal-400" />
                 פרטים אישיים
             </h2>
+
+            {/* Avatar editor */}
+            <div className="flex items-center gap-4">
+                <div className="relative w-20 h-20 rounded-full overflow-hidden bg-slate-700 border border-slate-600 flex items-center justify-center text-2xl font-bold text-white shrink-0">
+                    {avatarUrl ? (
+                        <img
+                            src={avatarUrl}
+                            alt="תמונת פרופיל"
+                            className="w-full h-full object-cover"
+                            onError={() => setAvatarUrl(null)}
+                        />
+                    ) : (
+                        <span aria-hidden="true">{initials || '?'}</span>
+                    )}
+                    {isAvatarBusy && (
+                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                            <Loader2 className="w-6 h-6 animate-spin text-white" aria-hidden="true" />
+                        </div>
+                    )}
+                </div>
+                <div className="flex flex-col gap-2">
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleAvatarFile}
+                    />
+                    <Button
+                        type="button"
+                        variant="outline"
+                        disabled={isAvatarBusy}
+                        onClick={() => fileInputRef.current?.click()}
+                        className="bg-slate-900 border-slate-700 text-white hover:bg-slate-700 h-9"
+                    >
+                        <Camera className="w-4 h-4 ml-2" aria-hidden="true" />
+                        {avatarUrl ? 'החלף תמונה' : 'העלה תמונה'}
+                    </Button>
+                    {avatarUrl && (
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            disabled={isAvatarBusy}
+                            onClick={handleAvatarRemove}
+                            className="text-red-400 hover:text-red-300 hover:bg-red-900/20 h-9 justify-start"
+                        >
+                            <Trash2 className="w-4 h-4 ml-2" aria-hidden="true" />
+                            הסר תמונה
+                        </Button>
+                    )}
+                </div>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">

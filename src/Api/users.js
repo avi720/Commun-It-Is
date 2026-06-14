@@ -1,5 +1,7 @@
 import { supabase, API_URL, getAuthHeaders } from './config';
 
+const AVATAR_BUCKET = 'avatars';
+
 /**
  * Create or update user profile directly via Supabase
  * @param {Object} profileData - Profile data to update
@@ -63,4 +65,67 @@ export async function deleteUser(userId, session = null) {
         throw new Error('Failed to delete user');
     }
     return response.json();
+}
+
+/**
+ * Upload a new avatar for the current user.
+ *
+ * Uploads directly from the browser to the Supabase `avatars` Storage bucket
+ * (RLS scopes writes to `${user.id}/...` — see migration profile_tab_v1).
+ * Then PUTs /users/{id} to persist the resulting public URL on
+ * `users.avatar_url`. The FastAPI backend never touches the binary.
+ *
+ * @param {File|Blob} file - The image to upload
+ * @param {Object} session - Supabase session (needed for the /users PUT)
+ * @returns {Promise<{ avatar_url: string }>}
+ */
+export async function uploadAvatar(file, session) {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('Not authenticated');
+
+    const ext = (file.name?.split('.').pop() || 'jpg').toLowerCase();
+    // Stable per-user filename → `upsert: true` overwrites the previous
+    // avatar atomically and the public URL stays the same shape. We append
+    // a cache-buster on the returned URL so the <img> reloads after replace.
+    const path = `${user.id}/avatar.${ext}`;
+
+    const { error: uploadError } = await supabase.storage
+        .from(AVATAR_BUCKET)
+        .upload(path, file, { upsert: true, contentType: file.type || undefined });
+    if (uploadError) throw new Error(uploadError.message || 'Avatar upload failed');
+
+    const { data: { publicUrl } } = supabase.storage
+        .from(AVATAR_BUCKET)
+        .getPublicUrl(path);
+    const avatar_url = `${publicUrl}?t=${Date.now()}`;
+
+    await update(user.id, { avatar_url }, session);
+    return { avatar_url };
+}
+
+/**
+ * Remove the current user's avatar — deletes the object from Storage and
+ * clears `users.avatar_url`. Storage delete failure is logged but does not
+ * abort the column update (orphans don't break correctness).
+ *
+ * @param {Object} session
+ * @returns {Promise<void>}
+ */
+export async function deleteAvatar(session) {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('Not authenticated');
+
+    // We don't know the extension here without a DB read; list the user's
+    // folder and remove anything we find. Idempotent — empty folder is fine.
+    const { data: files } = await supabase.storage
+        .from(AVATAR_BUCKET)
+        .list(user.id, { limit: 10 });
+
+    if (files && files.length > 0) {
+        const paths = files.map((f) => `${user.id}/${f.name}`);
+        const { error } = await supabase.storage.from(AVATAR_BUCKET).remove(paths);
+        if (error) console.error('Avatar storage delete failed:', error.message);
+    }
+
+    await update(user.id, { avatar_url: null }, session);
 }

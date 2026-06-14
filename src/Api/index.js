@@ -25,7 +25,11 @@ export const avior = {
         // Rides
         Ride: {
             create: (rideData, session) => rides.create(rideData, session),
-            list: (session) => rides.list(session),
+            // list now accepts an options object as second arg:
+            // { userId, type: 'offer'|'request', upcoming: boolean }
+            list: (session, options) => rides.list(session, options),
+            update: (rideId, patch, session) => rides.update(rideId, patch, session),
+            delete: (rideId, session) => rides.remove(rideId, session),
         },
 
         // Users
@@ -33,12 +37,17 @@ export const avior = {
             createProfile: users.createProfile,
             update: (userId, userData, session) => users.update(userId, userData, session),
             delete: (userId, session) => users.deleteUser(userId, session),
+            uploadAvatar: (file, session) => users.uploadAvatar(file, session),
+            deleteAvatar: (session) => users.deleteAvatar(session),
         },
 
         // Posts
         Post: {
-            list: (session) => posts.list(session),
+            // list now accepts { authorId } as second arg
+            list: (session, options) => posts.list(session, options),
             create: (formData, session) => posts.create(formData, session),
+            update: (postId, formData, session) => posts.update(postId, formData, session),
+            delete: (postId, session) => posts.remove(postId, session),
         },
 
         // Communities
