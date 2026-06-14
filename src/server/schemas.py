@@ -1,7 +1,7 @@
-from typing import Optional
+from typing import Literal, Optional
 
 from fastapi import UploadFile, File
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 # --- Pydantic models (schemas) ---
@@ -33,7 +33,21 @@ class RideSchema(BaseModel):
     destination: str
     departure_time: str
     seats: int
+    type: Literal["offer", "request"] = "offer"
     departure_minutes: Optional[int] = None
+
+
+class RideUpdateSchema(BaseModel):
+    """Fields editable on an existing ride. user_id, community_id and type are
+    intentionally NOT editable — flipping `type` post-creation would let an
+    'offer' silently become a 'request' (or vice-versa) without re-notifying
+    the community."""
+
+    driver_name: Optional[str] = None
+    location: Optional[str] = None
+    destination: Optional[str] = None
+    departure_time: Optional[str] = None
+    seats: Optional[int] = None
 
 
 class PostSchema(BaseModel):
@@ -51,7 +65,7 @@ class NotificationRequest(BaseModel):
 
 class UserUpdateSchema(BaseModel):
     """Schema for updating user profile information."""
-    
+
     firstName: Optional[str] = None
     lastName: Optional[str] = None
     phone: Optional[str] = None
@@ -59,4 +73,15 @@ class UserUpdateSchema(BaseModel):
     address: Optional[str] = None
     age: Optional[int] = None
     visible_on_phonebook: Optional[bool] = None
+
+    # Profile additions (Phase 1)
+    bio: Optional[str] = Field(default=None, max_length=200)
+    avatar_url: Optional[str] = None
+    address_visibility: Optional[Literal["everyone", "committee", "nobody"]] = None
+
+    # Per-channel push notification toggles
+    notify_posts: Optional[bool] = None
+    notify_committee_posts: Optional[bool] = None
+    notify_ride_offers: Optional[bool] = None
+    notify_ride_requests: Optional[bool] = None
 

@@ -21,12 +21,19 @@ def mock_supabase(monkeypatch):
     monkeypatch.setattr("src.server.config.supabase", mock, raising=False)
     monkeypatch.setattr("src.server.auth.supabase", mock, raising=False)
 
-    # rides router imports `supabase` at module level via `from ..config`
-    try:
-        import src.server.routes.rides as rides_mod  # noqa: F401
-        monkeypatch.setattr("src.server.routes.rides.supabase", mock, raising=False)
-    except ImportError:
-        # אם הראוטר לא נטען (למשל deps נחסרות), הבדיקה הקשורה תכשל לחוד עם הודעה ברורה
-        pass
+    # rides / posts / notifications routers all import `supabase` at module
+    # level via `from ..config`. Each is patched independently so a test that
+    # only touches posts isn't broken by another router failing to import.
+    for module_path in (
+        "src.server.routes.rides",
+        "src.server.routes.posts",
+        "src.server.routes.notifications",
+    ):
+        try:
+            __import__(module_path)
+            monkeypatch.setattr(f"{module_path}.supabase", mock, raising=False)
+        except ImportError:
+            # אם הראוטר לא נטען (למשל deps נחסרות), הבדיקה הקשורה תכשל לחוד עם הודעה ברורה
+            pass
 
     return mock
