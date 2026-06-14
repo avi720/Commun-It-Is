@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom'; // <--- הוקים לניווט
-import { Home, Car, Monitor, Send, Settings, X, ChevronDown, ChevronUp, Shield, BookUser, Bell } from 'lucide-react';
+import { Home, Car, Monitor, Send, Settings, X, ChevronDown, ChevronUp, Shield, BookUser, Bell, User } from 'lucide-react';
 import { useAppData } from '@/context/useAppData';
 
 // `onLogout` removed from the API — Log Out now lives at the bottom of /settings
@@ -111,6 +111,14 @@ export default function Sidebar({ isSidebarOpen, closeSidebar }) {
           >
             <Bell className="w-5 h-5" aria-hidden="true" />
             <span className="font-medium">הודעות חשובות</span>
+          </button>
+
+          <button
+            onClick={() => handleNavigation('/profile')}
+            className={`w-full flex items-center gap-3 p-3 min-h-[44px] text-sm rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 ${isActive('/profile') ? 'text-teal-400 bg-slate-800/50' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}
+          >
+            <User className="w-5 h-5" aria-hidden="true" />
+            <span className="font-medium">פרופיל</span>
           </button>
         </div>
 

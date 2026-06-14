@@ -18,6 +18,7 @@ export default function ProfileForm({ user, onSave }) {
         phone: user?.phone || '',
         city: user?.city || '',
         address: user?.address || '',
+        bio: user?.bio || '',
         visible_on_phonebook: user?.visible_on_phonebook || false,
     }));
     const [isSaving, setIsSaving] = useState(false);
@@ -168,6 +169,21 @@ export default function ProfileForm({ user, onSave }) {
                         className="bg-slate-900 border-slate-700 text-white"
                     />
                 </div>
+            </div>
+
+            {/* Bio — 200 char limit (matches DB CHECK) */}
+            <div className="space-y-2">
+                <Label className="text-slate-300">תיאור קצר על עצמי</Label>
+                <textarea
+                    value={formData.bio}
+                    onChange={(e) => setFormData({ ...formData, bio: e.target.value.slice(0, 200) })}
+                    rows={3}
+                    placeholder="למשל: אופה לחמי מחמצת בשעות הפנאי, אבא של נועם ורועי"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-md p-2 text-white text-sm resize-y focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400"
+                />
+                <p className="text-xs text-slate-500 text-left" dir="ltr">
+                    {formData.bio.length}/200
+                </p>
             </div>
 
             <div className="space-y-2">

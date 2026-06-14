@@ -8,7 +8,6 @@ import { useAppData } from '../context/useAppData';
 import { avior } from '../Api';
 import { ConfirmDialog } from '@/Components/ui/confirm-dialog';
 
-import ProfileForm from '../Components/pagesComp/settings/ProfileForm';
 import PrivacySection from '../Components/pagesComp/settings/PrivacySection';
 import NotificationsSection from '../Components/pagesComp/settings/NotificationsSection';
 import DangerZone from '../Components/pagesComp/settings/DangerZone';
@@ -16,16 +15,8 @@ import AboutSection from '../Components/pagesComp/settings/AboutSection';
 
 export default function SettingsPage() {
     const navigate = useNavigate();
-    const { user, session, updateUser, logout } = useAppData();
+    const { user, session, logout } = useAppData();
     const [deleteOpen, setDeleteOpen] = useState(false);
-
-    // Personal-details save handler. In Phase 4 this form moves to
-    // /profile/edit and gets removed from Settings; until then it stays
-    // here to keep editing names/phone/address available.
-    const handleProfileSave = (patch) => {
-        updateUser?.(patch);
-        toast.success('הפרטים נשמרו');
-    };
 
     const handleHardReset = () => setDeleteOpen(true);
 
@@ -67,10 +58,6 @@ export default function SettingsPage() {
                     </h1>
                     <p className="text-slate-400">ניהול פרטיות, התראות וחשבון</p>
                 </div>
-
-                {/* Personal details — temporary location. Phase 4 moves
-                    this to /profile/edit and removes the import here. */}
-                <ProfileForm user={user} onSave={handleProfileSave} />
 
                 <PrivacySection />
                 <NotificationsSection />
