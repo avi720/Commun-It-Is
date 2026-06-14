@@ -18,6 +18,14 @@ class fcmTokenUpdate(BaseModel):
     fcm_token: str
 
 
+class ChangePasswordSchema(BaseModel):
+    """Change the authenticated user's password. The current password is
+    re-verified server-side before the new one is set."""
+
+    current_password: str
+    new_password: str = Field(min_length=8)
+
+
 class UserSchema(BaseModel):
     email: str
     firstName: str

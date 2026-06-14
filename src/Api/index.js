@@ -39,6 +39,7 @@ export const avior = {
             delete: (userId, session) => users.deleteUser(userId, session),
             uploadAvatar: (file, session) => users.uploadAvatar(file, session),
             deleteAvatar: (session) => users.deleteAvatar(session),
+            changePassword: (params, session) => users.changePassword(params, session),
         },
 
         // Posts

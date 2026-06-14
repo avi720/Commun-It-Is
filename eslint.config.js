@@ -26,7 +26,11 @@ export default [
         languageOptions: {
             ecmaVersion: 2024,
             sourceType: 'module',
-            globals: { ...globals.browser },
+            globals: {
+                ...globals.browser,
+                // Build-time constants injected by Vite's `define` (see vite.config.js)
+                __APP_VERSION__: 'readonly',
+            },
             parserOptions: {
                 ecmaVersion: 'latest',
                 ecmaFeatures: { jsx: true },

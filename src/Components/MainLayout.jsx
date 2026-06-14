@@ -7,7 +7,8 @@ import { useAppData } from '../context/useAppData';
 export default function MainLayout() {
   const navigate = useNavigate();
 
-  const { user, logout } = useAppData();
+  // logout removed from Sidebar — it lives at the bottom of /settings now.
+  const { user } = useAppData();
 
   // מצב הסיידבר חי כאן (מקומית) ולא ב-AppContext כדי שדפים שלא צריכים אותו
   // לא ירונדרו מחדש בכל פתיחה/סגירה. דפים שכן צריכים (למשל HomePage שמדמדם
@@ -60,7 +61,6 @@ export default function MainLayout() {
       </main>
 
       <Sidebar
-        onLogout={logout}
         user={user}
         isSidebarOpen={isSidebarOpen}
         closeSidebar={closeSidebar}

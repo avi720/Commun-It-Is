@@ -104,6 +104,26 @@ export async function uploadAvatar(file, session) {
 }
 
 /**
+ * Change the current user's password. Verifies the current password
+ * server-side, then sets the new one via the admin API.
+ *
+ * @param {{current: string, next: string}} params
+ * @param {Object} session
+ * @returns {Promise<void>}
+ */
+export async function changePassword({ current, next }, session) {
+    const response = await fetch(`${API_URL}/users/me/change-password`, {
+        method: 'POST',
+        headers: getAuthHeaders(session),
+        body: JSON.stringify({ current_password: current, new_password: next }),
+    });
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ detail: 'Unknown error' }));
+        throw new Error(errorData.detail || 'שגיאה בשינוי הסיסמה');
+    }
+}
+
+/**
  * Remove the current user's avatar — deletes the object from Storage and
  * clears `users.avatar_url`. Storage delete failure is logged but does not
  * abort the column update (orphans don't break correctness).

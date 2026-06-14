@@ -3,11 +3,21 @@ from datetime import datetime, timezone
 from fastapi import APIRouter, HTTPException, Depends
 
 from ..config import supabase
-from ..schemas import fcmTokenUpdate, UserUpdateSchema
+from ..schemas import ChangePasswordSchema, fcmTokenUpdate, UserUpdateSchema
 from ..auth import get_current_user_id
 
 
 router = APIRouter(prefix="/api/users", tags=["users"])
+
+
+def _list_user_storage_objects(bucket: str, prefix: str) -> list[str]:
+    """List all object paths in `bucket` under `prefix/`. Returns full paths.
+    Empty list on any error (best-effort cleanup, not a hard requirement)."""
+    try:
+        res = supabase.storage.from_(bucket).list(prefix, {"limit": 1000})
+        return [f"{prefix}/{obj['name']}" for obj in (res or [])]
+    except Exception:  # pragma: no cover - best effort
+        return []
 
 
 @router.delete("/{user_id}")
@@ -16,8 +26,17 @@ async def delete_user(
     current_user_id: str = Depends(get_current_user_id),
 ):
     """
-    Delete a user. Only the authenticated user can delete their own profile —
-    the user_id in the URL must match the id derived from the auth token.
+    Delete a user end-to-end. Only the authenticated user can delete their own
+    profile (URL user_id must match token user_id).
+
+    Flow:
+      1. Collect the user's post-image paths from the DB while we still can.
+      2. Delete from `auth.users` via admin API. The CASCADE FKs from
+         `public.users.id` and `posts/rides.user_id` to `auth.users(id)` clean
+         up every dependent row in one transaction.
+      3. Best-effort Storage cleanup: avatar folder + all collected post-image
+         objects. Failures are logged but do not abort the operation —
+         leftover objects are orphans, not a data-integrity hazard.
     """
     try:
         if current_user_id != user_id:
@@ -25,22 +44,101 @@ async def delete_user(
                 status_code=403, detail="You can only delete your own profile"
             )
 
-        # Optional: if CASCADE is not configured, delete rides first.
-        # supabase.table("rides").delete().eq("user_id", user_id).execute()
+        # 1. Collect post image paths BEFORE the cascade nukes the rows
+        try:
+            posts_res = (
+                supabase.table("posts")
+                .select("image_url")
+                .eq("user_id", user_id)
+                .execute()
+            )
+        except Exception as e:  # pragma: no cover - if this fails we just skip cleanup
+            print(f"Could not list post images for cleanup: {e}")
+            posts_res = type("o", (), {"data": []})()
 
-        # Delete the user itself
-        response = supabase.table("users").delete().eq("id", user_id).execute()
+        marker = "/storage/v1/object/public/images/"
+        post_image_paths: list[str] = []
+        for row in (posts_res.data or []):
+            url = row.get("image_url")
+            if not url:
+                continue
+            idx = url.find(marker)
+            if idx != -1:
+                post_image_paths.append(url[idx + len(marker):].split("?")[0])
 
-        if len(response.data) > 0:
-            print(f"User {user_id} deleted successfully")
-            return {"status": "success", "message": "User deleted"}
+        # 2. Delete the auth user — this CASCADEs into public.users, posts, rides
+        try:
+            supabase.auth.admin.delete_user(user_id)
+        except Exception as e:
+            print(f"Failed to delete auth user {user_id}: {e}")
+            raise HTTPException(status_code=500, detail="Failed to delete account")
 
-        raise HTTPException(status_code=404, detail="User not found")
+        # 3. Best-effort Storage cleanup
+        avatar_paths = _list_user_storage_objects("avatars", user_id)
+        if avatar_paths:
+            try:
+                supabase.storage.from_("avatars").remove(avatar_paths)
+            except Exception as e:  # pragma: no cover - best effort
+                print(f"Failed to remove avatar objects {avatar_paths}: {e}")
+
+        if post_image_paths:
+            try:
+                supabase.storage.from_("images").remove(post_image_paths)
+            except Exception as e:  # pragma: no cover - best effort
+                print(f"Failed to remove post images: {e}")
+
+        print(f"User {user_id} deleted successfully (cascade + storage cleanup)")
+        return {"status": "success", "message": "User deleted"}
 
     except HTTPException:
         raise
     except Exception as e:
         print(f"Error deleting user: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/me/change-password")
+async def change_password(
+    payload: ChangePasswordSchema,
+    user_id: str = Depends(get_current_user_id),
+):
+    """Verify the user's current password (by re-attempting sign_in), then
+    set the new password via the auth admin API. The service-role key is
+    required for `admin.update_user_by_id`; password verification still goes
+    through the standard Supabase Auth path so a brute-force attempt is
+    visible in the auth logs/rate-limits."""
+    try:
+        # Look up the user's email — we need it for sign_in verification.
+        user_row = (
+            supabase.table("users").select("email").eq("id", user_id).execute()
+        )
+        if not user_row.data or not user_row.data[0].get("email"):
+            raise HTTPException(status_code=400, detail="User has no email on file")
+        email = user_row.data[0]["email"]
+
+        # 1. Verify the current password
+        try:
+            supabase.auth.sign_in_with_password(
+                {"email": email, "password": payload.current_password}
+            )
+        except Exception:
+            raise HTTPException(status_code=400, detail="הסיסמה הנוכחית שגויה")
+
+        # 2. Set the new password via the admin API
+        try:
+            supabase.auth.admin.update_user_by_id(
+                user_id, {"password": payload.new_password}
+            )
+        except Exception as e:
+            print(f"Failed to update password for {user_id}: {e}")
+            raise HTTPException(status_code=500, detail="Failed to update password")
+
+        return {"status": "success"}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"change_password error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

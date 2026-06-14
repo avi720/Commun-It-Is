@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom'; // <--- הוקים לניווט
-import { Home, Car, Monitor, Send, Settings, X, ChevronDown, ChevronUp, LogOut, Shield, BookUser, Bell } from 'lucide-react';
+import { Home, Car, Monitor, Send, Settings, X, ChevronDown, ChevronUp, Shield, BookUser, Bell } from 'lucide-react';
 import { useAppData } from '@/context/useAppData';
 
-export default function Sidebar({ onLogout, isSidebarOpen, closeSidebar }) {
+// `onLogout` removed from the API — Log Out now lives at the bottom of /settings
+// (per the redesign brief). Keeping the param name in destructure-with-rest so
+// any stale callers don't crash, but the button itself is gone.
+export default function Sidebar({ isSidebarOpen, closeSidebar }) {
   const [isTrempOpen, setIsTrempOpen] = useState(false);
 
   const navigate = useNavigate(); // פונקציה למעבר דפים
@@ -130,14 +133,6 @@ export default function Sidebar({ onLogout, isSidebarOpen, closeSidebar }) {
           >
             <Settings className="w-5 h-5" aria-hidden="true" />
             <span>הגדרות</span>
-          </button>
-
-          <button
-            onClick={onLogout}
-            className="w-full flex items-center gap-3 p-3 min-h-[44px] rounded-lg text-red-400 hover:bg-red-900/20 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
-          >
-            <LogOut className="w-5 h-5" aria-hidden="true" />
-            <span>התנתק</span>
           </button>
         </div>
 

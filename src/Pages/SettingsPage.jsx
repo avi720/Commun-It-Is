@@ -1,106 +1,102 @@
 import React, { useState } from 'react';
-import { useAppData } from '../context/useAppData';
-import ProfileForm from '../Components/pagesComp/settings/ProfileForm';
-import DangerZone from '../Components/pagesComp/settings/DangerZone';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { CheckCircle, XCircle } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import { toast } from 'sonner';
+
+import { useAppData } from '../context/useAppData';
 import { avior } from '../Api';
 import { ConfirmDialog } from '@/Components/ui/confirm-dialog';
 
+import ProfileForm from '../Components/pagesComp/settings/ProfileForm';
+import PrivacySection from '../Components/pagesComp/settings/PrivacySection';
+import NotificationsSection from '../Components/pagesComp/settings/NotificationsSection';
+import DangerZone from '../Components/pagesComp/settings/DangerZone';
+import AboutSection from '../Components/pagesComp/settings/AboutSection';
+
 export default function SettingsPage() {
-    // 2. שולפים הכל מהקונטקסט המרכזי
-    const { user, updateUser, session } = useAppData(); 
-    
-    // סטייט מקומי להודעות (טוסטים) - זה שייך רק לדף הזה
-    const [message, setMessage] = useState(null);
-    // state לדיאלוג מחיקת החשבון — מחליף את window.confirm()
+    const navigate = useNavigate();
+    const { user, session, updateUser, logout } = useAppData();
     const [deleteOpen, setDeleteOpen] = useState(false);
 
-    // פונקציה שעוטפת את העדכון עם הודעת הצלחה
-    const handleSave = (updatedFields) => {
-        try {
-            // מיזוג המידע החדש עם הקיים
-            const newUser = { ...user, ...updatedFields };
-            
-            // עדכון דרך הקונטקסט (זה יעדכן את כל האפליקציה וגם את ה-LocalStorage)
-            updateUser(newUser);
-
-            setMessage({ type: 'success', text: 'הפרטים נשמרו בהצלחה!' });
-            setTimeout(() => setMessage(null), 3000);
-        } catch {
-            setMessage({ type: 'error', text: 'שגיאה בשמירת הנתונים' });
-        }
+    // Personal-details save handler. In Phase 4 this form moves to
+    // /profile/edit and gets removed from Settings; until then it stays
+    // here to keep editing names/phone/address available.
+    const handleProfileSave = (patch) => {
+        updateUser?.(patch);
+        toast.success('הפרטים נשמרו');
     };
 
-    // פתיחת דיאלוג מחיקת חשבון. הביצוע עצמו מתבצע ב-confirmHardReset כשהמשתמש
-    // לוחץ "אישור" בדיאלוג — מחליף את window.confirm() החוסם.
     const handleHardReset = () => setDeleteOpen(true);
 
     const confirmHardReset = async () => {
         setDeleteOpen(false);
         try {
-            // 1. קריאה לשרת למחיקת המשתמש
             if (user && user.id) {
+                // Server-side deletes auth.users via admin; CASCADE fans out
+                // to public.users + posts + rides, and Storage gets cleaned
+                // best-effort. See routes/users.py:delete_user.
                 await avior.entities.User.delete(user.id, session);
             }
-
-            // 2. ניקוי מקומי והתנתקות
             localStorage.clear();
             window.location.href = '/login';
-
         } catch (error) {
-            console.error("Error deleting account:", error);
-            toast.error("אירעה שגיאה במחיקת החשבון. אנא נסה שוב.");
+            console.error('Error deleting account:', error);
+            toast.error('אירעה שגיאה במחיקת החשבון. אנא נסה שוב.');
+        }
+    };
+
+    const handleLogout = async () => {
+        try {
+            await logout();
+        } finally {
+            navigate('/login');
         }
     };
 
     return (
         <div className="p-4 max-w-2xl mx-auto pb-20 overflow-y-auto h-full">
-            <motion.div 
+            <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="space-y-6"
             >
-                {/* כותרת */}
                 <div className="mb-6">
                     <h1 className="text-3xl font-bold bg-gradient-to-r from-teal-400 to-blue-500 bg-clip-text text-transparent">
                         הגדרות
                     </h1>
-                    <p className="text-slate-400">ניהול פרופיל והעדפות</p>
+                    <p className="text-slate-400">ניהול פרטיות, התראות וחשבון</p>
                 </div>
 
-                {/* הודעות מערכת */}
-                {message && (
-                    <motion.div 
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className={`p-4 rounded-xl flex items-center gap-3 ${
-                            message.type === 'success' 
-                                ? 'bg-teal-900/30 border border-teal-800 text-teal-300' 
-                                : 'bg-red-900/30 border border-red-800 text-red-300'
-                        }`}
-                    >
-                        {message.type === 'success' ? <CheckCircle className="w-5 h-5" /> : <XCircle className="w-5 h-5" />}
-                        {message.text}
-                    </motion.div>
-                )}
+                {/* Personal details — temporary location. Phase 4 moves
+                    this to /profile/edit and removes the import here. */}
+                <ProfileForm user={user} onSave={handleProfileSave} />
 
-                {/* הטפסים עצמם נשארו ללא שינוי */}
-                <ProfileForm user={user} onSave={handleSave} />
-                
-                <DangerZone onReset={handleHardReset} />
+                <PrivacySection />
+                <NotificationsSection />
 
-                <div className="text-center text-slate-400 text-xs mt-10">
-                    Commun-it-is v1.0 • Developed by Hanan
-                </div>
+                {/* Account management — Delete Account */}
+                <section className="space-y-3">
+                    <DangerZone onReset={handleHardReset} />
+                </section>
+
+                <AboutSection />
+
+                {/* Logout — bottom of page per redesign brief. Was in Sidebar. */}
+                <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center justify-center gap-2 p-4 rounded-2xl bg-red-900/40 border border-red-800 text-red-200 hover:bg-red-900/60 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+                >
+                    <LogOut className="w-5 h-5" aria-hidden="true" />
+                    <span className="font-semibold">התנתקות</span>
+                </button>
             </motion.div>
 
             <ConfirmDialog
                 open={deleteOpen}
                 onOpenChange={setDeleteOpen}
                 title="מחיקת חשבון לצמיתות"
-                description={"פעולה בלתי הפיכה: כל הפרטים, הפוסטים, הנסיעות והקשרים שלך יימחקו לתמיד."}
+                description={'פעולה בלתי הפיכה: כל הפרטים, הפוסטים, הנסיעות והקשרים שלך יימחקו לתמיד.'}
                 confirmText="מחק"
                 confirmLabel="כן, מחק לצמיתות"
                 cancelLabel="ביטול"
