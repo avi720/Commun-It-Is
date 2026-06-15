@@ -1,9 +1,10 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Car, MapPin, Clock, User } from "lucide-react";
+import { MapPin, Clock, User, Search } from "lucide-react";
 import { formatRideTime } from "@/lib/utils"; // <--- הייבוא החשוב
 
 export default function RideCard({ ride, currentTime }) {
+    const isRequest = ride?.type === 'request';
 
     // חישוב צבע לפי הזמן (דחוף = אדום, רחוק = ירוק)
     // currentTime נדרש מהפרנט; אין fallback ל-Date.now() כדי לשמור על הרכיב טהור.
@@ -45,13 +46,21 @@ export default function RideCard({ ride, currentTime }) {
                             <div className="flex flex-col">
 
                                 {/* שורה 1: שם ומושבים */}
-                                <div className="flex items-baseline gap-2">
+                                <div className="flex items-baseline gap-2 flex-wrap">
                                     <span className="text-xl font-bold text-white leading-tight">
                                         {ride.driver_name},
                                     </span>
                                     <span className="text-sm text-slate-300 leading-tight tabular-nums">
-                                        מקומות פנויים: {ride.seats}
+                                        {isRequest
+                                            ? `מחפש/ת ${ride.seats} מקומות`
+                                            : `מקומות פנויים: ${ride.seats}`}
                                     </span>
+                                    {isRequest && (
+                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                                            <Search className="w-3 h-3" aria-hidden="true" />
+                                            בקשה
+                                        </span>
+                                    )}
                                 </div>
 
                                 {/* שורה 2: זמן יציאה */}

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
-import { Car, MapPin, Send, Loader2, Clock, Users } from "lucide-react";
+import { Car, MapPin, Send, Loader2, Clock, Users, Search } from "lucide-react";
 import { formatRideTime } from "@/lib/utils";
 import Location from "./rideform/location";
 
@@ -40,9 +40,13 @@ export default function RideForm({
     setSeats,
     departureTime,
     setDepartureTime,
+    // type === 'offer' | 'request'. Defaults to 'offer' if parent doesn't pass.
+    type = 'offer',
+    setType,
     onSubmit,
     isSubmitting
 }) {
+    const isRequest = type === 'request';
     // bounds מחושב פעם אחת ב-mount דרך lazy initializer. אין צורך ב-useEffect:
     // dateStr/timeStr נשארים mutable, minDate/maxDate הם קבועים לכל הסשן.
     const [bounds] = useState(() => getInitialBounds(departureTime));
@@ -72,11 +76,33 @@ export default function RideForm({
 
     return (
         <form onSubmit={onSubmit} className="space-y-5">
+            {/* Type toggle — offer vs request. Hidden if parent doesn't expose setType. */}
+            {setType && (
+                <div className="grid grid-cols-2 gap-2 bg-slate-900 border border-slate-700 rounded-lg p-1">
+                    <button
+                        type="button"
+                        onClick={() => setType('offer')}
+                        className={`flex items-center justify-center gap-2 py-2 rounded-md text-sm font-medium transition-colors ${!isRequest ? 'bg-teal-600 text-white' : 'text-slate-300 hover:text-white'}`}
+                    >
+                        <Car className="w-4 h-4" aria-hidden="true" />
+                        מציע נסיעה
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setType('request')}
+                        className={`flex items-center justify-center gap-2 py-2 rounded-md text-sm font-medium transition-colors ${isRequest ? 'bg-teal-600 text-white' : 'text-slate-300 hover:text-white'}`}
+                    >
+                        <Search className="w-4 h-4" aria-hidden="true" />
+                        מחפש טרמפ
+                    </button>
+                </div>
+            )}
+
             {/* שדה מי אני */}
             <div className="space-y-1">
                 <Label htmlFor="driver" className="text-sm font-medium text-slate-300 flex items-center gap-2">
                     <Car className="w-4 h-4 text-teal-400" />
-                    מי נוהג?
+                    {isRequest ? 'מי מבקש?' : 'מי נוהג?'}
                 </Label>
                 <Input
                     id="driver"
@@ -109,11 +135,11 @@ export default function RideForm({
                 />
             </div>
 
-            {/* שדה מספר מושבים */}
+            {/* שדה מספר מושבים / נוסעים */}
             <div className="space-y-1">
                 <Label htmlFor="seats" className="text-sm font-medium text-slate-300 flex items-center gap-2">
                     <Users className="w-4 h-4 text-teal-400" />
-                    מספר מושבים פנויים
+                    {isRequest ? 'כמה אנשים מחפשים טרמפ?' : 'מספר מושבים פנויים'}
                 </Label>
                 <Input
                     id="seats"
@@ -181,7 +207,7 @@ export default function RideForm({
                     </div>
                 ) : (
                     <div className="flex items-center gap-2">
-                        פרסם נסיעה <Send className="w-5 h-5" />
+                        {isRequest ? 'פרסם בקשת טרמפ' : 'פרסם נסיעה'} <Send className="w-5 h-5" />
                     </div>
                 )}
             </Button>

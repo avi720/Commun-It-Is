@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom'; // <--- הוקים לניווט
-import { Home, Car, Monitor, Send, Settings, X, ChevronDown, ChevronUp, Shield, BookUser, Bell, User } from 'lucide-react';
+import { Home, Car, Monitor, Send, Settings, X, ChevronDown, ChevronUp, Shield, BookUser, Bell, User, Search } from 'lucide-react';
 import { useAppData } from '@/context/useAppData';
 
 // `onLogout` removed from the API — Log Out now lives at the bottom of /settings
@@ -67,7 +67,7 @@ export default function Sidebar({ isSidebarOpen, closeSidebar }) {
             <button
               onClick={() => setIsTrempOpen(!isTrempOpen)}
               aria-expanded={isTrempOpen}
-              className={`w-full flex items-center justify-between p-3 min-h-[44px] rounded-lg text-slate-300 hover:bg-slate-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 ${['/rides', '/send-ride'].some(p => location.pathname.includes(p)) ? 'bg-slate-800' : ''}`}
+              className={`w-full flex items-center justify-between p-3 min-h-[44px] rounded-lg text-slate-300 hover:bg-slate-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 ${['/rides', '/send-ride', '/ride-requests'].some(p => location.pathname.includes(p)) ? 'bg-slate-800' : ''}`}
             >
               <div className="flex items-center gap-3">
                 <Car className="w-5 h-5" aria-hidden="true" />
@@ -91,6 +91,13 @@ export default function Sidebar({ isSidebarOpen, closeSidebar }) {
                 >
                   <Send className="w-4 h-4" aria-hidden="true" />
                   פרסם נסיעה
+                </button>
+                <button
+                  onClick={() => handleNavigation('/ride-requests')}
+                  className={`w-full flex items-center gap-3 p-3 min-h-[44px] text-sm rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 ${isActive('/ride-requests') ? 'text-teal-400 bg-slate-800/50' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}
+                >
+                  <Search className="w-4 h-4" aria-hidden="true" />
+                  בקשות טרמפ
                 </button>
               </div>
             )}

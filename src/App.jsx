@@ -26,6 +26,7 @@ const PhoneBook = lazy(() => import('./Pages/PhoneBook'));
 const NotificationsHistory = lazy(() => import('./Pages/NotificationsHistory'));
 const ProfilePage = lazy(() => import('./Pages/ProfilePage'));
 const EditProfilePage = lazy(() => import('./Pages/EditProfilePage'));
+const RideRequestsPage = lazy(() => import('./Pages/RideRequestsPage'));
 
 // מסך טעינה אחיד שמוצג בזמן שדף עצל נטען או בזמן טעינת הסשן הראשונית
 const PageLoader = () => (
@@ -64,6 +65,7 @@ function AppRoutes() {
         <Route path="notifications" element={<NotificationsHistory />} />
         <Route path="profile" element={<ProfilePage />} />
         <Route path="profile/edit" element={<EditProfilePage />} />
+        <Route path="ride-requests" element={<RideRequestsPage />} />
       </Route>
       {/* כל נתיב אחר זורק ללוגין */}
       <Route path="*" element={<Navigate to="/login" />} />

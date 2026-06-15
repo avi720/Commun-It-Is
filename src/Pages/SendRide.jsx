@@ -16,6 +16,7 @@ export default function SendRide() {
     const [destination, setDestination] = useState("");
     const [seats, setSeats] = useState(4);
     const [departureTime, setDepartureTime] = useState(new Date());
+    const [type, setType] = useState('offer');
     const [showSuccess, setShowSuccess] = useState(false);
 
     const queryClient = useQueryClient();
@@ -32,7 +33,8 @@ export default function SendRide() {
                 location: rideData.location,       // שים לב: אנחנו שולחים location
                 destination: rideData.destination,
                 departure_time: rideData.departure_time.toISOString(),
-                seats: rideData.seats // ברירת מחדל
+                seats: rideData.seats, // ברירת מחדל
+                type: rideData.type,
             }, session);
         },
         onSuccess: () => {
@@ -60,7 +62,8 @@ export default function SendRide() {
             location: location,
             destination: destination,
             seats: seats,
-            departure_time: departureTime
+            departure_time: departureTime,
+            type,
         });
     };
 
@@ -93,6 +96,8 @@ export default function SendRide() {
                         setSeats={setSeats}
                         departureTime={departureTime}
                         setDepartureTime={setDepartureTime}
+                        type={type}
+                        setType={setType}
                         onSubmit={handleSubmit}
                         isSubmitting={createRideMutation.isPending}
                     />
