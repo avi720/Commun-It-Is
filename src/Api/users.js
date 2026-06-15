@@ -121,6 +121,26 @@ export async function changePassword({ current, next }, session) {
         const errorData = await response.json().catch(() => ({ detail: 'Unknown error' }));
         throw new Error(errorData.detail || 'שגיאה בשינוי הסיסמה');
     }
+
+    // Changing the password via the admin API revokes all existing JWTs for
+    // this user, including the one currently sitting in localStorage. The
+    // next API call would 401 and the user would silently lose their session.
+    // Re-sign-in with the new password to mint a fresh token in place. Use
+    // the email from the passed-in session — `supabase.auth.getUser()` would
+    // itself fail because the cached JWT is already invalid.
+    const email = session?.user?.email;
+    if (email) {
+        const { error } = await supabase.auth.signInWithPassword({
+            email,
+            password: next,
+        });
+        if (error) {
+            console.error('Re-sign-in after password change failed:', error.message);
+            // Don't throw — the password change itself succeeded. AuthContext
+            // will pick up the missing session on its next check and redirect
+            // to login. Better than misleading the user with a failure toast.
+        }
+    }
 }
 
 /**
