@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { X, Loader2 } from 'lucide-react';
+import { ChevronRight, Loader2 } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
@@ -61,20 +61,22 @@ export default function MyPostsScroll({ posts, focusPostId, onClose, queryKey })
         }
     };
 
+    // The overlay deliberately sits BELOW the MainLayout header (z-30) and
+    // sidebar (z-50) so the community-name header stays visible and clickable
+    // (it routes home). Pattern matches Instagram/TikTok — no extra title bar.
+    // `top-14` matches the header's h-14; `md:mr-64` mirrors the sidebar offset
+    // the rest of the app uses (Tailwind `mr` in RTL still applies as margin-right).
     return (
-        <div className="fixed inset-0 z-40 bg-slate-900 overflow-y-auto">
-            <header className="sticky top-0 z-10 bg-slate-900/95 backdrop-blur border-b border-slate-800 px-4 h-14 flex items-center justify-between">
-                <h2 className="text-white font-bold">הפוסטים שלי</h2>
+        <div className="fixed top-14 right-0 left-0 bottom-0 md:mr-64 z-20 bg-slate-900 overflow-y-auto pt-[env(safe-area-inset-top)]">
+            <div className="max-w-2xl mx-auto py-4 px-2">
                 <button
                     onClick={onClose}
-                    aria-label="סגור"
-                    className="p-2 rounded-full text-slate-400 hover:text-white hover:bg-slate-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400"
+                    className="mb-3 inline-flex items-center gap-1 text-sm text-teal-400 hover:text-teal-300 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 rounded px-1"
                 >
-                    <X className="w-5 h-5" aria-hidden="true" />
+                    <ChevronRight className="w-4 h-4" aria-hidden="true" />
+                    חזרה לפרופיל
                 </button>
-            </header>
 
-            <div className="max-w-2xl mx-auto py-4 px-2">
                 {posts.map((p) => (
                     <div key={p.id} id={`scroll-post-${p.id}`} className="relative">
                         {/* Kebab menu overlay in the top-left of each card */}
