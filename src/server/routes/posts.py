@@ -57,13 +57,14 @@ def get_posts(
         if not posts:
             return []
 
-        # Attach author info (firstName/lastName/phone/city) via a second query.
+        # Attach author info via a second query. avatar_url is included so
+        # FeedPosts can render the author's picture next to their name.
         user_ids = list({p["user_id"] for p in posts if p.get("user_id")})
         users_map = {}
         if user_ids:
             users_res = (
                 supabase.table("users")
-                .select("id, firstName, lastName, phone, city")
+                .select("id, firstName, lastName, phone, city, avatar_url")
                 .in_("id", user_ids)
                 .execute()
             )
