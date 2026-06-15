@@ -159,17 +159,36 @@ def update_ride(
     user_id: str = Depends(get_current_user_id),
 ):
     """Edit a ride. Owner-only. Cannot mutate user_id/community_id/type
-    (RideUpdateSchema intentionally omits them)."""
+    (RideUpdateSchema intentionally omits them). Past rides (departure_time
+    older than 10 minutes ago) are frozen — only future/open rides can be
+    edited."""
     try:
         ride_res = (
-            supabase.table("rides").select("user_id").eq("id", ride_id).execute()
+            supabase.table("rides")
+            .select("user_id, departure_time")
+            .eq("id", ride_id)
+            .execute()
         )
         if not ride_res.data:
             raise HTTPException(status_code=404, detail="Ride not found")
-        if ride_res.data[0]["user_id"] != user_id:
+        ride = ride_res.data[0]
+        if ride["user_id"] != user_id:
             raise HTTPException(
                 status_code=403, detail="You can only edit your own rides"
             )
+
+        dep_str = ride.get("departure_time")
+        if dep_str:
+            dep_time = datetime.fromisoformat(
+                dep_str.replace("Z", "+00:00")
+            )
+            if dep_time.tzinfo is None:
+                dep_time = dep_time.replace(tzinfo=timezone.utc)
+            if dep_time + timedelta(minutes=10) < datetime.now(timezone.utc):
+                raise HTTPException(
+                    status_code=400,
+                    detail="לא ניתן לערוך טרמפ שעבר זמנו",
+                )
 
         update_data = payload.dict(exclude_unset=True)
         if not update_data:
