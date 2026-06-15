@@ -1,5 +1,7 @@
+import os
 from datetime import datetime, timezone
 
+import httpx
 from fastapi import APIRouter, HTTPException, Depends
 
 from ..config import supabase
@@ -116,15 +118,47 @@ async def change_password(
             raise HTTPException(status_code=400, detail="User has no email on file")
         email = user_row.data[0]["email"]
 
-        # 1. Verify the current password
-        try:
-            supabase.auth.sign_in_with_password(
-                {"email": email, "password": payload.current_password}
+        # 1. Verify the current password by hitting the Auth REST API directly
+        # with the anon key. We deliberately do NOT use
+        # `supabase.auth.sign_in_with_password()` here — that call mutates the
+        # shared `supabase` client's session, replacing the service-role JWT
+        # with the user's JWT. The next call to `supabase.auth.admin.*` would
+        # then 403 with "this token needs to have one of the following roles:
+        # supabase_admin, service_role".
+        supabase_url = os.getenv("VITE_SUPABASE_URL")
+        anon_key = (
+            os.getenv("VITE_SUPABASE_KEY")
+            or os.getenv("VITE_SUPABASE_ANON_KEY")
+            or os.getenv("SUPABASE_ANON_KEY")
+        )
+        if not supabase_url or not anon_key:
+            raise HTTPException(
+                status_code=500,
+                detail="Server misconfigured: missing Supabase URL or anon key",
             )
-        except Exception:
+
+        try:
+            verify_response = httpx.post(
+                f"{supabase_url}/auth/v1/token",
+                params={"grant_type": "password"},
+                headers={
+                    "apikey": anon_key,
+                    "Content-Type": "application/json",
+                },
+                json={"email": email, "password": payload.current_password},
+                timeout=10.0,
+            )
+        except httpx.HTTPError as e:
+            print(f"Auth verification request failed for {user_id}: {e}")
+            raise HTTPException(status_code=502, detail="Auth service unreachable")
+
+        if verify_response.status_code != 200:
+            # Either invalid credentials or some other auth error — surface as
+            # "wrong password" so we don't leak which case it was.
             raise HTTPException(status_code=400, detail="הסיסמה הנוכחית שגויה")
 
-        # 2. Set the new password via the admin API
+        # 2. Set the new password via the admin API. The shared client still
+        # has the service-role JWT because step 1 didn't touch it.
         try:
             supabase.auth.admin.update_user_by_id(
                 user_id, {"password": payload.new_password}
