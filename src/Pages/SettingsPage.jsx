@@ -10,6 +10,7 @@ import { ConfirmDialog } from '@/Components/ui/confirm-dialog';
 
 import PrivacySection from '../Components/pagesComp/settings/PrivacySection';
 import NotificationsSection from '../Components/pagesComp/settings/NotificationsSection';
+import CommunitiesSection from '../Components/pagesComp/settings/CommunitiesSection';
 import DangerZone from '../Components/pagesComp/settings/DangerZone';
 import AboutSection from '../Components/pagesComp/settings/AboutSection';
 
@@ -59,6 +60,7 @@ export default function SettingsPage() {
                     <p className="text-slate-400">ניהול פרטיות, התראות וחשבון</p>
                 </div>
 
+                <CommunitiesSection />
                 <PrivacySection />
                 <NotificationsSection />
 

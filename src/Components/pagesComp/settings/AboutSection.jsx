@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Info, FileText } from 'lucide-react';
 
 // __APP_VERSION__ is replaced at build time by Vite (define) — falls back to
@@ -15,15 +16,21 @@ export default function AboutSection() {
             </h2>
 
             <div className="space-y-2">
-                <a
-                    href="/privacy-policy.html"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                <Link
+                    to="/about"
+                    className="flex items-center gap-3 p-3 rounded-xl bg-slate-900/50 border border-slate-800 hover:bg-slate-900 transition-colors text-slate-200"
+                >
+                    <Info className="w-4 h-4 text-teal-400" aria-hidden="true" />
+                    <span className="text-sm">מידע ותמיכה</span>
+                </Link>
+
+                <Link
+                    to="/privacy"
                     className="flex items-center gap-3 p-3 rounded-xl bg-slate-900/50 border border-slate-800 hover:bg-slate-900 transition-colors text-slate-200"
                 >
                     <FileText className="w-4 h-4 text-teal-400" aria-hidden="true" />
                     <span className="text-sm">מדיניות פרטיות</span>
-                </a>
+                </Link>
             </div>
 
             <p className="text-center text-xs text-slate-500 pt-2">

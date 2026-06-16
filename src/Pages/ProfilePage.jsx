@@ -7,6 +7,7 @@ import { useAppData } from '../context/useAppData';
 import { avior } from '../Api';
 
 import ProfileHeader from '../Components/pagesComp/profile/ProfileHeader';
+import CommunitySwitcher from '../Components/pagesComp/profile/CommunitySwitcher';
 import ProfileStats from '../Components/pagesComp/profile/ProfileStats';
 import ProfileTabs from '../Components/pagesComp/profile/ProfileTabs';
 import MyPostsGrid from '../Components/pagesComp/profile/MyPostsGrid';
@@ -63,6 +64,10 @@ export default function ProfilePage() {
                 className="space-y-4"
             >
                 <ProfileHeader user={user} />
+
+                <div className="flex justify-center">
+                    <CommunitySwitcher />
+                </div>
 
                 <ProfileStats
                     postCount={postsQuery.isLoading ? null : posts.length}

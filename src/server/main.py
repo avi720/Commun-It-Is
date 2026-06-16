@@ -25,6 +25,7 @@ if sentry_dsn:
     )
 
 from . import firebase_init  # noqa: E402, F401  - ensure Firebase initializes on startup
+from .routes.communities import router as communities_router  # noqa: E402
 from .routes.notifications import router as notifications_router  # noqa: E402
 from .routes.posts import router as posts_router  # noqa: E402
 from .routes.rides import router as rides_router  # noqa: E402
@@ -58,6 +59,7 @@ app.include_router(users_router)
 app.include_router(rides_router)
 app.include_router(posts_router)
 app.include_router(notifications_router)
+app.include_router(communities_router)
 
 
 if __name__ == "__main__":

@@ -55,6 +55,11 @@ export const avior = {
         communities: {
             getAll: communities.getAll,
             joinByName: communities.joinByName,
+            // Multi-community v1
+            listMyMemberships: (session) => communities.listMyMemberships(session),
+            joinByCode: (code, session) => communities.joinByCode(code, session),
+            switchActive: (id, session) => communities.switchActive(id, session),
+            leave: (id, session) => communities.leave(id, session),
         },
     },
 
