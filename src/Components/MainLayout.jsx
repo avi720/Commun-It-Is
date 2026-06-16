@@ -31,11 +31,17 @@ export default function MainLayout() {
     enabled: !!user?.community_id,
     staleTime: 60_000,
   });
-  const headerLabel = activeCommunity?.name
-    ? `קהילת ${activeCommunity.name}`
-    : user?.city
-    ? `קהילת ${user.city}`
-    : 'קהילת טרמפיקציה';
+  // Strip a leading "קהילת" from the community name to avoid "קהילת קהילת X"
+  // when the operator named their community "קהילת ..." literally.
+  const formatLabel = (raw) => {
+    if (!raw) return null;
+    const trimmed = raw.trim();
+    return trimmed.startsWith('קהילת ') ? trimmed : `קהילת ${trimmed}`;
+  };
+  const headerLabel =
+    formatLabel(activeCommunity?.name) ||
+    formatLabel(user?.city) ||
+    'קהילת טרמפיקציה';
 
   // מצב הסיידבר חי כאן (מקומית) ולא ב-AppContext כדי שדפים שלא צריכים אותו
   // לא ירונדרו מחדש בכל פתיחה/סגירה. דפים שכן צריכים (למשל HomePage שמדמדם
