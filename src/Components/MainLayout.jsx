@@ -1,14 +1,41 @@
 import React, { useState, useCallback } from 'react';
 import { Menu } from 'lucide-react';
 import { Outlet, useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import Sidebar from './mainlayoutComp/Sidebar';
 import { useAppData } from '../context/useAppData';
+import { supabase } from '../Api';
 
 export default function MainLayout() {
   const navigate = useNavigate();
 
   // logout removed from Sidebar — it lives at the bottom of /settings now.
   const { user } = useAppData();
+
+  // Header label: show the ACTIVE community's name, not the user's city. With
+  // multi-community membership the user can switch active communities; the
+  // header must follow the active one (otherwise the label keeps showing the
+  // city the user lives in regardless of which community they're viewing).
+  // Falls back to user.city for the rare case where the lookup fails.
+  const { data: activeCommunity } = useQuery({
+    queryKey: ['active-community', user?.community_id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('communities')
+        .select('name')
+        .eq('id', user.community_id)
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.community_id,
+    staleTime: 60_000,
+  });
+  const headerLabel = activeCommunity?.name
+    ? `קהילת ${activeCommunity.name}`
+    : user?.city
+    ? `קהילת ${user.city}`
+    : 'קהילת טרמפיקציה';
 
   // מצב הסיידבר חי כאן (מקומית) ולא ב-AppContext כדי שדפים שלא צריכים אותו
   // לא ירונדרו מחדש בכל פתיחה/סגירה. דפים שכן צריכים (למשל HomePage שמדמדם
@@ -41,7 +68,7 @@ export default function MainLayout() {
             className="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity active:scale-95"
           >
             <h1 className="text-lg font-bold bg-gradient-to-r from-teal-400 to-blue-500 bg-clip-text text-transparent select-none truncate max-w-[200px] md:max-w-[360px]">
-              {user?.city ? `קהילת ${user.city}` : 'קהילת טרמפיקציה'}
+              {headerLabel}
             </h1>
           </div>
         </div>
