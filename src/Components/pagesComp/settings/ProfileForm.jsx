@@ -19,7 +19,6 @@ export default function ProfileForm({ user, onSave }) {
         city: user?.city || '',
         address: user?.address || '',
         bio: user?.bio || '',
-        visible_on_phonebook: user?.visible_on_phonebook || false,
     }));
     const [isSaving, setIsSaving] = useState(false);
     // Avatar state — separate from formData because uploads go through
@@ -226,31 +225,6 @@ export default function ProfileForm({ user, onSave }) {
                 </div>
             </div>
 
-            <div className="bg-slate-900/50 p-4 rounded-xl border border-slate-800 flex items-center justify-between mt-4">
-                <div className="space-y-1">
-                    <span id="phonebook-visibility-label" className="text-sm font-medium text-white block">
-                        הופעה בספר הטלפונים
-                    </span>
-                    <p className="text-xs text-slate-400">
-                        אפשר לתושבים לראות את שמך ומספר הטלפון שלך
-                    </p>
-                </div>
-
-                <button
-                    type="button"
-                    role="switch"
-                    aria-checked={!!formData.visible_on_phonebook}
-                    aria-labelledby="phonebook-visibility-label"
-                    onClick={() => setFormData({ ...formData, visible_on_phonebook: !formData.visible_on_phonebook })}
-                    className={`relative inline-block h-6 w-12 shrink-0 cursor-pointer rounded-full transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-slate-800 ${formData.visible_on_phonebook ? 'bg-teal-600' : 'bg-slate-600'}`}
-                >
-                    <span
-                        aria-hidden="true"
-                        style={{ right: formData.visible_on_phonebook ? '2px' : '24px' }}
-                        className="pointer-events-none absolute top-0.5 inline-block h-5 w-5 rounded-full bg-white shadow transition-all duration-300"
-                    />
-                </button>
-            </div>
             <div className="pt-2">
                 <Button type="submit" disabled={isSaving} className="w-full bg-teal-700 hover:bg-teal-800 text-white h-11">
                     {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}

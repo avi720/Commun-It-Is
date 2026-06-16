@@ -1,6 +1,7 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
+import { useSearchParams } from 'react-router-dom';
 
 import { useAppData } from '../context/useAppData';
 import { avior } from '../Api';
@@ -15,7 +16,16 @@ import MyRidesList from '../Components/pagesComp/profile/MyRidesList';
 export default function ProfilePage() {
     const { user, session } = useAppData();
     const [activeTab, setActiveTab] = useState('posts');
-    const [openPostId, setOpenPostId] = useState(null);
+    const [searchParams, setSearchParams] = useSearchParams();
+    const openPostId = searchParams.get('post') || null;
+
+    const setOpenPostId = useCallback((id) => {
+        if (id) {
+            setSearchParams({ post: id }, { preventScrollReset: true });
+        } else {
+            setSearchParams({}, { preventScrollReset: true });
+        }
+    }, [setSearchParams]);
 
     const postsQuery = useQuery({
         queryKey: ['profile-posts', user?.id],
@@ -95,7 +105,7 @@ export default function ProfilePage() {
                 <MyPostsScroll
                     posts={posts}
                     focusPostId={openPostId}
-                    onClose={() => setOpenPostId(null)}
+                    onClose={() => window.history.back()}
                     queryKey={['profile-posts', user?.id]}
                 />
             )}
