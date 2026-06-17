@@ -79,19 +79,40 @@ export function AppProvider({ children }) {
 
             // OAuth avatar fallback: if the user has no avatar set in our DB
             // but their identity provider supplied one (Google → `picture`,
-            // others → `avatar_url`), copy it over once. Silent and idempotent
-            // — failures don't disrupt login.
+            // others → `avatar_url`), copy it over once. Idempotent.
+            //
+            // Race safety: we use a conditional UPDATE — `.is('avatar_url',
+            // null)` is evaluated atomically at the row level by Postgres,
+            // so even if loadUserData fires while the user is uploading their
+            // own avatar in another tab, only one write wins. If the user's
+            // upload landed first, this no-ops; if the fallback lands first,
+            // the upload still overwrites it (its UPDATE has no IS NULL
+            // filter). RLS already restricts the UPDATE to the user's own row
+            // (`auth.uid() = id`), so no elevated permissions are needed.
             if (profile && currentSession && !profile.avatar_url) {
                 const meta = currentSession.user?.user_metadata || {};
                 const providerAvatar = meta.picture || meta.avatar_url;
                 if (providerAvatar) {
-                    avior.entities.User.update(
-                        currentSession.user.id,
-                        { avatar_url: providerAvatar },
-                        currentSession,
-                    )
-                        .then(() => setUser((prev) => prev ? { ...prev, avatar_url: providerAvatar } : prev))
-                        .catch((err) => console.error("OAuth avatar copy failed:", err));
+                    supabase
+                        .from('users')
+                        .update({ avatar_url: providerAvatar })
+                        .eq('id', currentSession.user.id)
+                        .is('avatar_url', null)
+                        .select('avatar_url')
+                        .then(({ data, error }) => {
+                            if (error) {
+                                console.error("OAuth avatar copy failed:", error);
+                                return;
+                            }
+                            // data.length === 0 means the WHERE didn't match
+                            // (the user already has a custom avatar — don't
+                            // touch local state).
+                            if (data && data.length > 0) {
+                                setUser((prev) =>
+                                    prev ? { ...prev, avatar_url: providerAvatar } : prev
+                                );
+                            }
+                        });
                 }
             }
 
