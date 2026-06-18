@@ -35,6 +35,10 @@ if (import.meta.env.VITE_SENTRY_DSN) {
     })
 }
 
+window.addEventListener('vite:preloadError', () => {
+    window.location.reload();
+});
+
 // יצירת מופע של הלקוח — ברירות מחדל שמתאימות לאפליקציה:
 // - staleTime של 30 שניות חוסך רענונים מיותרים בין ניווטים קצרים
 // - refetchOnWindowFocus כבוי כי האפליקציה מותקנת כ-PWA / Capacitor ומיקוד חלון
