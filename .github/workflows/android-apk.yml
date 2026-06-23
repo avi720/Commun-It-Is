@@ -1,0 +1,51 @@
+name: Build Android APK
+
+# רץ לפי דרישה בלבד (כפתור "Run workflow" ב-GitHub Actions).
+# מייצר APK debug שניתן להתקין ישירות בטלפון (sideload).
+# כיוון שזו אפליקציית Capacitor עם server.url חיצוני, אין צורך לבנות מחדש
+# בכל שינוי באתר — רק כש-server.url משתנה או כש-Capacitor/plugins מתעדכנים.
+on:
+  workflow_dispatch:
+
+jobs:
+  build-apk:
+    name: Build debug APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Build web bundle
+        run: npm run build
+
+      - name: Sync Capacitor (android)
+        run: npx cap sync android
+
+      # Capacitor 8 דורש JDK 21
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Build debug APK
+        working-directory: android
+        run: ./gradlew assembleDebug
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 30
