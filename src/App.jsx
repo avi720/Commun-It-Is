@@ -4,6 +4,7 @@ import { Toaster } from 'sonner';
 import { AppProvider } from './context/AppContext';
 import { useAppData } from './context/useAppData';
 import { usePushNotifications } from './Components/hooks/usePushNotifications';
+import { useNativeAuthCallback } from './Components/hooks/useNativeAuthCallback';
 
 import MainLayout from './Components/MainLayout';
 import CommitteeRoute from './Components/routes/CommitteeRoute';
@@ -80,6 +81,7 @@ function AppRoutes() {
 
 export default function App() {
   usePushNotifications();
+  useNativeAuthCallback();
   return (
     <AppProvider>
       <BrowserRouter>

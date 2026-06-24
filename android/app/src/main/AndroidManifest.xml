@@ -22,6 +22,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+            <!-- Deep link עבור OAuth callback של Supabase לאחר אימות Google.
+                 ה-scheme חייב להתאים בדיוק ל-NATIVE_OAUTH_REDIRECT ב-src/Api/auth.js
+                 ולרשימת Redirect URLs ב-Supabase. autoVerify=false כי זה custom
+                 scheme (לא https) ולא רוצים App Links verification. -->
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="com.CommunItIs.myapp" android:host="login-callback" />
+            </intent-filter>
+
         </activity>
 
         <provider
