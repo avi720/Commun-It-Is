@@ -1,42 +1,49 @@
 import { useEffect } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { App } from '@capacitor/app';
-import { Browser } from '@capacitor/browser';
 import { supabase } from '@/Api';
+import { NATIVE_OAUTH_REDIRECT } from '@/Api/auth';
 
 /**
  * ב-APK של Capacitor, אחרי ש-Google מסיים אימות, Supabase מפנה ל-
- * `com.CommunItIs.myapp://login-callback#access_token=...&refresh_token=...`.
- * האירוע `appUrlOpen` יורה ב-MainActivity (singleTask) כשה-OS פותח את ה-URI.
- * ה-hook הזה מחלץ את ה-tokens, מקרא setSession (זה גורם ל-onAuthStateChange
- * לעדכן את ה-AppContext) וסוגר את ה-Custom Tab.
+ * `com.CommunItIs.myapp://login-callback?code=...` (PKCE) או
+ * `com.CommunItIs.myapp://login-callback#access_token=...` (implicit).
  *
- * ב-web — הזרימה הרגילה של supabase-js דואגת לכל זה דרך ה-URL hash, וה-hook
- * לא עושה כלום.
+ * supabase-js v2 משתמש PKCE כברירת מחדל — ה-callback מחזיר `?code=`,
+ * וה-hook קורא exchangeCodeForSession שמשתמש ב-code_verifier שנשמר
+ * ב-localStorage של ה-WebView על ידי signInWithOAuth.
  */
 export function useNativeAuthCallback() {
     useEffect(() => {
         if (!Capacitor.isNativePlatform()) return;
-        // ב-remote-URL architecture ה-JS מ-Vercel יכול לרוץ על APK ישן
-        // שעדיין לא כולל את ה-native layer של @capacitor/app.
         if (!Capacitor.isPluginAvailable('App')) return;
 
         let listenerHandle;
         (async () => {
             listenerHandle = await App.addListener('appUrlOpen', async ({ url }) => {
-                if (!url || !url.startsWith('com.CommunItIs.myapp://login-callback')) {
-                    return;
+                if (!url || !url.startsWith(NATIVE_OAUTH_REDIRECT)) return;
+
+                // PKCE flow: Supabase מחזיר ?code= ב-query params
+                const queryStart = url.indexOf('?');
+                if (queryStart !== -1) {
+                    const params = new URLSearchParams(url.slice(queryStart));
+                    const code = params.get('code');
+                    if (code) {
+                        await supabase.auth.exchangeCodeForSession(code);
+                        return;
+                    }
                 }
-                // ה-tokens חוזרים ב-fragment (#...). URL constructor שומר את ה-#
-                // ב-hash; חותכים את ה-# וקוראים את הפרמטרים.
-                const hash = url.split('#')[1] || '';
-                const params = new URLSearchParams(hash);
-                const access_token = params.get('access_token');
-                const refresh_token = params.get('refresh_token');
-                if (access_token && refresh_token) {
-                    await supabase.auth.setSession({ access_token, refresh_token });
+
+                // Implicit flow fallback: tokens ב-fragment (#)
+                const hashStart = url.indexOf('#');
+                if (hashStart !== -1) {
+                    const params = new URLSearchParams(url.slice(hashStart + 1));
+                    const access_token = params.get('access_token');
+                    const refresh_token = params.get('refresh_token');
+                    if (access_token && refresh_token) {
+                        await supabase.auth.setSession({ access_token, refresh_token });
+                    }
                 }
-                try { await Browser.close(); } catch { /* כבר סגור — מתעלמים */ }
             });
         })();
 
