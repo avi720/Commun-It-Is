@@ -17,6 +17,9 @@ import { supabase } from '@/Api';
 export function useNativeAuthCallback() {
     useEffect(() => {
         if (!Capacitor.isNativePlatform()) return;
+        // ב-remote-URL architecture ה-JS מ-Vercel יכול לרוץ על APK ישן
+        // שעדיין לא כולל את ה-native layer של @capacitor/app.
+        if (!Capacitor.isPluginAvailable('App')) return;
 
         let listenerHandle;
         (async () => {

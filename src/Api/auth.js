@@ -63,6 +63,9 @@ export async function signInWithGoogle() {
     });
     if (error) throw error;
     if (isNative && data?.url) {
+        if (!Capacitor.isPluginAvailable('Browser')) {
+            throw new Error('יש להתקין APK חדש כדי להשתמש בהתחברות דרך Google');
+        }
         await Browser.open({ url: data.url, presentationStyle: 'popover' });
     }
     return data;
