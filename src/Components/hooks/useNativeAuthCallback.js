@@ -5,6 +5,16 @@ import { Browser } from '@capacitor/browser';
 import { supabase } from '@/Api';
 import { NATIVE_DEEP_LINK } from '@/Api/auth';
 
+// HTTPS App Link — Android יורה כאשר Supabase מפנה ל-callback URL
+const HTTPS_CALLBACK_PREFIX = 'https://commun-it-is.vercel.app/api/auth/native-callback';
+
+function isAuthCallbackUrl(url) {
+    return url && (
+        url.startsWith(NATIVE_DEEP_LINK) ||
+        url.startsWith(HTTPS_CALLBACK_PREFIX)
+    );
+}
+
 export function useNativeAuthCallback() {
     useEffect(() => {
         if (!Capacitor.isNativePlatform()) return;
@@ -13,7 +23,7 @@ export function useNativeAuthCallback() {
         let listenerHandle;
         (async () => {
             listenerHandle = await App.addListener('appUrlOpen', async ({ url }) => {
-                if (!url || !url.startsWith(NATIVE_DEEP_LINK)) return;
+                if (!isAuthCallbackUrl(url)) return;
                 console.log('[OAuth] Deep link received:', url);
 
                 if (Capacitor.isPluginAvailable('Browser')) {

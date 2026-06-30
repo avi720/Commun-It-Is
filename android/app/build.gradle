@@ -16,6 +16,25 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    // Debug signing config מצביע ל-debug.keystore מקומי (committed ל-repo).
+    // הסיבה: Android App Links דורש SHA-256 fingerprint יציב של ה-cert,
+    // ולא ה-keystore האקראי ש-AGP יוצר בכל build חדש.
+    // אם הקובץ לא קיים (לפני setup-app-links workflow), AGP יחזור לברירת מחדל.
+    if (file('debug.keystore').exists()) {
+        signingConfigs {
+            debug {
+                storeFile file('debug.keystore')
+                storePassword 'android'
+                keyAlias 'androiddebugkey'
+                keyPassword 'android'
+            }
+        }
+        buildTypes {
+            debug {
+                signingConfig signingConfigs.debug
+            }
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false

@@ -22,15 +22,27 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- Deep link עבור OAuth callback של Supabase לאחר אימות Google.
-                 ה-scheme חייב להתאים בדיוק ל-NATIVE_OAUTH_REDIRECT ב-src/Api/auth.js
-                 ולרשימת Redirect URLs ב-Supabase. autoVerify=false כי זה custom
-                 scheme (לא https) ולא רוצים App Links verification. -->
+            <!-- Custom scheme deep link — fallback אם App Links לא verified -->
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="com.CommunItIs.myapp" android:host="login-callback" />
+            </intent-filter>
+
+            <!-- Android App Links — מיירט את ה-callback של Supabase ישירות
+                 ל-app בכל דפדפן (Chrome, Samsung Internet, Firefox).
+                 autoVerify=true → Android Play Services בודק את
+                 /.well-known/assetlinks.json בדומיין ומאמת SHA-256 fingerprint
+                 של ה-cert. דורש: setup-app-links workflow + APK חתום עם
+                 ה-keystore היציב (debug.keystore committed ל-repo). -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https"
+                      android:host="commun-it-is.vercel.app"
+                      android:pathPrefix="/api/auth/native-callback" />
             </intent-filter>
 
         </activity>

@@ -1,0 +1,90 @@
+name: Setup App Links
+
+# Workflow חד-פעמי שמכין את התשתית ל-Android App Links:
+# 1. מייצר debug keystore יציב (אם עוד אין)
+# 2. מחשב את ה-SHA-256 fingerprint של ה-cert
+# 3. כותב public/.well-known/assetlinks.json עם ה-SHA
+# 4. דוחף הכל חזרה ל-repo
+#
+# אחרי הרצה אחת מוצלחת, הקבצים יישארו ב-repo ולא צריך להריץ שוב
+# (אלא אם רוצים לאפס את ה-keystore — שאז ידרוש uninstall+reinstall של ה-APK).
+
+on:
+  workflow_dispatch:
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Generate debug keystore if missing
+        run: |
+          if [ ! -f android/app/debug.keystore ]; then
+            keytool -genkeypair -v \
+              -keystore android/app/debug.keystore \
+              -storepass android \
+              -keypass android \
+              -alias androiddebugkey \
+              -keyalg RSA \
+              -keysize 2048 \
+              -validity 10000 \
+              -dname "CN=Commun-It-Is Debug, OU=Dev, O=avi720, L=, ST=, C=IL"
+            echo "Generated new debug.keystore"
+          else
+            echo "debug.keystore already exists — using it"
+          fi
+
+      - name: Extract SHA-256 fingerprint
+        id: sha
+        run: |
+          SHA=$(keytool -list -v \
+            -keystore android/app/debug.keystore \
+            -storepass android \
+            -alias androiddebugkey \
+            | grep "SHA256:" \
+            | head -1 \
+            | awk '{print $2}')
+          if [ -z "$SHA" ]; then
+            echo "Failed to extract SHA-256"
+            exit 1
+          fi
+          echo "SHA-256: $SHA"
+          echo "value=$SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Write assetlinks.json
+        run: |
+          mkdir -p public/.well-known
+          cat > public/.well-known/assetlinks.json <<EOF
+          [
+            {
+              "relation": ["delegate_permission/common.handle_all_urls"],
+              "target": {
+                "namespace": "android_app",
+                "package_name": "com.CommunItIs.myapp",
+                "sha256_cert_fingerprints": ["${{ steps.sha.outputs.value }}"]
+              }
+            }
+          ]
+          EOF
+          cat public/.well-known/assetlinks.json
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add android/app/debug.keystore public/.well-known/assetlinks.json
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore(android): setup debug keystore + assetlinks.json for App Links"
+            git push
+          fi
