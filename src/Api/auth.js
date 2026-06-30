@@ -50,6 +50,7 @@ export async function signInWithGoogle() {
         options: {
             redirectTo: NATIVE_CALLBACK_URL,
             skipBrowserRedirect: true,
+            queryParams: { prompt: 'select_account' },
         },
     });
     if (error) throw error;

@@ -28,7 +28,9 @@ export default function GoogleSignInButton({ label = 'המשך עם Google' }) {
         setError('');
         try {
             await avior.auth.signInWithGoogle();
-            // בהצלחה הדפדפן מנותב ל-Google, אז לא נגיע לכאן בדרך כלל
+            // ב-native, signInWithGoogle חוזר מיד אחרי שה-Custom Tab נפתח.
+            // ב-web — הדפדפן מנותב ל-Google ולא נגיע לכאן.
+            setLoading(false);
         } catch (err) {
             console.error('Google sign-in error:', err);
             setError('שגיאה בהתחברות דרך Google');
