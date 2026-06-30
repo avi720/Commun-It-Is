@@ -1,5 +1,6 @@
 import { supabase } from './config';
 import { Capacitor } from '@capacitor/core';
+import { Browser } from '@capacitor/browser';
 
 export const NATIVE_DEEP_LINK = 'com.CommunItIs.myapp://login-callback';
 const NATIVE_CALLBACK_URL = `${window.location.origin}/api/auth/native-callback`;
@@ -38,11 +39,12 @@ export async function signInWithGoogle() {
     }
 
     // Supabase's /auth/v1/authorize sends "Content-Security-Policy: sandbox"
-    // on its 302, causing Chrome on Android to block Google's sign-in page.
-    // Workaround: get the authorize URL without navigating, extract Google's
-    // URL via a server-side proxy, and open Google directly.
-    // The callback redirectTo points to our /api/auth/native-callback which
-    // renders a page that deep-links back into the app.
+    // on its 302, which causes Chrome on Android to blank out Google's
+    // sign-in page.  Workaround: get the authorize URL without navigating,
+    // extract Google's URL via a server-side proxy, then open Google in a
+    // Chrome Custom Tab.
+    // redirectTo points to our /api/auth/native-callback, an HTTPS page that
+    // reads code/access_token client-side and deep-links back into the app.
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -63,8 +65,8 @@ export async function signInWithGoogle() {
         throw new Error(body.error || 'Failed to get Google OAuth URL');
     }
 
-    console.log('[OAuth] Opening Google directly:', body.url);
-    window.location.assign(body.url);
+    console.log('[OAuth] Opening Custom Tab:', body.url);
+    await Browser.open({ url: body.url, presentationStyle: 'popover' });
 
     return data;
 }

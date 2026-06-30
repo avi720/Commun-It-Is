@@ -1,6 +1,3 @@
-import json
-from urllib.parse import urlencode
-
 import httpx
 from fastapi import APIRouter, Query
 from fastapi.responses import HTMLResponse, JSONResponse
@@ -12,13 +9,10 @@ router = APIRouter(prefix="/api/auth", tags=["oauth"])
 async def oauth_redirect(url: str = Query(...)):
     """Extract the Google OAuth URL from a Supabase authorize 302.
 
-    Supabase's ``/auth/v1/authorize`` returns a ``Content-Security-Policy:
-    sandbox`` header on its 302 response, which causes Chrome on Android to
-    sandbox the redirect target (Google's sign-in page) — scripts are blocked
-    and the user sees a blank screen.
-
-    This endpoint follows the 302 server-side and returns the Location URL so
-    the mobile client can open Google directly, bypassing the CSP.
+    Supabase's ``/auth/v1/authorize`` returns ``Content-Security-Policy:
+    sandbox`` on its 302, which causes Chrome on Android to block scripts on
+    Google's sign-in page (blank screen).  We follow the redirect server-side
+    and return Google's URL so the client can open it directly.
     """
     if "supabase.co/auth/v1/authorize" not in url:
         return JSONResponse({"error": "Invalid URL"}, status_code=400)
@@ -32,57 +26,85 @@ async def oauth_redirect(url: str = Query(...)):
             {"error": f"No redirect (status {resp.status_code})"},
             status_code=502,
         )
-
     return {"url": location}
 
 
-@router.get("/native-callback")
-async def native_callback(
-    code: str = Query(None),
-    error: str = Query(None),
-    error_description: str = Query(None),
-):
-    """Handle Supabase OAuth callback for the native (Capacitor) app.
-
-    After the user authenticates with Google, Supabase redirects here with a
-    PKCE ``code``.  This page renders a minimal HTML document that immediately
-    redirects to the app's deep-link URL, where ``useNativeAuthCallback``
-    picks up the code and calls ``exchangeCodeForSession``.
-
-    Why not redirect straight from Supabase to the deep-link?  Because
-    Supabase's callback 303 also carries ``Content-Security-Policy: sandbox``,
-    and Chrome may refuse to follow a redirect to a custom-scheme URL under
-    sandbox restrictions.
-    """
-    if error:
-        safe_msg = json.dumps(error_description or error)
-        return HTMLResponse(
-            f'<!DOCTYPE html><html><body style="background:#0f172a;color:#ef4444;'
-            f'display:flex;align-items:center;justify-content:center;height:100vh;'
-            f'font-family:sans-serif;direction:rtl">'
-            f"<p>שגיאה באימות: {error_description or error}</p>"
-            f"</body></html>",
-            status_code=400,
-        )
-
-    if not code:
-        return HTMLResponse("Missing code parameter", status_code=400)
-
-    safe_code = json.dumps(code)
-
-    return HTMLResponse(
-        f"""<!DOCTYPE html>
+_CALLBACK_HTML = """<!DOCTYPE html>
 <html>
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="background:#0f172a;color:#14b8a6;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;direction:rtl">
-<p>חוזר לאפליקציה...</p>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>חוזר לאפליקציה...</title>
+<style>
+  body {
+    background: #0f172a;
+    color: #14b8a6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    font-family: system-ui, -apple-system, sans-serif;
+    direction: rtl;
+    text-align: center;
+    padding: 1rem;
+  }
+  #msg { font-size: 1.1rem; }
+  #err { color: #ef4444; font-size: 0.9rem; margin-top: 1rem; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<div>
+  <p id="msg">חוזר לאפליקציה...</p>
+  <p id="err"></p>
+</div>
 <script>
-var code = {safe_code};
-window.location.assign("com.CommunItIs.myapp://login-callback?code=" + encodeURIComponent(code));
-setTimeout(function() {{
-  document.querySelector("p").textContent = "אם האפליקציה לא נפתחה, חזור אליה ידנית.";
-}}, 3000);
+(function() {
+  var deepLink = "com.CommunItIs.myapp://login-callback";
+  var search = window.location.search || "";
+  var hash = window.location.hash || "";
+
+  // קריאת error בכל סוג זרימה (query או hash)
+  var qp = new URLSearchParams(search);
+  var hp = new URLSearchParams(hash.replace(/^#/, ""));
+  var err = qp.get("error") || hp.get("error");
+  if (err) {
+    var desc = qp.get("error_description") || hp.get("error_description") || err;
+    document.getElementById("msg").textContent = "שגיאה באימות";
+    document.getElementById("err").textContent = decodeURIComponent(desc);
+    return;
+  }
+
+  // בנייה של ה-deep link עם אותם פרמטרים שהגיעו
+  var target = deepLink;
+  if (qp.get("code")) {
+    target += search;
+  } else if (hp.get("access_token")) {
+    target += hash;
+  } else {
+    document.getElementById("msg").textContent = "אין פרמטרים בקריאה החוזרת";
+    return;
+  }
+
+  window.location.replace(target);
+
+  setTimeout(function() {
+    document.getElementById("msg").textContent = "אם האפליקציה לא נפתחה אוטומטית, חזור אליה ידנית.";
+  }, 2500);
+})();
 </script>
 </body>
-</html>"""
-    )
+</html>
+"""
+
+
+@router.get("/native-callback")
+async def native_callback():
+    """Serve a static HTML page that deep-links into the Capacitor app.
+
+    The page reads ``?code=`` (PKCE) or ``#access_token=`` (implicit) on the
+    client side and redirects to ``com.CommunItIs.myapp://login-callback``
+    with the same parameters.  We can't read the fragment on the server, so
+    everything is handled in JS.
+    """
+    return HTMLResponse(_CALLBACK_HTML)
