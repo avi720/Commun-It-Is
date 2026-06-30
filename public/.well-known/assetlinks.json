@@ -1,0 +1,10 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.CommunItIs.myapp",
+      "sha256_cert_fingerprints": ["56:E5:58:9E:90:35:12:87:18:EC:5C:72:3A:0A:54:65:91:B6:3A:A2:84:D9:9F:32:7B:B9:C9:DD:73:45:FD:20"]
+    }
+  }
+]
