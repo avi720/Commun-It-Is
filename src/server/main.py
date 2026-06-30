@@ -29,6 +29,7 @@ from .routes.communities import router as communities_router  # noqa: E402
 from .routes.notifications import router as notifications_router  # noqa: E402
 from .routes.posts import router as posts_router  # noqa: E402
 from .routes.rides import router as rides_router  # noqa: E402
+from .routes.oauth import router as oauth_router  # noqa: E402
 from .routes.users import router as users_router  # noqa: E402
 
 
@@ -59,6 +60,7 @@ app.include_router(users_router)
 app.include_router(rides_router)
 app.include_router(posts_router)
 app.include_router(notifications_router)
+app.include_router(oauth_router)
 app.include_router(communities_router)
 
 

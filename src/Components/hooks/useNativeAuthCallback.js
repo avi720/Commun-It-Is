@@ -2,17 +2,8 @@ import { useEffect } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { App } from '@capacitor/app';
 import { supabase } from '@/Api';
-import { NATIVE_OAUTH_REDIRECT } from '@/Api/auth';
+import { NATIVE_DEEP_LINK } from '@/Api/auth';
 
-/**
- * ב-APK של Capacitor, אחרי ש-Google מסיים אימות, Supabase מפנה ל-
- * `com.CommunItIs.myapp://login-callback?code=...` (PKCE) או
- * `com.CommunItIs.myapp://login-callback#access_token=...` (implicit).
- *
- * supabase-js v2 משתמש PKCE כברירת מחדל — ה-callback מחזיר `?code=`,
- * וה-hook קורא exchangeCodeForSession שמשתמש ב-code_verifier שנשמר
- * ב-localStorage של ה-WebView על ידי signInWithOAuth.
- */
 export function useNativeAuthCallback() {
     useEffect(() => {
         if (!Capacitor.isNativePlatform()) return;
@@ -21,7 +12,8 @@ export function useNativeAuthCallback() {
         let listenerHandle;
         (async () => {
             listenerHandle = await App.addListener('appUrlOpen', async ({ url }) => {
-                if (!url || !url.startsWith(NATIVE_OAUTH_REDIRECT)) return;
+                if (!url || !url.startsWith(NATIVE_DEEP_LINK)) return;
+                console.log('[OAuth] Deep link received:', url);
 
                 // PKCE flow: Supabase מחזיר ?code= ב-query params
                 const queryStart = url.indexOf('?');
