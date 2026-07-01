@@ -39,7 +39,9 @@ const PageLoader = () => (
 );
 
 function AppRoutes() {
-  const { isAuthenticated, isLoading } = useAppData();
+  const { isAuthenticated, isLoading, session } = useAppData();
+  usePushNotifications(session);
+
   if (isLoading) {
     return <PageLoader />;
   }
@@ -80,7 +82,6 @@ function AppRoutes() {
 }
 
 export default function App() {
-  usePushNotifications();
   useNativeAuthCallback();
   return (
     <AppProvider>

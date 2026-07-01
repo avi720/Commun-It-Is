@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import * as Sentry from '@sentry/react';
-import { supabase, avior } from '../Api';
+import { supabase } from '../Api';
 
 // ה-context object מיוצא כדי ש-useAppData (בקובץ נפרד) יוכל להשתמש בו.
 // פיצול הזה מונע אזהרת react-refresh/only-export-components: קובץ עם קומפוננטה
@@ -70,13 +70,6 @@ export function AppProvider({ children }) {
                 });
                 setIsAuthenticated(true);
             }
-            // אם יש טוקן של FCM שממתין בזיכרון, שלח אותו לשרת
-            const storedToken = localStorage.getItem('fcm_token');
-            if (storedToken && profile && currentSession) {
-                avior.notifications.updateToken(storedToken, currentSession)
-                    .catch(err => console.error("Token update failed", err));
-            }
-
             // OAuth avatar fallback: if the user has no avatar set in our DB
             // but their identity provider supplied one (Google → `picture`,
             // others → `avatar_url`), copy it over once. Idempotent.
