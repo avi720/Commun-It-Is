@@ -36,6 +36,16 @@ export const usePushNotifications = (session) => {
                 if (permStatus.receive === 'granted') {
                     await PushNotifications.register();
                 }
+
+                // Cover the race where register() fired before session was
+                // available: the token is in localStorage but was never uploaded.
+                if (session?.access_token) {
+                    const saved = localStorage.getItem('fcm_token');
+                    if (saved) {
+                        avior.notifications.updateToken(saved, session)
+                            .catch(err => console.error("Token upload failed:", err));
+                    }
+                }
             } catch (e) {
                 console.error("Push init error:", e);
             }
