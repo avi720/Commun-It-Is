@@ -176,6 +176,36 @@ async def change_password(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.put("/token")
+async def update_user_token(
+    token_data: fcmTokenUpdate,
+    user_id: str = Depends(get_current_user_id),
+):
+    """
+    Register or update a user's FCM device token.
+
+    Declared BEFORE `/{user_id}` because FastAPI matches routes in order —
+    otherwise `PUT /api/users/token` would be captured by the dynamic route
+    with `user_id="token"` and return 403 from the ownership check.
+    """
+    try:
+        data = {
+            "user_id": user_id,
+            "fcm_token": token_data.fcm_token,
+            "last_updated": datetime.now(timezone.utc).isoformat(),
+        }
+
+        supabase.table("user_devices").upsert(
+            data, on_conflict="user_id, fcm_token"
+        ).execute()
+
+        return {"message": "Device token registered securely"}
+
+    except Exception as e:
+        print(f"Error updating token: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.put("/{user_id}")
 async def update_user(
     user_id: str,
@@ -219,29 +249,4 @@ async def update_user(
         print(f"Error updating user: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
-@router.put("/token")
-async def update_user_token(
-    token_data: fcmTokenUpdate,
-    user_id: str = Depends(get_current_user_id),
-):
-    """
-    Register or update a user's FCM device token.
-    """
-    try:
-        data = {
-            "user_id": user_id,
-            "fcm_token": token_data.fcm_token,
-            "last_updated": datetime.now(timezone.utc).isoformat(),
-        }
-
-        supabase.table("user_devices").upsert(
-            data, on_conflict="user_id, fcm_token"
-        ).execute()
-
-        return {"message": "Device token registered securely"}
-
-    except Exception as e:
-        print(f"Error updating token: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
 
