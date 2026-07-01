@@ -61,4 +61,8 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Required on Android 13+ (API 33+) for FCM push notifications.
+         Without this, requestPermissions() auto-denies and register()
+         is skipped. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 </manifest>
