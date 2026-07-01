@@ -315,11 +315,11 @@ The following four findings became important the moment desktop became a support
 
 These were noted during the audit but need product decisions before they become actionable findings:
 
-- **Push notifications UX** — the `usePushNotifications` hook runs at the app root but no in-app surface explains permission state or recovery if the user denies. Worth a dedicated UX pass.
-- **Onboarding error handling** — current behavior on duplicate community join is to silently refresh on `"already assigned"`. Confirm this is the intended UX.
-- **Ride details "הצטרף לנסיעה" CTA** has no handler wired. Either implement or remove until ready.
-- **Tablet and landscape behavior** were not audited; the app forces a phone-like layout at every width. Decide whether tablets/landscape need a distinct treatment for the committee dashboard at minimum.
-- **Push of post deep links** — `FeedPosts` builds a `#post-${id}` link for the WhatsApp share. Confirm router actually scrolls to that anchor.
+- **Push notifications UX** — resolved as F50 (open finding, awaiting implementation).
+- **Onboarding error handling** — resolved as F52 (open finding, awaiting implementation).
+- **Ride details "הצטרף לנסיעה" CTA** — resolved as F51 (open finding, pending product decision on desired behavior).
+- ~~**Tablet and landscape behavior**~~ — **Not needed (2026-06-23).** Desktop adaptation (F44/F49) is sufficient; no distinct tablet/landscape treatment planned.
+- ~~**Push of post deep links**~~ — **Resolved (2026-06-23).** `FeedPosts` sets `id="post-${id}"` on each card and the share link uses `/#post-${id}`; browser native anchor scrolling handles it.
 
 ---
 
@@ -336,4 +336,19 @@ These were noted during the audit but need product decisions before they become 
 - **Where:** App-wide, but specifically: HomePage (feed could pair with a community-sidebar widget at lg+), CommitteeDashboard (tabs and tables, currently mobile-density at any width), empty states (NoRidesMessage, NotificationsHistory empty, FeedPosts empty — all centered alone on huge desktop viewports), Card hover/focus polish.
 - **Issue:** Split out of F44. Phase 2 widened `max-w` on the main pages and made the sidebar persistent at md+, but every page still uses a single-column mobile layout — the desktop view doesn't earn its extra width with any content density, secondary panes, or layout shifts. Empty states still look like phone screenshots floating in a 1528px viewport.
 - **Acceptance:** At least three high-traffic pages have an intentional desktop treatment (e.g., HomePage = feed + community-info aside at lg+; CommitteeDashboard = data-dense tables/cards at md+; empty states = appropriately sized illustration + CTA at md+). Interactive cards have explicit hover, focus, and active styles distinct from each other. Mobile layout is not regressed. Verified by walking each page at 375px, 768px, and 1400px.
+
+#### [x] F50. Push notification permission state not reflected in Settings toggles
+- **Where:** `src/Components/pagesComp/settings/NotificationsSection.jsx`, `src/Components/hooks/usePushNotifications.js`.
+- **Issue:** The four notification preference toggles (posts, committee posts, ride offers, ride requests) are always interactive regardless of the OS-level push permission state. If the user denied push permission, the toggles appear enabled and can be toggled, but no notifications will ever arrive — there is no feedback that permission is missing. The hook exposes no permission state to the rest of the app.
+- **Acceptance:** On app load, check the OS push permission status. If denied: all four toggles render as disabled (visually and `aria-disabled`), and a banner/note in the section explains that push notifications are blocked and links/prompts the user to grant permission in device settings. Only after permission is granted can the user toggle individual preferences on/off. On platforms where push is not available (web without Capacitor), the section is either hidden or clearly labeled as Android-only.
+
+#### [ ] F51. "הצטרף לנסיעה" button in RideDetailsModal has no handler
+- **Where:** `src/Components/pagesComp/publicdisplay/RideDetailsModal.jsx:89`.
+- **Issue:** The primary CTA "הצטרף לנסיעה" renders as a button with no `onClick`. Tapping it does nothing. The desired behavior is pending a product decision.
+- **Acceptance:** TBD — owner to define what joining a ride means (e.g., WhatsApp message to driver, in-app request, phone call). Until decided: either remove the button or replace with a placeholder that opens a "בקרוב" tooltip so the UI isn't silently broken.
+
+#### [x] F52. Onboarding silently refreshes on duplicate community join instead of informing user
+- **Where:** `src/Pages/Register/OnboardingPage.jsx:72`.
+- **Issue:** When a user attempts to join a community they already belong to, the `"already assigned"` error is caught and triggers a silent `refresh()`. No feedback is shown — the user has no idea why nothing happened or that they're already a member.
+- **Acceptance:** When the `"already assigned"` error is caught, a toast (or inline message) appears: "אתה כבר חבר בקהילה X" (with the community name). The refresh still happens so the app state is correct, but the user now understands the situation.
 

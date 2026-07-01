@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Bell } from 'lucide-react';
+import { Bell, BellOff } from 'lucide-react';
 import { toast } from 'sonner';
 import { avior } from '@/Api';
 import { useAppData } from '@/context/useAppData';
+import { usePushPermission } from '@/Components/hooks/usePushPermission';
 
 const TOGGLES = [
     {
@@ -27,29 +28,83 @@ const TOGGLES = [
     },
 ];
 
-function Toggle({ checked, onChange, labelId }) {
+function Toggle({ checked, onChange, labelId, disabled }) {
     return (
         <button
             type="button"
             role="switch"
             aria-checked={!!checked}
             aria-labelledby={labelId}
-            onClick={() => onChange(!checked)}
-            className={`relative inline-block h-6 w-12 shrink-0 cursor-pointer rounded-full transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-800 ${checked ? 'bg-teal-600' : 'bg-slate-600'}`}
+            aria-disabled={disabled || undefined}
+            onClick={() => !disabled && onChange(!checked)}
+            className={`relative inline-block h-6 w-12 shrink-0 rounded-full transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-800 ${disabled ? 'cursor-not-allowed opacity-40' : 'cursor-pointer'} ${checked && !disabled ? 'bg-teal-600' : 'bg-slate-600'}`}
         >
             <span
                 aria-hidden="true"
-                style={{ right: checked ? '2px' : '24px' }}
+                style={{ right: checked && !disabled ? '2px' : '24px' }}
                 className="pointer-events-none absolute top-0.5 inline-block h-5 w-5 rounded-full bg-white shadow transition-all duration-300"
             />
         </button>
     );
 }
 
+function PermissionBanner({ permission, onRequest }) {
+    if (permission === 'denied') {
+        return (
+            <div className="flex items-start gap-3 rounded-xl bg-amber-900/30 border border-amber-800/50 p-4">
+                <BellOff className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+                <div className="space-y-1">
+                    <p className="text-sm font-medium text-amber-200">
+                        ההתראות חסומות במכשיר
+                    </p>
+                    <p className="text-xs text-slate-400">
+                        כדי לקבל התראות, יש לאשר אותן בהגדרות המכשיר עבור האפליקציה.
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
+    if (permission === 'prompt') {
+        return (
+            <div className="flex items-start gap-3 rounded-xl bg-teal-900/30 border border-teal-800/50 p-4">
+                <Bell className="w-5 h-5 text-teal-400 shrink-0 mt-0.5" />
+                <div className="space-y-2">
+                    <p className="text-sm font-medium text-teal-200">
+                        ההתראות לא הופעלו עדיין
+                    </p>
+                    <button
+                        type="button"
+                        onClick={onRequest}
+                        className="text-xs font-semibold text-teal-400 hover:text-teal-300 underline underline-offset-2 transition-colors"
+                    >
+                        הפעל התראות
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    if (permission === 'unsupported') {
+        return (
+            <div className="flex items-start gap-3 rounded-xl bg-slate-700/40 border border-slate-600/50 p-4">
+                <BellOff className="w-5 h-5 text-slate-400 shrink-0 mt-0.5" />
+                <p className="text-sm text-slate-400">
+                    התראות זמינות רק באפליקציה לאנדרואיד.
+                </p>
+            </div>
+        );
+    }
+
+    return null;
+}
+
 export default function NotificationsSection() {
     const { user, session, updateUser } = useAppData();
-    // Server defaults all four to true. Treat undefined as true so a user
-    // who hasn't touched the toggles still appears "on" on first load.
+    const { permission, requestPermission } = usePushPermission();
+
+    const isDisabled = permission !== 'granted';
+
     const initial = TOGGLES.reduce((acc, t) => {
         acc[t.key] = user?.[t.key] !== false;
         return acc;
@@ -57,6 +112,19 @@ export default function NotificationsSection() {
     const [state, setState] = useState(initial);
 
     const handle = (key) => async (next) => {
+        if (isDisabled) {
+            if (permission === 'prompt') {
+                const granted = await requestPermission();
+                if (!granted) {
+                    toast.error('לא ניתן להפעיל התראות ללא הרשאה');
+                    return;
+                }
+            } else {
+                toast.error('יש לאשר התראות בהגדרות המכשיר');
+                return;
+            }
+        }
+
         const prev = state[key];
         setState((s) => ({ ...s, [key]: next }));
         try {
@@ -66,6 +134,15 @@ export default function NotificationsSection() {
             console.error(err);
             toast.error('שגיאה בשמירת ההגדרה');
             setState((s) => ({ ...s, [key]: prev }));
+        }
+    };
+
+    const handleRequestPermission = async () => {
+        const granted = await requestPermission();
+        if (granted) {
+            toast.success('התראות הופעלו בהצלחה');
+        } else {
+            toast.error('לא ניתן להפעיל התראות — יש לאשר בהגדרות המכשיר');
         }
     };
 
@@ -79,18 +156,20 @@ export default function NotificationsSection() {
                 בחר אילו סוגי התראות תרצה לקבל. השינוי תקף מיד.
             </p>
 
+            <PermissionBanner permission={permission} onRequest={handleRequestPermission} />
+
             <div className="divide-y divide-slate-700/60">
                 {TOGGLES.map((t) => {
                     const labelId = `notif-${t.key}`;
                     return (
-                        <div key={t.key} className="flex items-center justify-between py-3">
+                        <div key={t.key} className={`flex items-center justify-between py-3 ${isDisabled ? 'opacity-50' : ''}`}>
                             <div className="space-y-0.5 flex-1 min-w-0 pl-4">
                                 <span id={labelId} className="text-sm font-medium text-white block">
                                     {t.label}
                                 </span>
                                 <p className="text-xs text-slate-400">{t.hint}</p>
                             </div>
-                            <Toggle checked={state[t.key]} onChange={handle(t.key)} labelId={labelId} />
+                            <Toggle checked={state[t.key]} onChange={handle(t.key)} labelId={labelId} disabled={isDisabled} />
                         </div>
                     );
                 })}

@@ -70,6 +70,7 @@ export default function OnboardingPage() {
     } catch (error) {
       console.error("שגיאה בשמירת המשתמש:", error);
       if (error.message.includes("already assigned")) {
+        toast.info(`אתה כבר חבר בקהילה ${selectedCommunityName}`);
         await refresh();
       } else {
         toast.error("שגיאה: " + error.message);
