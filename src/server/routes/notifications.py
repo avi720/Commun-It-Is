@@ -18,33 +18,43 @@ def _send_community_push(
     gate_column: Optional[str] = None,
     exclude_user_id: Optional[str] = None,
 ) -> int:
-    """Send a push to every user in `community_id` whose `fcm_token` is set.
+    """Send a push to every user in `community_id` who has a registered device.
+
+    Tokens live in `user_devices`; notification preferences and community
+    membership live in `users`. We query users first to get eligible IDs,
+    then pull their tokens from user_devices.
 
     `gate_column` — optional boolean column on `public.users` (e.g.
     `notify_ride_requests`); when set, only users whose value is `True`
-    receive the push. Use `None` to bypass the gate (only the committee
-    broadcast endpoint should consider this — it gates on
-    `notify_committee_posts` anyway).
+    receive the push.
 
-    `exclude_user_id` — drop this user from the recipient list. Used to
-    avoid sending an author a push for their own action.
+    `exclude_user_id` — drop this user from the recipient list.
 
     Returns the success_count from Firebase; 0 if there were no recipients.
     """
-    query = (
+    users_query = (
         supabase.table("users")
-        .select("fcm_token")
+        .select("id")
         .eq("community_id", community_id)
-        .neq("fcm_token", "null")
     )
     if gate_column:
-        query = query.eq(gate_column, True)
+        users_query = users_query.eq(gate_column, True)
     if exclude_user_id:
-        query = query.neq("id", exclude_user_id)
+        users_query = users_query.neq("id", exclude_user_id)
 
-    users_response = query.execute()
+    users_response = users_query.execute()
+    user_ids = [u["id"] for u in (users_response.data or [])]
+    if not user_ids:
+        return 0
+
+    devices_response = (
+        supabase.table("user_devices")
+        .select("fcm_token")
+        .in_("user_id", user_ids)
+        .execute()
+    )
     tokens = [
-        u["fcm_token"] for u in (users_response.data or []) if u.get("fcm_token")
+        d["fcm_token"] for d in (devices_response.data or []) if d.get("fcm_token")
     ]
     if not tokens:
         return 0
