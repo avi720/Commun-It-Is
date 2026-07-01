@@ -99,7 +99,7 @@ def test_gate_and_exclude_can_combine(mock_supabase):
 
 def test_with_tokens_calls_firebase_messaging(mock_supabase):
     """When recipients exist, firebase_admin.messaging is imported and
-    send_multicast is invoked."""
+    send_each_for_multicast is invoked."""
     from src.server.routes import notifications as notif_mod
     import sys
 
@@ -108,7 +108,7 @@ def test_with_tokens_calls_firebase_messaging(mock_supabase):
     )
 
     fake_messaging = MagicMock()
-    fake_messaging.send_multicast.return_value = MagicMock(success_count=2)
+    fake_messaging.send_each_for_multicast.return_value = MagicMock(success_count=2)
     fake_module = MagicMock()
     fake_module.messaging = fake_messaging
     sys.modules["firebase_admin"] = fake_module
@@ -121,4 +121,4 @@ def test_with_tokens_calls_firebase_messaging(mock_supabase):
         sys.modules.pop("firebase_admin", None)
 
     assert result == 2
-    fake_messaging.send_multicast.assert_called_once()
+    fake_messaging.send_each_for_multicast.assert_called_once()

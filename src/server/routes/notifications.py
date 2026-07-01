@@ -68,7 +68,10 @@ def _send_community_push(
         notification=messaging.Notification(title=title, body=body),
         tokens=tokens,
     )
-    response = messaging.send_multicast(message)
+    # send_multicast() was removed in firebase-admin ≥ 7.
+    # send_each_for_multicast sends one HTTP request per token — this is
+    # what Firebase now recommends.
+    response = messaging.send_each_for_multicast(message)
     return response.success_count
 
 
