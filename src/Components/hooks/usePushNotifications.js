@@ -8,21 +8,39 @@ export const usePushNotifications = (session) => {
     useEffect(() => {
         if (!Capacitor.isNativePlatform()) return;
 
+        // DIAGNOSTIC: visible toasts so we can see on-phone where the flow
+        // breaks. Remove once user_devices row appears reliably.
+        const dbg = (msg) => toast(msg, { duration: 6000 });
+
+        const uploadToken = async (tokenValue, why) => {
+            if (!session?.access_token) {
+                dbg(`no session, skip upload (${why})`);
+                return;
+            }
+            try {
+                dbg(`uploading (${why})`);
+                await avior.notifications.updateToken(tokenValue, session);
+                dbg(`upload OK (${why})`);
+            } catch (err) {
+                dbg(`upload FAIL: ${err?.message || err}`);
+            }
+        };
+
         const initPush = async () => {
             try {
-                await PushNotifications.addListener('registration', token => {
+                dbg(`push init, session=${session?.access_token ? 'yes' : 'no'}`);
+
+                await PushNotifications.addListener('registration', (token) => {
                     localStorage.setItem('fcm_token', token.value);
-                    if (session?.access_token) {
-                        avior.notifications.updateToken(token.value, session)
-                            .catch(err => console.error("Token upload failed:", err));
-                    }
+                    dbg(`reg event, token=${token.value.slice(0, 12)}…`);
+                    uploadToken(token.value, 'event');
                 });
 
-                await PushNotifications.addListener('registrationError', err => {
-                    console.error('Registration error: ', err.error);
+                await PushNotifications.addListener('registrationError', (err) => {
+                    dbg(`reg ERROR: ${err.error}`);
                 });
 
-                await PushNotifications.addListener('pushNotificationReceived', notification => {
+                await PushNotifications.addListener('pushNotificationReceived', (notification) => {
                     toast(notification.title || 'הודעה חדשה', {
                         description: notification.body,
                         duration: 8000,
@@ -30,24 +48,30 @@ export const usePushNotifications = (session) => {
                 });
 
                 let permStatus = await PushNotifications.checkPermissions();
+                dbg(`perm check = ${permStatus.receive}`);
                 if (permStatus.receive === 'prompt') {
                     permStatus = await PushNotifications.requestPermissions();
+                    dbg(`perm req = ${permStatus.receive}`);
                 }
                 if (permStatus.receive === 'granted') {
                     await PushNotifications.register();
+                    dbg('register() done');
+                } else {
+                    dbg(`perm not granted, stopping`);
+                    return;
                 }
 
-                // Cover the race where register() fired before session was
-                // available: the token is in localStorage but was never uploaded.
-                if (session?.access_token) {
-                    const saved = localStorage.getItem('fcm_token');
-                    if (saved) {
-                        avior.notifications.updateToken(saved, session)
-                            .catch(err => console.error("Token upload failed:", err));
-                    }
+                // Race cover: token may have been saved in a previous run
+                // when session wasn't ready yet.
+                const saved = localStorage.getItem('fcm_token');
+                if (saved) {
+                    dbg(`ls token found, len=${saved.length}`);
+                    uploadToken(saved, 'localStorage');
+                } else {
+                    dbg('ls token empty');
                 }
             } catch (e) {
-                console.error("Push init error:", e);
+                dbg(`init EXC: ${e?.message || e}`);
             }
         };
         initPush();
