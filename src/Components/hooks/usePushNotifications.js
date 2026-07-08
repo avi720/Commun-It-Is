@@ -6,7 +6,7 @@ import { avior } from '@/Api';
 
 export const usePushNotifications = (session) => {
     useEffect(() => {
-        if (!Capacitor.isNativePlatform()) return;
+        if (!Capacitor.isNativePlatform() || !Capacitor.isPluginAvailable('PushNotifications')) return;
 
         const uploadToken = (tokenValue) => {
             if (!session?.access_token) return;
@@ -51,7 +51,7 @@ export const usePushNotifications = (session) => {
         initPush();
 
         return () => {
-            PushNotifications.removeAllListeners();
+            PushNotifications.removeAllListeners().catch(() => {});
         };
     }, [session]);
 };
