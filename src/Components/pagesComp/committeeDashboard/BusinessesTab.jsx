@@ -16,7 +16,7 @@ export default function BusinessesTab({ communityId, onCountChange }) {
         queryFn: async () => {
             const { data, error } = await supabase
                 .from('businesses')
-                .select('*')
+                .select('id, community_id, owner_id, name, description, phone, address, category, is_verified_by_committee, created_at')
                 .eq('community_id', communityId);
             if (error) throw error;
             return data || [];

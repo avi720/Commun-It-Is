@@ -75,3 +75,24 @@ jobs:
           SUPABASE_SERVICE_KEY: 'fake-test-key'
           FIREBASE_CREDENTIALS: '{"type":"service_account"}'
         run: pytest tests/server -v
+
+  database:
+    name: Database (local Supabase pgTAP)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.122.0
+
+      # Local stack only. Do not pass --linked or a project ref — these tests
+      # must never touch the hosted database.
+      - name: Start local Supabase
+        run: supabase start
+
+      - name: Reset database from migrations
+        run: supabase db reset
+
+      - name: pgTAP
+        run: supabase test db --local

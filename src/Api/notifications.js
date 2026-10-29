@@ -43,7 +43,7 @@ export async function updateToken(token, session = null) {
 export async function getHistory(communityId) {
     const { data, error } = await supabase
         .from('important_notifications')
-        .select('*')
+        .select('id, created_at, community_id, title, body, sender_name, is_emergency')
         .eq('community_id', communityId)
         .order('created_at', { ascending: false });
 

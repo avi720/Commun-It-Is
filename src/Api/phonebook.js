@@ -1,30 +1,26 @@
 import { supabase } from './config';
 
 /**
- * Get contacts from phonebook for a specific community.
+ * Contacts for the caller's active community.
  *
- * Reads from the `phonebook_visible` view rather than the `users` table
- * directly. The view applies `address_visibility` filtering server-side
- * (`SECURITY INVOKER`, see migration profile_tab_v1): if a user set their
- * address to "nobody" or "committee" and the caller doesn't qualify, the
- * address column is NULL in the JSON response — so a hidden address never
- * leaves the database, even to DevTools Network tab.
+ * `get_phonebook()` is security definer and returns only the columns the
+ * phonebook is allowed to show. Address is already filtered inside the
+ * function (everyone / committee / nobody), so a hidden address is never
+ * sent to the browser. Direct `select` on `users` is own-row or committee
+ * only — do not read the phonebook from that table.
  *
- * RLS on the underlying `users` table also constrains which rows are
- * returned (only `visible_on_phonebook = true` peers in the same community,
- * plus the caller's own row, plus everything for committee members).
+ * The RPC also returns the caller and, for committee members, residents who
+ * opted out. This page keeps the previous behaviour: only people who turned
+ * `visible_on_phonebook` on, and only for the community the UI asked for.
  *
- * @param {string} communityId - Community ID to get contacts for
+ * @param {string} communityId - Community the screen is showing
  * @returns {Promise<Array>} Array of contact objects
  */
 export async function getContacts(communityId) {
-    const { data, error } = await supabase
-        .from('phonebook_visible')
-        .select('id, firstName, lastName, phone, city, address, avatar_url')
-        .eq('community_id', communityId)
-        .eq('visible_on_phonebook', true)
-        .order('firstName');
+    const { data, error } = await supabase.rpc('get_phonebook');
 
     if (error) throw error;
-    return data;
+    return (data || []).filter(
+        (row) => row.community_id === communityId && row.visible_on_phonebook
+    );
 }

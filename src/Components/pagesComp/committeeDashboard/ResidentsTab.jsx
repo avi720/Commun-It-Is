@@ -20,7 +20,7 @@ export default function ResidentsTab({ communityId }) {
         queryFn: async () => {
             const { data, error } = await supabase
                 .from('users')
-                .select('*')
+                .select('id, firstName, lastName, age, city, address, phone, email, community_role, is_verified_as_resident, created_at')
                 .eq('community_id', communityId)
                 .order('created_at', { ascending: false });
             if (error) throw error;

@@ -4,7 +4,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 
 from ..config import supabase
-from ..auth import get_current_user_id
+from ..auth import get_committee_community_id, get_current_user_id
 
 
 router = APIRouter(prefix="/api/communities", tags=["communities"])
@@ -16,6 +16,11 @@ class JoinByCodeSchema(BaseModel):
 
 class SwitchActiveSchema(BaseModel):
     community_id: str
+
+
+# Roles a membership row is allowed to copy onto users.community_role.
+# Anything else is treated as a forged membership and rejected.
+_MEMBERSHIP_ROLES = {"resident", "committee"}
 
 
 @router.get("/me")
@@ -142,6 +147,31 @@ def join_by_code(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.get("/active/invite-code")
+def get_active_invite_code(community_id: str = Depends(get_committee_community_id)):
+    """Return the invite code for the caller's active community.
+
+    `invite_code` is not granted to the `authenticated` role, so the
+    committee dashboard cannot read it with supabase-js. This endpoint is
+    the only client path, and it requires a live committee role.
+    """
+    try:
+        res = (
+            supabase.table("communities")
+            .select("invite_code")
+            .eq("id", community_id)
+            .execute()
+        )
+        if not res.data or not res.data[0].get("invite_code"):
+            raise HTTPException(status_code=404, detail="Community not found")
+        return {"invite_code": res.data[0]["invite_code"]}
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error loading invite code: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.put("/active")
 def switch_active(
     payload: SwitchActiveSchema,
@@ -165,7 +195,13 @@ def switch_active(
                 detail="You are not a member of that community",
             )
 
-        role = membership.data[0]["role"]
+        # Role comes from the membership row, never from the request. Client
+        # inserts into user_communities are revoked; this check is what stops
+        # a caller from activating a community they never joined.
+        role = membership.data[0].get("role")
+        if role not in _MEMBERSHIP_ROLES:
+            raise HTTPException(status_code=403, detail="Invalid membership")
+
         supabase.table("users").update({
             "community_id": payload.community_id,
             "community_role": role,

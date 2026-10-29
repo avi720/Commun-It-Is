@@ -47,7 +47,7 @@ def get_posts(
         # relationship isn't discoverable and the embed errors out.
         query = (
             supabase.table("posts")
-            .select("*")
+            .select("id, created_at, user_id, content, image_url, is_committee, community_id")
             .eq("community_id", community_id)
         )
         if author_id:

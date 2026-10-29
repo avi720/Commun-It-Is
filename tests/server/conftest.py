@@ -28,6 +28,7 @@ def mock_supabase(monkeypatch):
         "src.server.routes.rides",
         "src.server.routes.posts",
         "src.server.routes.notifications",
+        "src.server.routes.communities",
     ):
         try:
             __import__(module_path)

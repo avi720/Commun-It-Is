@@ -18,9 +18,12 @@ a feature; this file only holds what every task needs.
 | Backend locally | `uvicorn src.server.main:app --reload --port 8000` (after `pip install -r requirements.txt`) |
 | Lint / build / frontend tests | `npm run lint`, `npm run build`, `npm test` (Vitest) |
 | Backend tests | `pytest tests/server -v` (deps in `requirements-dev.txt`) |
+| Database tests | `supabase start`, then `supabase db reset`, then `supabase test db --local` |
 
-CI ([.github/workflows/ci.yml](.github/workflows/ci.yml)) runs all of the above on Node 22 and
-Python 3.13, plus `npm audit --audit-level=high`. Run the same set before pushing.
+CI ([.github/workflows/ci.yml](.github/workflows/ci.yml)) runs lint, build, vitest, pytest, and
+the pgTAP suite on Node 22 and Python 3.13, plus `npm audit --audit-level=high`. The database
+job uses a local Supabase stack only — do not `supabase link` or `db push` from CI or from an
+agent. Run the same set before pushing.
 
 ## Layout
 
@@ -34,11 +37,15 @@ Python 3.13, plus `npm audit --audit-level=high`. Run the same set before pushin
 ## Two data paths — the one thing to remember
 
 The client reaches Supabase two ways. Through `src/Api` → FastAPI, the token is re-verified on
-the server (posts, rides, notification send, FCM token, self user update/delete). Through
-supabase-js directly, **Row-Level Security is the only guard** (phonebook, communities, notification
-history, `CommitteeDashboard`, onboarding `users.createProfile`). New feature that needs role
-checks or server-side logic → FastAPI. Plain read of community-visible data → direct, only after
+the server (posts, rides, notification send, FCM token in `user_devices`, self user update/delete,
+community invite code, active-community switch). Through supabase-js directly, **Row-Level
+Security is the only guard** (communities list, notification history, `CommitteeDashboard` reads,
+onboarding `users.createProfile`). The phonebook is `rpc('get_phonebook')`, not a `select` on
+`users`. Invite codes are not a direct column — `CommunitySettingsTab` loads them from
+`GET /api/communities/active/invite-code` (committee only). New feature that needs role checks
+or server-side logic → FastAPI. Plain read of community-visible data → direct, only after
 confirming an RLS policy covers it ([docs/RLS-AUDIT.md](docs/RLS-AUDIT.md)). When unsure, FastAPI.
+Do not add `select *` on a direct query; name the columns.
 
 ## Environment variables
 

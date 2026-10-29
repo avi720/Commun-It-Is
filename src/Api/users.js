@@ -2,6 +2,31 @@ import { supabase, API_URL, getAuthHeaders } from './config';
 
 const AVATAR_BUCKET = 'avatars';
 
+// Onboarding writes straight to public.users under the caller's RLS policy.
+// Anything outside this list (role, verification, email, community) is ignored
+// so a tampered form cannot promote the account. Age is coerced to an integer
+// because the column is integer and the form keeps it as a string.
+const PROFILE_FIELDS = ['firstName', 'lastName', 'city', 'address', 'phone', 'age'];
+
+export function pickProfileFields(profileData) {
+    const update = {};
+    if (!profileData || typeof profileData !== 'object') return update;
+    for (const key of PROFILE_FIELDS) {
+        const value = profileData[key];
+        if (value === undefined || value === null || value === '') continue;
+        if (key === 'age') {
+            const age = Number(value);
+            if (!Number.isInteger(age)) {
+                throw new Error('גיל לא תקין');
+            }
+            update.age = age;
+            continue;
+        }
+        update[key] = value;
+    }
+    return update;
+}
+
 /**
  * Create or update user profile directly via Supabase
  * @param {Object} profileData - Profile data to update
@@ -15,7 +40,11 @@ export async function createProfile(profileData) {
         console.error("User not logged in");
         return;
     }
-    const { error } = await supabase.from('users').update(profileData).eq('id', user.id);
+    const update = pickProfileFields(profileData);
+    if (Object.keys(update).length === 0) {
+        throw new Error('שגיאה בשמירת הפרטים');
+    }
+    const { error } = await supabase.from('users').update(update).eq('id', user.id);
     if (error) {
         console.error('Error updating profile:', error.message);
         // זורקים כדי שהקורא (OnboardingPage / ProfileForm) יציג toast.error.
