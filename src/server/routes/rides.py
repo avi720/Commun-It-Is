@@ -35,7 +35,7 @@ def get_rides(
 
         query = (
             supabase.table("rides")
-            .select("*")
+            .select("id, driver_name, location, destination, departure_time, seats, created_date, user_id, community_id, type")
             .eq("community_id", community_id)
         )
         if user_id:

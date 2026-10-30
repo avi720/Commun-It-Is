@@ -1,6 +1,6 @@
 # Commun-It-Is — Architecture
 
-> **Last updated:** 2026-06-09 (Batch 1 of the TECH-DEBT remediation pass).
+> **Last updated:** 2026-10-29 (RLS audit, issue #10).
 > **Audience:** future-you on another machine + any new contributor.
 > **Scope:** how the app is wired, why it's wired that way, and the conventions you should keep.
 
@@ -13,7 +13,7 @@ This document is *short on purpose*. It describes the live system, not an ideali
 - **Frontend:** React 19 + Vite 7 + Tailwind 3 + shadcn-style UI primitives, deployed to Vercel as a static SPA. Wrapped with Capacitor 8 for the Android store build.
 - **Backend:** A single FastAPI app served from one Vercel Serverless Function (`api/index.py` → `src/server/main.py`).
 - **Data + Auth:** Supabase (Postgres + GoTrue). The app reaches Supabase **two different ways** — see *Two data paths* below.
-- **Push:** Firebase Cloud Messaging via the Capacitor `@capacitor/push-notifications` plugin; the FCM token is stored on the user row and used by the backend's `firebase-admin` to push committee announcements.
+- **Push:** Firebase Cloud Messaging via the Capacitor `@capacitor/push-notifications` plugin. The FCM token is stored in `user_devices` (one row per device) and read from there by the backend's `firebase-admin` sender. It is not a column on `users`.
 - **State on the client:** React Query for data; `AppContext` for the cross-cutting `user` / `session` / `isAuthenticated` triplet only.
 
 ---
@@ -33,7 +33,7 @@ The single most surprising thing about this codebase is that the client reaches 
 ```
 
 - **avior → FastAPI path** carries an auth header (`Authorization: Bearer <access_token>`); the FastAPI dependency `get_current_user_id` (and `get_committee_community_id`) re-verifies the token and runs the query as a trusted server. Used by: posts, rides, notification-send, FCM-token update, business approval.
-- **supabase-js direct path** uses the user's anon JWT directly; the only thing standing between a curious client and somebody else's data is **Row-Level Security**. Used by: phonebook contacts, communities (list / join), notification *history*, all reads in `CommitteeDashboard`, and `users.createProfile` during onboarding.
+- **supabase-js direct path** uses the user's JWT directly; the only thing standing between a curious client and somebody else's data is **Row-Level Security** (and, for the phonebook, the `get_phonebook()` function). Used by: phonebook, communities (list / join-by-name), notification *history*, reads in `CommitteeDashboard`, and `users.createProfile` during onboarding. Invite codes are not in that list — committee members load them from FastAPI.
 
 | Resource | Path | Auth model |
 |---|---|---|
@@ -43,14 +43,15 @@ The single most surprising thing about this codebase is that the client reaches 
 | FCM token update | avior → FastAPI | Token verified. |
 | `users.delete` (self) | avior → FastAPI | Token verified; `current_user_id == user_id` enforced. |
 | `users.update` (self) | avior → FastAPI | Token verified; self-update only. |
-| `users.createProfile` (onboarding) | supabase-js direct | RLS required. |
-| `phonebook` reads | supabase-js direct | RLS required. |
-| `communities.getAll` / `joinByName` | supabase-js direct | RLS required. |
-| `important_notifications` history reads | supabase-js direct | RLS required. |
-| `CommitteeDashboard` reads (`businesses`, `users`, `communities`) | supabase-js direct | RLS required. |
-| `CommitteeDashboard` business approval | supabase-js direct | RLS required. |
+| `users.createProfile` (onboarding) | supabase-js direct | RLS plus a client field whitelist. The guard trigger rejects role, verification, and identity columns. |
+| `phonebook` reads | `rpc('get_phonebook')` | Definer function. Returns safe columns and applies `address_visibility`. Do not select the phonebook from `users`. |
+| `communities.getAll` / `joinByName` | supabase-js direct | Signed-in select of `id, name` (and the other public columns). Join is the `join_community_by_name` RPC. |
+| Community invite code | FastAPI `GET /api/communities/active/invite-code` | Committee of the active community only. |
+| `important_notifications` history reads | supabase-js direct | RLS, active community only. |
+| `CommitteeDashboard` reads (`businesses`, `users`, `communities`) | supabase-js direct | Explicit columns. `users` is own-row or committee. `communities` cannot include `invite_code`. |
+| `CommitteeDashboard` business approval | supabase-js direct | RLS. Owners cannot set `is_verified_by_committee`; the guard trigger enforces it. |
 
-The RLS column with "required" is the open question — see `docs/RLS-AUDIT.md` (produced by Batch 3 of the TECH-DEBT pass).
+The direct-path policies are the ones closed in issue #10. Current rules and the production rollout order are in `docs/RLS-AUDIT.md`.
 
 **Rule of thumb for new features:**
 - If the operation needs role enforcement or any logic that should not be in client code → avior → FastAPI.
@@ -114,9 +115,9 @@ The backend is deployed as a single Vercel Serverless Function via `api/index.py
 ## Push notifications
 
 1. Capacitor's `@capacitor/push-notifications` plugin fires `registration` on the device; the listener writes the FCM token to `localStorage`.
-2. `AppContext.loadUserData` reads the stored token after login and sends it to the backend (`avior.notifications.updateToken`).
-3. Committee broadcasts go through `avior.notifications.sendToCommunity` → FastAPI → `firebase-admin` → FCM.
-4. History is read back via supabase-js direct from `important_notifications`.
+2. `AppContext.loadUserData` reads the stored token after login and sends it to the backend (`avior.notifications.updateToken`). FastAPI upserts `user_devices` (`user_id`, `fcm_token`). The token is not stored on `users`.
+3. Committee broadcasts go through `avior.notifications.sendToCommunity` → FastAPI, which loads tokens from `user_devices` and sends them with `firebase-admin`.
+4. History is read back via supabase-js direct from `important_notifications` (explicit columns, active community only).
 
 The Web build does **not** initialise FCM (Capacitor's `isNativePlatform()` gate); push exists only in the Android wrapper.
 
@@ -141,10 +142,10 @@ Loaded by Vite (`VITE_*` prefix → client bundle) or by `os.getenv` in Python. 
 ## Known caveats (the things future-you will trip on)
 
 1. ~~**Stale `community_role`** — `CommitteeRoute` reads the role from the `AppContext` snapshot loaded once at sign-in.~~ **Resolved in Batch 2.** `CommitteeRoute` now runs a React Query (`['me', userId]`, `staleTime: 0`) on every navigation and redirects home if the role isn't `committee`. The FastAPI side still re-checks live as a server-side defence-in-depth.
-2. **Onboarding writes go direct** — `users.createProfile` bypasses FastAPI. If the corresponding RLS policy is missing or wrong, the entire onboarding flow either silently succeeds (no policy → admin-bypass via service role from somewhere else) or silently fails. Audit lives in `docs/RLS-AUDIT.md` (Batch 3).
+2. **Onboarding writes go direct** — `users.createProfile` bypasses FastAPI, but it whitelists `firstName`, `lastName`, `city`, `address`, `phone`, and `age`. RLS plus `guard_privileged_user_columns` reject role, verification, and identity changes. `join_community_by_name` is what attaches the first community, always as an unverified resident. Details in `docs/RLS-AUDIT.md`.
 3. **`alert()` is everywhere** — the app uses native `alert()` / `confirm()` for in-app feedback in many places. Batch 2 of the TECH-DEBT pass migrates these to `sonner` toasts and a shadcn-style `AlertDialog`.
 4. **ARM64 Windows dev machine** — npm packages that ship x64-only `.node` binaries fail to load. Prefer pure-JS or WASM alternatives. (This is why we use Supabase JS instead of Prisma, and `sonner` instead of any toast library with native deps.)
-5. **No CI gate** — `main` auto-deploys to Vercel. Vercel runs `npm run build` before deploy, so a build failure blocks the deploy, but `npm run lint` is local-only. Tracked as TECH-DEBT T5; on hold until an ESLint config exists.
+5. **CI does not block the Vercel deploy** — `.github/workflows/ci.yml` runs lint, build, vitest, pytest, and local Supabase pgTAP (`supabase test db --local`) on pull requests to `main`. Vercel still deploys from `main` on its own. The database job starts a local stack only; it must not be pointed at the hosted project.
 
 ---
 

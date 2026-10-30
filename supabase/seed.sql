@@ -1,0 +1,1 @@
+-- No seed data. pgTAP fixtures live inside supabase/tests and roll back.

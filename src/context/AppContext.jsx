@@ -38,7 +38,7 @@ export function AppProvider({ children }) {
             Sentry.setUser({ id: currentSession.user.id });
             const { data: profile, error } = await supabase
                 .from('users')
-                .select('*')
+                .select('id, email, firstName, lastName, city, address, age, phone, created_at, updated_at, last_sign_in_at, community_id, community_role, is_verified_as_resident, visible_on_phonebook, avatar_url, bio, address_visibility, notify_posts, notify_committee_posts, notify_ride_offers, notify_ride_requests')
                 .eq('id', currentSession.user.id)
                 .single();
 

@@ -90,6 +90,25 @@ export async function switchActive(communityId, session) {
 }
 
 /**
+ * Invite code for the caller's active community. Column privileges hide
+ * `invite_code` from supabase-js, so only this committee-only endpoint
+ * returns it.
+ *
+ * @param {Object} session
+ * @returns {Promise<{ invite_code: string }>}
+ */
+export async function getInviteCode(session) {
+    const res = await fetch(`${API_URL}/communities/active/invite-code`, {
+        headers: getAuthHeaders(session),
+    });
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({ detail: 'Unknown' }));
+        throw new Error(err.detail || 'Failed to load invite code');
+    }
+    return res.json();
+}
+
+/**
  * Leave a community. Blocked server-side if it's the only membership.
  * If the user leaves their active community, the server repoints the
  * active pointer to one of the remaining memberships.
