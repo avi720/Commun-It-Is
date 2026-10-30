@@ -1,12 +1,16 @@
 name: CI
 
-# רץ על כל push ל-main ועל כל PR שמכוון ל-main. Vercel ממילא פורס על push,
+# רץ על כל push ל-main ול-dev, ועל כל PR שמכוון ל-main. Vercel ממילא פורס על push,
 # אז ה-CI הזה הוא רשת בטיחות נוספת ולא חוסם הפצה — אם הוא נכשל, יראה ✕ אדום
 # בדף הקומיט, אבל ה-deploy ימשיך. אם תרצה לחסום, אפשר להפעיל branch protection
 # ב-GitHub Settings → Branches.
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+      - dev
+      # So this audit branch's push is tested before it merges to dev.
+      - cursor/deps-audit-issue-12-aa40
   pull_request:
     branches: [main]
 
