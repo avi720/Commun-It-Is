@@ -6,11 +6,7 @@ name: CI
 # ב-GitHub Settings → Branches.
 on:
   push:
-    branches:
-      - main
-      - dev
-      # So this audit branch's push is tested before it merges to dev.
-      - cursor/deps-audit-issue-12-aa40
+    branches: [main, dev]
   pull_request:
     branches: [main]
 
