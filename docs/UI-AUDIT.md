@@ -1,5 +1,6 @@
 # Commun-It-Is — UI/UX Audit & Remediation Plan
 
+> **Last triaged:** 2026-10-31 — docs-only pass for issue #14. Reopened F48 (raw inputs remain). Added F53–F55 for routes/SEO/404 gaps verified in code.
 > **Audit date:** 2026-06-08
 > **Auditor:** Claude (ui-ux-pro-max skill)
 > **App version reviewed:** main branch + production at https://commun-it-is.vercel.app/
@@ -327,10 +328,11 @@ These were noted during the audit but need product decisions before they become 
 
 > Add new findings here as they surface while working through the plan. Same format: `[ ] F##. Title` + Where / Issue / Acceptance.
 
-#### [x] F48. Full migration of raw `<input>` to shadcn `<Input>` primitive
+#### [ ] F48. Full migration of raw `<input>` to shadcn `<Input>` primitive
 - **Where:** `src/Pages/Register/OnboardingPage.jsx` (6 inputs), `src/Pages/PhoneBook.jsx` (search), `src/Pages/Register/ResidentVerificationPending.jsx` (none currently, but the page pattern), `src/Components/pagesComp/onBoarding/CommunitiesList.jsx` (search), `src/Components/pagesComp/committeeDashboard/SendCommitteeMessageModal.jsx` (title + body), and any other surviving raw `<input>` outside auth.
 - **Issue:** Split out of F10. Phase 2 brought LoginPage + RegisterPage raw inputs to visual parity with the shadcn `<Input>` primitive, but every other form in the app still hand-rolls its input markup. This duplicates focus-ring, padding, height, autofill, and dark-surface handling across files, and risks future drift whenever the primitive evolves.
 - **Acceptance:** Every text input in the app uses `<Input>` from `src/Components/ui/input.jsx` (or `<textarea>` for multiline). No raw `<input type="text|email|password|tel|search">` remains in `src/Pages/**` or `src/Components/**` outside the primitive file itself. Visual + interaction parity verified by tabbing through OnboardingPage, PhoneBook, CommunitiesList, and SendCommitteeMessageModal.
+- **Triage 2026-10-31:** Marked done prematurely. Raw `<input>` still exists in `ProfileForm.jsx`, `CreatePostModal.jsx`, `PrivacySection.jsx`, `MyPostsScroll.jsx`, and `MyRidesList.jsx`.
 
 #### [x] F49. Multi-column / desktop-native layouts beyond max-width widening
 - **Where:** App-wide, but specifically: HomePage (feed could pair with a community-sidebar widget at lg+), CommitteeDashboard (tabs and tables, currently mobile-density at any width), empty states (NoRidesMessage, NotificationsHistory empty, FeedPosts empty — all centered alone on huge desktop viewports), Card hover/focus polish.
@@ -346,6 +348,21 @@ These were noted during the audit but need product decisions before they become 
 - **Where:** `src/Components/pagesComp/publicdisplay/RideDetailsModal.jsx:89`.
 - **Issue:** The primary CTA "הצטרף לנסיעה" renders as a button with no `onClick`. Tapping it does nothing. The desired behavior is pending a product decision.
 - **Acceptance:** TBD — owner to define what joining a ride means (e.g., WhatsApp message to driver, in-app request, phone call). Until decided: either remove the button or replace with a placeholder that opens a "בקרוב" tooltip so the UI isn't silently broken.
+
+#### [ ] F53. `/about` and `/privacy` require login
+- **Where:** `src/App.jsx:63-75` — both routes are nested under `ProtectedRoute` + `MainLayout`, not the public auth block.
+- **Issue:** Legal/info pages linked from Settings (`AboutSection.jsx`) are unreachable without a session; store reviewers and shared links expect these URLs to be public.
+- **Acceptance:** `/about` and `/privacy` render without authentication (still RTL/hebrew), while the rest of the app stays protected.
+
+#### [ ] F54. Missing HTML meta, OG tags, favicon, and `robots.txt`
+- **Where:** `index.html` (title only); no `public/favicon.ico` or `public/robots.txt` in the repo.
+- **Issue:** Link previews, browser tab branding, and crawler policy are undefined. PWA install still works but looks generic in shares and search.
+- **Acceptance:** Description + Open Graph/Twitter tags for the community app; favicon/apple-touch-icon assets; `robots.txt` appropriate for a mostly-authenticated SPA.
+
+#### [ ] F55. Unknown routes redirect to login instead of a 404
+- **Where:** `src/App.jsx:78` — `<Route path="*" element={<Navigate to="/login" />} />`.
+- **Issue:** Mistyped URLs and stale bookmarks send anonymous users to login with no "page not found" signal; authenticated users also never see a dedicated 404.
+- **Acceptance:** Public unknown paths show a lightweight 404 (Hebrew copy + link home/login); authenticated unknown paths show 404 inside the shell or an equivalent clear message.
 
 #### [x] F52. Onboarding silently refreshes on duplicate community join instead of informing user
 - **Where:** `src/Pages/Register/OnboardingPage.jsx:72`.

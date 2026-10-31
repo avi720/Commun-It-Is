@@ -1,5 +1,6 @@
 # Commun-It-Is — Tech Debt Audit & Remediation Plan
 
+> **Last triaged:** 2026-10-31 — docs-only pass for issue #14. RLS closure tracked in PR #11 (issue #10); dependency/npm audit in PR #13 (issue #12). New open items: T28–T30 below.
 > **Audit date:** 2026-06-08
 > **Auditor:** Claude (engineering:tech-debt skill)
 > **App version reviewed:** main branch at commit `b9010c4` + production at https://commun-it-is.vercel.app/
@@ -176,7 +177,7 @@ ID convention: `T##` numbered globally across phases. Where a finding was confir
 #### [x] T21. No `npm audit` automation
 - **Where:** No CI step exists.
 - **Issue:** Supply-chain vulnerabilities in transitive deps surface only when the developer remembers to run `npm audit` locally.
-- **Acceptance:** A non-blocking `npm audit --audit-level=high` step in the CI workflow from T5, with results visible on each PR. Verified — a known-vulnerable dep produces a PR comment or a failing check. *(Closed 2026-06-09: attached to the frontend job in `.github/workflows/ci.yml` with `continue-on-error: true` so CVEs in transitive deps surface without breaking deploys. Currently reporting 13 vulnerabilities — 10 high + 3 moderate — to investigate separately.)*
+- **Acceptance:** A non-blocking `npm audit --audit-level=high` step in the CI workflow from T5, with results visible on each PR. Verified — a known-vulnerable dep produces a PR comment or a failing check. *(Closed 2026-06-09: attached to the frontend job in `.github/workflows/ci.yml` with `continue-on-error: true`. Cleared to 0 advisories at `--audit-level=high` in PR #13 / issue #12, 2026-10-30.)*
 
 #### [x] T22. No architecture documentation for the two data paths
 - **Where:** No `docs/ARCHITECTURE.md`.
@@ -194,11 +195,11 @@ ID convention: `T##` numbered globally across phases. Where a finding was confir
 
 These were noted during the audit but need product or security decisions before they become actionable findings:
 
-- **Supabase RLS status** — without seeing the live RLS policies, T7 and T11 cannot be fully scoped. Decision needed: enforce via RLS, via FastAPI, or both?
-- **Backend retention** — React Query + supabase-js could plausibly replace FastAPI entirely (committee guards via RLS, file uploads via Supabase Storage from the client). Is the Python backend worth keeping? Killing it removes a deploy target and a language; keeping it preserves room for server-side image processing, scheduled jobs, and trusted business logic.
-- **Local dev backend** — `run_local_backend.py` and the global note about ARM64 Firebase issues suggest backend dev is awkward on the dev machine. Is the local dev story "frontend only, point at production API", or should the backend run locally too?
-- **Capacitor** — the Android wrapper is configured and the README treats it as a future-store-publish artefact. Is it still planned? If not, removing `@capacitor/*` deps shrinks `node_modules` materially.
-- **Logging policy** — once T19 lands, decide what to send to the error tracker (errors only? warnings? performance events?) and what to retain in plain `console.error` for local debugging.
+- ~~**Supabase RLS status**~~ — **Closed (issue #10, PR #11, 2026-10-29).** Baseline + fix migrations and pgTAP live in-repo; see `docs/RLS-AUDIT.md`.
+- **Backend retention** — React Query + supabase-js could plausibly replace FastAPI entirely (committee guards via RLS, file uploads via Supabase Storage from the client). Is the Python backend worth keeping?
+- **Local dev backend** — `run_local_backend.py` and the ARM64 Firebase note suggest backend dev is awkward on some machines. Is the local dev story "frontend only, point at production API", or should the backend run locally too?
+- **Capacitor** — still on Capacitor 8.x (PR #13). Android wrapper remains a future store artefact; confirm whether store publish is still planned.
+- **Logging policy** — Sentry is live (T19). Still decide default sampling, which warnings to forward, and when to add source maps (T29).
 
 ---
 
@@ -225,3 +226,18 @@ These were noted during the audit but need product or security decisions before 
 - **Where:** `src/Components/mainlayoutComp/Sidebar.jsx:16` had `closeSidebar;` (expression statement, function reference discarded) inside `handleNavigation`. Lines 89 and 98 used raw `navigate(...)` instead of `handleNavigation`, so even after the fix those buttons wouldn't close the sidebar.
 - **Issue:** Tapping a nav item on mobile left the sidebar open over the destination page. User had to tap the X or the backdrop to dismiss. Bug had been live since the sidebar was introduced.
 - **Acceptance:** `closeSidebar()` is called inside `handleNavigation`. All in-app nav buttons (`/`, `/phonebook`, `/notifications`, `/committee-dashboard`, `/settings`) use `handleNavigation`. Bonus: the home button's `isActive` check was wrongly comparing to `'/send-ride'` — corrected to `'/'`.
+
+#### [ ] T28. Lazy route chunks fail silently after deploy (no retry)
+- **Where:** `src/App.jsx` — bare `React.lazy(() => import(...))` for every page; `vite.config.js` manual chunk splits.
+- **Issue:** After a Vercel deploy, users on an old tab still reference previous chunk hashes. A failed dynamic import surfaces as a blank/error state with no automatic reload. Open PR #8 proposes retry-on-failure; not merged as of 2026-10-31.
+- **Acceptance:** Failed lazy imports retry (with backoff) and/or force a one-time full page reload before showing an error. Verified by simulating a stale chunk after deploy.
+
+#### [ ] T29. Sentry source maps not uploaded (missing `SENTRY_AUTH_TOKEN`)
+- **Where:** `@sentry/vite-plugin` is in `package.json` (PR #13) but `vite.config.js` does not register it; `.env.example` lists DSNs only, not `SENTRY_AUTH_TOKEN`.
+- **Issue:** Production frontend stack traces in Sentry stay minified (`docs/SENTRY-GUIDE.md` already notes this). The auth token for upload is not documented in Vercel env vars.
+- **Acceptance:** Vite build uploads source maps to the `commun-it-is-frontend` project; `SENTRY_AUTH_TOKEN` documented in `.env.example` / Vercel; a test issue shows readable file:line in Sentry.
+
+#### [ ] T30. Architecture doc drift (not the trackers themselves)
+- **Where:** `docs/ARCHITECTURE.md` — *Known caveats* still claim native `alert()` is everywhere and that route guards "live in" `App.jsx`; push flow is correct on `user_devices` but older audit text (e.g. T1 issue narrative) still mentions `fcm_token` on `users`.
+- **Issue:** Onboarding readers hit contradictory guidance versus the current code and versus `docs/RLS-AUDIT.md` / AGENTS.md.
+- **Acceptance:** ARCHITECTURE caveats and routing section match extracted guards, toast-based feedback, and FCM storage in `user_devices` only. Historical TECH-DEBT findings may keep past-tense "Confirmed" wording but must not imply current behavior.
