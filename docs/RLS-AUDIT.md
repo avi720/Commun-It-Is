@@ -1,7 +1,8 @@
 # Supabase RLS Audit
 
+> **Last triaged:** 2026-10-31 — issue #14. Findings G1–G7 and G9 remain closed via issue #10 / PR #11; pgTAP + CI database job unchanged. Ops reminder: enable leaked-password protection in the Supabase dashboard (see Rollout).
 > **First pass:** 2026-06-09, read-only `pg_policies` against project `crhhgcisokrjehnyviya`. That pass marked every direct-path table healthy. It was wrong — the expressions were copied, but they were not executed as `anon` or `authenticated`.
-> **Closed:** 2026-10-29, issue #10. The production shape is the baseline migration. The fixes are the two migrations after it. Proof is `supabase/tests/rls_issue10_test.sql` on a local Supabase stack (`supabase test db --local`). Nothing here was applied to the hosted database.
+> **Closed:** 2026-10-29, issue #10 (PR #11). The production shape is the baseline migration. The fixes are the two migrations after it. Proof is `supabase/tests/rls_issue10_test.sql` on a local Supabase stack (`supabase test db --local`). Nothing here was applied to the hosted database.
 
 ## What was wrong
 
@@ -31,7 +32,7 @@ G8 (`important_notifications`) already scoped rows correctly. Migration 2 tighte
 | `businesses` | members of the community, owners | Owners cannot verify or move a business. Committee can verify. |
 | `important_notifications` | active community | Committee insert only. |
 | `transport_schedules` | active community | Committee of that community manages rows. |
-| `user_devices` | the device owner (select/insert) | FCM tokens are written by FastAPI, not by a column on `users`. |
+| `user_devices` | service role (FastAPI upsert); owner may select/insert via RLS but the app does not use that path | FCM tokens live here only — `PUT` token handler upserts with the service role. Not a column on `users`. `anon` grants dropped in the issue #10 close migration. |
 | `posts`, `rides` | service role | No policies. Direct supabase-js gets nothing. |
 
 `join_community_by_name` is still the onboarding RPC. It only works when `users.community_id` is null, forces `resident` + unverified, and inserts the membership. A second call returns "already assigned".
