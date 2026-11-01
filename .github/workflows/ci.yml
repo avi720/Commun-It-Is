@@ -7,7 +7,7 @@ on:
   push:
     branches: [main, dev]
   pull_request:
-    branches: [main]
+    branches: [main, dev]
 
 # מבטל ריצות ישנות של אותו branch כדי לא להציף את ה-queue
 concurrency:
