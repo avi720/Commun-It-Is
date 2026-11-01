@@ -11,25 +11,36 @@ import CommitteeRoute from './Components/routes/CommitteeRoute';
 import ProtectedRoute from './Components/routes/ProtectedRoute';
 import OnboardingRoute from './Components/routes/OnboardingRoute';
 
-// טעינה עצלה (lazy) של הדפים - כל דף נטען רק כשנכנסים אליו,
-// מה שמקטין משמעותית את החבילה הראשונית ואת זמן הטעינה הראשון.
-const PublicDisplay = lazy(() => import('./Pages/PublicDisplay'));
-const SendRide = lazy(() => import('./Pages/SendRide'));
-const LoginPage = lazy(() => import('./Pages/LoginPage'));
-const SettingsPage = lazy(() => import('./Pages/SettingsPage'));
-const HomePage = lazy(() => import('./Pages/HomePage'));
-const RegisterPage = lazy(() => import('./Pages/Register/RegisterPage'));
-const OnboardingPage = lazy(() => import('./Pages/Register/OnboardingPage'));
-const VerificationSuccess = lazy(() => import('./Pages/Register/VerificationSuccess'));
-const ResidentVerificationPending = lazy(() => import('./Pages/Register/ResidentVerificationPending'));
-const CommitteeDashboard = lazy(() => import('./Pages/CommitteeDashboard'));
-const PhoneBook = lazy(() => import('./Pages/PhoneBook'));
-const NotificationsHistory = lazy(() => import('./Pages/NotificationsHistory'));
-const ProfilePage = lazy(() => import('./Pages/ProfilePage'));
-const EditProfilePage = lazy(() => import('./Pages/EditProfilePage'));
-const RideRequestsPage = lazy(() => import('./Pages/RideRequestsPage'));
-const AboutPage = lazy(() => import('./Pages/AboutPage'));
-const PrivacyPolicyPage = lazy(() => import('./Pages/PrivacyPolicyPage'));
+function lazyWithRetry(importFn) {
+  return lazy(() =>
+    importFn().catch(() =>
+      new Promise(resolve => setTimeout(resolve, 1500))
+        .then(() => importFn())
+        .catch(() => {
+          window.location.reload();
+          return new Promise(() => {});
+        })
+    )
+  );
+}
+
+const PublicDisplay = lazyWithRetry(() => import('./Pages/PublicDisplay'));
+const SendRide = lazyWithRetry(() => import('./Pages/SendRide'));
+const LoginPage = lazyWithRetry(() => import('./Pages/LoginPage'));
+const SettingsPage = lazyWithRetry(() => import('./Pages/SettingsPage'));
+const HomePage = lazyWithRetry(() => import('./Pages/HomePage'));
+const RegisterPage = lazyWithRetry(() => import('./Pages/Register/RegisterPage'));
+const OnboardingPage = lazyWithRetry(() => import('./Pages/Register/OnboardingPage'));
+const VerificationSuccess = lazyWithRetry(() => import('./Pages/Register/VerificationSuccess'));
+const ResidentVerificationPending = lazyWithRetry(() => import('./Pages/Register/ResidentVerificationPending'));
+const CommitteeDashboard = lazyWithRetry(() => import('./Pages/CommitteeDashboard'));
+const PhoneBook = lazyWithRetry(() => import('./Pages/PhoneBook'));
+const NotificationsHistory = lazyWithRetry(() => import('./Pages/NotificationsHistory'));
+const ProfilePage = lazyWithRetry(() => import('./Pages/ProfilePage'));
+const EditProfilePage = lazyWithRetry(() => import('./Pages/EditProfilePage'));
+const RideRequestsPage = lazyWithRetry(() => import('./Pages/RideRequestsPage'));
+const AboutPage = lazyWithRetry(() => import('./Pages/AboutPage'));
+const PrivacyPolicyPage = lazyWithRetry(() => import('./Pages/PrivacyPolicyPage'));
 
 // מסך טעינה אחיד שמוצג בזמן שדף עצל נטען או בזמן טעינת הסשן הראשונית
 const PageLoader = () => (
