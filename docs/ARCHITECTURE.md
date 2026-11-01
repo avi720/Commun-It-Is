@@ -145,7 +145,7 @@ Loaded by Vite (`VITE_*` prefix → client bundle) or by `os.getenv` in Python. 
 2. **Onboarding writes go direct** — `users.createProfile` bypasses FastAPI, but it whitelists `firstName`, `lastName`, `city`, `address`, `phone`, and `age`. RLS plus `guard_privileged_user_columns` reject role, verification, and identity changes. `join_community_by_name` is what attaches the first community, always as an unverified resident. Details in `docs/RLS-AUDIT.md`.
 3. **`alert()` is everywhere** — the app uses native `alert()` / `confirm()` for in-app feedback in many places. Batch 2 of the TECH-DEBT pass migrates these to `sonner` toasts and a shadcn-style `AlertDialog`.
 4. **ARM64 Windows dev machine** — npm packages that ship x64-only `.node` binaries fail to load. Prefer pure-JS or WASM alternatives. (This is why we use Supabase JS instead of Prisma, and `sonner` instead of any toast library with native deps.)
-5. **CI does not block the Vercel deploy** — `.github/workflows/ci.yml` runs lint, build, vitest, pytest, and local Supabase pgTAP (`supabase test db --local`) on pull requests to `main`. Vercel still deploys from `main` on its own. The database job starts a local stack only; it must not be pointed at the hosted project.
+5. **Production deploy gate** — `.github/workflows/ci.yml` runs lint, build, vitest, pytest, and local Supabase pgTAP (`supabase test db --local`) on pushes to `main`/`dev` and on PRs to `main`. Production promotion is gated by Vercel Deployment Checks (GitHub) once configured in the dashboard; see [`docs/DEPLOY-GATE.md`](DEPLOY-GATE.md). Preview deploys are not gated. The database job uses a local stack only and must not be pointed at the hosted project.
 
 ---
 
