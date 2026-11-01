@@ -1,9 +1,8 @@
 name: CI
 
-# רץ על כל push ל-main ול-dev, ועל כל PR שמכוון ל-main. Vercel ממילא פורס על push,
-# אז ה-CI הזה הוא רשת בטיחות נוספת ולא חוסם הפצה — אם הוא נכשל, יראה ✕ אדום
-# בדף הקומיט, אבל ה-deploy ימשיך. אם תרצה לחסום, אפשר להפעיל branch protection
-# ב-GitHub Settings → Branches.
+# Runs on push to main/dev and on PRs targeting main. Job `name:` values are wired into
+# Vercel Deployment Checks (GitHub) to hold production promotion until all three pass;
+# see docs/DEPLOY-GATE.md for the one-time dashboard setup.
 on:
   push:
     branches: [main, dev]
