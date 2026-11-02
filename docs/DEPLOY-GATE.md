@@ -33,6 +33,10 @@ To ship despite a stuck check, use **Force Promote** on the deployment (document
 
 Renaming CI jobs requires updating the same names in Vercel Deployment Checks.
 
+### Docs-only commits and stuck promotions
+
+`vercel.json` `ignoreCommand` skips builds for commits that change only `*.md`, `docs/` or `.claude/`, so such a commit on `main` has no deployment to promote. If the last code commit's checks failed or were cancelled, pushing a docs-only fix does not move production: re-run that code commit's CI (or push a code change), or use **Force Promote**. CI never cancels in-progress runs on `main` for this reason.
+
 ### Alternatives considered
 
 | Option | Why not chosen |

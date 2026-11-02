@@ -84,7 +84,7 @@ ID convention: `T##` numbered globally across phases. Where a finding was confir
 #### [x] T5. No CI gate on `main` — Vercel auto-deploys unchecked code
 - **Where:** No `.github/workflows/` directory exists.
 - **Issue:** push to `main` triggers a Vercel deploy with zero pre-flight checks. Lint, type-check, and build all currently rely on the developer remembering to run them locally.
-- **Acceptance:** `.github/workflows/ci.yml` runs `npm ci`, `npm run lint`, and `npm run build` on every push and PR. Branch protection on `main` requires the workflow to pass. Verified by intentionally breaking a file and seeing the workflow fail. *(Closed 2026-06-09: workflow added with two jobs — frontend (lint + build + vitest + npm audit non-blocking) and backend (pytest). ESLint 9 flat config tuned for codebase patterns: `no-alert` blocks T9 regressions, `no-console` blocks T10, `react/jsx-no-comment-textnodes` blocks T12, `no-unused-expressions` blocks T25. Baseline lint pass: 0 errors, 8 informational warnings. Branch protection not enabled per single-user proprietary project preference; CI reports status on commits but doesn't block deploys.)*
+- **Acceptance:** `.github/workflows/ci.yml` runs `npm ci`, `npm run lint`, and `npm run build` on every push and PR. Branch protection on `main` requires the workflow to pass. Verified by intentionally breaking a file and seeing the workflow fail. *(Closed 2026-06-09: workflow added with two jobs — frontend (lint + build + vitest + npm audit non-blocking) and backend (pytest). ESLint 9 flat config tuned for codebase patterns: `no-alert` blocks T9 regressions, `no-console` blocks T10, `react/jsx-no-comment-textnodes` blocks T12, `no-unused-expressions` blocks T25. Baseline lint pass: 0 errors, 8 informational warnings. Branch protection not enabled per single-user proprietary project preference; CI reports status on commits but doesn't block deploys. Update 2026-11-01: production promotion is gated by Vercel Deployment Checks (issue #16), active once the dashboard step in `docs/DEPLOY-GATE.md` is done.)*
 
 #### [x] T6. `docs/UI-AUDIT.md` is untracked in git
 - **Where:** `docs/UI-AUDIT.md` (only on the working tree per `git status` at session start).
@@ -233,7 +233,7 @@ These were noted during the audit but need product or security decisions before 
 - **Acceptance:** Failed lazy imports retry (with backoff) and/or force a one-time full page reload before showing an error. Verified by simulating a stale chunk after deploy.
 
 #### [ ] T29. Sentry source maps not uploaded (missing `SENTRY_AUTH_TOKEN`)
-- **Where:** `@sentry/vite-plugin` is in `package.json` (PR #13) but `vite.config.js` does not register it; `.env.example` lists DSNs only, not `SENTRY_AUTH_TOKEN`.
+- **Where:** `@sentry/vite-plugin` is in `package.json` (bumped, not added, in PR #13) but `vite.config.js` does not register it; `.env.example` lists DSNs only, not `SENTRY_AUTH_TOKEN`.
 - **Issue:** Production frontend stack traces in Sentry stay minified (`docs/SENTRY-GUIDE.md` already notes this). The auth token for upload is not documented in Vercel env vars.
 - **Acceptance:** Vite build uploads source maps to the `commun-it-is-frontend` project; `SENTRY_AUTH_TOKEN` documented in `.env.example` / Vercel; a test issue shows readable file:line in Sentry.
 

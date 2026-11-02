@@ -27,8 +27,9 @@ a feature; this file only holds what every task needs.
 
 CI ([.github/workflows/ci.yml](.github/workflows/ci.yml)) runs lint, build, vitest, pytest, and
 the pgTAP suite on Node 22 and Python 3.13, plus `npm audit --audit-level=high` (non-blocking).
-Production promotion on `main` is gated by Vercel Deployment Checks once configured; see
-[docs/DEPLOY-GATE.md](docs/DEPLOY-GATE.md). The database job uses a local Supabase stack only —
+Production promotion on `main` is gated by Vercel Deployment Checks only once the dashboard
+step in [docs/DEPLOY-GATE.md](docs/DEPLOY-GATE.md) is done; until then a red CI does not stop
+the deploy. The database job uses a local Supabase stack only —
 do not `supabase link` or `db push` from CI or from an agent. Run the same set before pushing.
 
 Local gotchas:
