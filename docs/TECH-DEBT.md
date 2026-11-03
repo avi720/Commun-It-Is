@@ -177,7 +177,7 @@ ID convention: `T##` numbered globally across phases. Where a finding was confir
 #### [x] T21. No `npm audit` automation
 - **Where:** No CI step exists.
 - **Issue:** Supply-chain vulnerabilities in transitive deps surface only when the developer remembers to run `npm audit` locally.
-- **Acceptance:** A non-blocking `npm audit --audit-level=high` step in the CI workflow from T5, with results visible on each PR. Verified — a known-vulnerable dep produces a PR comment or a failing check. *(Closed 2026-06-09: attached to the frontend job in `.github/workflows/ci.yml` with `continue-on-error: true`. Cleared to 0 advisories at `--audit-level=high` in PR #13 / issue #12, 2026-10-30.)*
+- **Acceptance:** A non-blocking `npm audit --audit-level=high` step in the CI workflow from T5, with results visible on each PR. Verified — a known-vulnerable dep produces a PR comment or a failing check. *(Closed 2026-06-09: attached to the frontend job in `.github/workflows/ci.yml` with `continue-on-error: true`. Cleared to 0 advisories at `--audit-level=high` in PR #13 / issue #12, 2026-10-30. Update 2026-11-03: moved to its own blocking `audit` job, production deps only (`npm audit --omit=dev`, `pip-audit -r requirements.txt`); not a Vercel Deployment Check.)*
 
 #### [x] T22. No architecture documentation for the two data paths
 - **Where:** No `docs/ARCHITECTURE.md`.
