@@ -26,10 +26,14 @@ a feature; this file only holds what every task needs.
 | Single backend test | `pytest tests/server/test_rides.py::<test_name> -v` |
 
 CI ([.github/workflows/ci.yml](.github/workflows/ci.yml)) runs lint, build, vitest, pytest, and
-the pgTAP suite on Node 22 and Python 3.13, plus `npm audit --audit-level=high` (non-blocking). The
-database job uses a local Supabase stack only — do not `supabase link` or `db push` from CI or from
-an agent. Run the same set before pushing; CI does not block the Vercel deploy, which happens on
-every push to `main`.
+the pgTAP suite on Node from `.nvmrc` (24, matching Vercel and `engines.node`) and Python 3.13,
+plus a separate `Dependency audit (prod deps)` job (`npm audit --omit=dev --audit-level=high`,
+`pip-audit -r requirements.txt`). It runs on PRs to `main`/`dev` and on push to `main` only —
+a push to a branch with no open PR gets no CI.
+Production promotion on `main` is gated by Vercel Deployment Checks only once the dashboard
+step in [docs/DEPLOY-GATE.md](docs/DEPLOY-GATE.md) is done; until then a red CI does not stop
+the deploy. The database job uses a local Supabase stack only —
+do not `supabase link` or `db push` from CI or from an agent. Run the same set before pushing.
 
 Local gotchas:
 

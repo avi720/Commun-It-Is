@@ -4,6 +4,6 @@
 # Vercel installs only the root requirements.txt — these stay separate so the
 # serverless function bundle stays small.
 
-pytest==8.3.4
-pytest-asyncio==0.25.0
+pytest==9.2.0
+pytest-asyncio==1.4.1
 httpx==0.28.1
