@@ -3,22 +3,25 @@ name: CI
 # Runs on PRs targeting main/dev and on push to main. Push to dev is not a trigger:
 # dev commits arrive through PRs, so it would run every commit twice. Price: a push
 # to a branch with no open PR runs no CI. Job `name:` values are wired into
-# Vercel Deployment Checks (GitHub) to hold production promotion until all three pass;
-# see docs/DEPLOY-GATE.md for the one-time dashboard setup.
+# Vercel Deployment Checks (GitHub) to hold production promotion until the three test
+# jobs pass (frontend, backend, database; not the audit job); see docs/DEPLOY-GATE.md
+# for the one-time dashboard setup.
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main, dev]
 
-# מבטל ריצות ישנות של אותו branch כדי לא להציף את ה-queue
 permissions:
   contents: read
 
+# מבטל ריצות ישנות של אותו branch כדי לא להציף את ה-queue
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
   # Never cancel on main: a cancelled run leaves that commit's production deployment
-  # unpromoted under Vercel Deployment Checks (docs/DEPLOY-GATE.md).
+  # unpromoted under Vercel Deployment Checks (docs/DEPLOY-GATE.md). A shared group
+  # still drops a queued run when a newer one queues, even with cancel-in-progress
+  # off, so each main commit gets its own group.
+  group: ${{ github.workflow }}-${{ github.ref == 'refs/heads/main' && github.sha || github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
